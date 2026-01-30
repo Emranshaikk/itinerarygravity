@@ -1,0 +1,27 @@
+{
+  "name": "itinerarygravity",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "^6.37.0",
+    "@clerk/themes": "^2.4.51",
+    "@stripe/stripe-js": "^8.7.0",
+    "@supabase/supabase-js": "^2.93.3",
+    "lucide-react": "^0.563.0",
+    "next": "latest",
+    "razorpay": "^2.9.6",
+    "react": "latest",
+    "react-dom": "latest",
+    "stripe": "^20.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.10",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "5.9.3"
+  }
+}
