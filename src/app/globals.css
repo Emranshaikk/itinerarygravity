@@ -276,3 +276,123 @@ button {
 .print-only-show {
   display: none !important;
 }
+
+/* ========================================
+   MOBILE RESPONSIVE STYLES
+   ======================================== */
+
+/* Mobile Navigation */
+@media (max-width: 768px) {
+  .hidden-mobile {
+    display: none !important;
+  }
+
+  nav button[aria-label="Toggle menu"] {
+    display: block !important;
+  }
+
+  /* Logo/Brand sizing */
+  .text-gradient {
+    font-size: 1.2rem !important;
+  }
+
+  /* Container padding */
+  .container {
+    padding: 0 16px !important;
+  }
+
+  /* Typography scaling */
+  h1 {
+    font-size: 2rem !important;
+    line-height: 1.2 !important;
+  }
+
+  h2 {
+    font-size: 1.75rem !important;
+  }
+
+  h3 {
+    font-size: 1.25rem !important;
+  }
+
+  /* Hero sections */
+  section {
+    padding: 60px 0 !important;
+  }
+
+  /* Grid layouts - stack on mobile */
+  [style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Flex layouts - wrap on mobile */
+  [style*="display: flex"][style*="gap"] {
+    flex-wrap: wrap !important;
+  }
+
+  /* Buttons */
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Cards */
+  .card {
+    padding: 20px !important;
+  }
+
+  /* Badge sizing */
+  .badge {
+    font-size: 0.7rem !important;
+    padding: 3px 10px !important;
+  }
+
+  /* Form inputs */
+  .form-input,
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+    /* Prevents zoom on iOS */
+  }
+}
+
+/* Tablet and below */
+@media (max-width: 1024px) {
+  .container {
+    max-width: 100%;
+    padding: 0 20px;
+  }
+
+  /* Adjust grid for tablets */
+  [style*="gridTemplateColumns: '2fr 1fr'"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+
+  /* Even smaller typography */
+  h1 {
+    font-size: 1.75rem !important;
+  }
+
+  h2 {
+    font-size: 1.5rem !important;
+  }
+
+  /* Tighter spacing */
+  section {
+    padding: 40px 0 !important;
+  }
+
+  .card {
+    padding: 16px !important;
+  }
+
+  /* Stack everything */
+  [style*="display: 'flex'"] {
+    flex-direction: column !important;
+  }
+}

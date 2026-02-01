@@ -23,23 +23,41 @@ export default function CreatorsPage() {
                     <span className="badge" style={{ background: 'var(--surface)', border: '1px solid var(--border)', marginBottom: '24px' }}>
                         Now Open for Beta
                     </span>
-                    <h1 style={{ fontSize: '4.5rem', fontWeight: 800, marginBottom: '24px', lineHeight: 1.1 }}>
+                    <h1 style={{
+                        fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
+                        fontWeight: 800,
+                        marginBottom: '24px',
+                        lineHeight: 1.1
+                    }}>
                         Turn Your Travels into <br />
                         <span className="text-gradient">Passive Income</span>
                     </h1>
-                    <p style={{ fontSize: '1.25rem', color: 'var(--gray-400)', maxWidth: '700px', margin: '0 auto 48px', lineHeight: '1.8' }}>
+                    <p style={{
+                        fontSize: 'clamp(1rem, 3vw, 1.25rem)',
+                        color: 'var(--gray-400)',
+                        maxWidth: '700px',
+                        margin: '0 auto 48px',
+                        lineHeight: '1.8',
+                        padding: '0 20px'
+                    }}>
                         Your followers want to know how you travel. Stop sending free recommendations and start selling verified, high-quality itineraries.
                     </p>
-                    <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+                    <div style={{
+                        display: 'flex',
+                        gap: '16px',
+                        justifyContent: 'center',
+                        flexWrap: 'wrap',
+                        padding: '0 20px'
+                    }}>
                         <Link
                             href="/signup"
                             onClick={handleCreatorSignup}
                             className="btn btn-primary"
-                            style={{ padding: '16px 40px', fontSize: '1.1rem' }}
+                            style={{ padding: '16px 40px', fontSize: '1.1rem', minWidth: '200px' }}
                         >
                             Start Creating Now
                         </Link>
-                        <Link href="#how-it-works" className="btn btn-outline" style={{ padding: '16px 40px', fontSize: '1.1rem' }}>
+                        <Link href="#how-it-works" className="btn btn-outline" style={{ padding: '16px 40px', fontSize: '1.1rem', minWidth: '200px' }}>
                             How it Works
                         </Link>
                     </div>
@@ -94,14 +112,14 @@ export default function CreatorsPage() {
                         maxWidth: '900px',
                         margin: '0 auto',
                         display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                         gap: '60px',
-                        padding: '60px',
+                        padding: 'clamp(30px, 5vw, 60px)',
                         alignItems: 'center'
                     }}>
                         <div>
-                            <h2 style={{ fontSize: '2.5rem', marginBottom: '24px' }}>The Verified Creator</h2>
-                            <p style={{ color: 'var(--gray-400)', marginBottom: '32px', fontSize: '1.1rem', lineHeight: '1.6' }}>
+                            <h2 style={{ fontSize: 'clamp(1.75rem, 5vw, 2.5rem)', marginBottom: '24px' }}>The Verified Creator</h2>
+                            <p style={{ color: 'var(--gray-400)', marginBottom: '32px', fontSize: 'clamp(1rem, 2.5vw, 1.1rem)', lineHeight: '1.6' }}>
                                 For just $9.99/mo, unlock the ability to sell itineraries and get a verified badge on your profile.
                             </p>
                             <Link href="/signup" onClick={handleCreatorSignup} className="btn btn-primary" style={{ width: '100%' }}>

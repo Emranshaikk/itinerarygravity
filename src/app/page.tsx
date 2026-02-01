@@ -7,12 +7,13 @@ export default function Home() {
       {/* Hero Section */}
       <section style={{
         position: 'relative',
-        height: '80vh',
+        minHeight: '80vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        padding: '40px 20px'
       }}>
         {/* Abstract Background Elements */}
         <div style={{
@@ -40,7 +41,7 @@ export default function Home() {
 
         <div className="container">
           <h1 style={{
-            fontSize: '4.5rem',
+            fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
             fontWeight: 800,
             marginBottom: '24px',
             lineHeight: 1.05,
@@ -52,21 +53,28 @@ export default function Home() {
             <span style={{ color: 'var(--foreground)', WebkitTextFillColor: 'initial' }}>Favorite Creator</span>
           </h1>
           <p style={{
-            fontSize: '1.25rem',
+            fontSize: 'clamp(1rem, 3vw, 1.25rem)',
             color: 'var(--gray-400)',
             marginBottom: '40px',
             maxWidth: '600px',
             marginLeft: 'auto',
-            marginRight: 'auto'
+            marginRight: 'auto',
+            padding: '0 20px'
           }}>
             Access detailed, verified itineraries from top travel influencers.
             Experience the world through their eyes, with curated tips for hotels, food, and hidden gems.
           </p>
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-            <Link href="/explore" className="btn btn-primary" style={{ padding: '16px 40px', fontSize: '1.1rem' }}>
+          <div style={{
+            display: 'flex',
+            gap: '16px',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            padding: '0 20px'
+          }}>
+            <Link href="/explore" className="btn btn-primary" style={{ padding: '16px 40px', fontSize: '1.1rem', minWidth: '200px' }}>
               Explore Itineraries
             </Link>
-            <Link href="/creators" className="btn btn-outline" style={{ padding: '16px 40px', fontSize: '1.1rem' }}>
+            <Link href="/creators" className="btn btn-outline" style={{ padding: '16px 40px', fontSize: '1.1rem', minWidth: '200px' }}>
               Become a Creator
             </Link>
           </div>
