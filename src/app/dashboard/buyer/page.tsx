@@ -64,9 +64,27 @@ export default function BuyerDashboard() {
 
     return (
         <div className="container" style={{ padding: '40px 0' }}>
-            <header style={{ marginBottom: '48px' }}>
-                <h1 className="text-gradient" style={{ fontSize: '2.5rem', marginBottom: '8px' }}>My Library</h1>
-                <p style={{ color: 'var(--gray-400)' }}>Your personal collection of world-class travel guides.</p>
+            <header style={{ marginBottom: '48px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <div>
+                    <h1 className="text-gradient" style={{ fontSize: '2.5rem', marginBottom: '8px' }}>My Library</h1>
+                    <p style={{ color: 'var(--gray-400)' }}>Your personal collection of world-class travel guides.</p>
+                </div>
+                <button
+                    onClick={async () => {
+                        if (!confirm("Switch to Creator Mode?")) return;
+                        try {
+                            const response = await fetch('/api/profiles', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ role: 'influencer' })
+                            });
+                            if (response.ok) window.location.href = '/dashboard/influencer';
+                        } catch (e) { alert("Failed to switch role"); }
+                    }}
+                    className="btn btn-outline text-xs py-2 px-3"
+                >
+                    Switch to Creator View
+                </button>
             </header>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px' }}>

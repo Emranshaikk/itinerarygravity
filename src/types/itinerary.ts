@@ -11,7 +11,10 @@ export interface ItineraryContent {
         brandLogo?: string; // URL
         version?: string;
         lastUpdated?: string;
-        tagline?: string; // "Curated by a local expert"
+        tagline?: string;
+        // Listing Details (Used for platform)
+        price?: number;
+        currency?: string;
     };
 
     // 2. Before You Travel
@@ -175,6 +178,8 @@ export const initialItineraryContent: ItineraryContent = {
         duration: "",
         bestTimeToVisit: "",
         targetAudience: "",
+        price: 0,
+        currency: "USD",
     },
     preTrip: {
         flightGuide: { bestAirports: [], arrivalDepartureStats: "" },
@@ -191,7 +196,17 @@ export const initialItineraryContent: ItineraryContent = {
         hotelCheckIn: { tips: "" },
         firstDayExploration: { activity: "", foodSuggestion: "" },
     },
-    dailyItinerary: [],
+    dailyItinerary: [
+        {
+            dayNumber: 1,
+            title: "",
+            description: "",
+            morning: { time: "09:00", activity: "" },
+            afternoon: { time: "13:00", activity: "" },
+            evening: { time: "18:00", activity: "" },
+            logistics: { transport: "", travelTime: "" }
+        }
+    ],
     food: { mustTryDishes: [], restaurantRecommendations: [], foodSafety: "" },
     transport: { modes: [], passes: "", walkingAdvice: "" },
     secrets: { places: [] },

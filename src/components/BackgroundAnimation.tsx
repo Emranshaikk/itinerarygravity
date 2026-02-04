@@ -44,7 +44,7 @@ export default function BackgroundAnimation() {
                     ease: "linear",
                     delay: 2,
                 }}
-                className="absolute text-gray-700/20 dark:text-gray-500/20"
+                className="absolute text-gray-500/40 dark:text-gray-300/20"
             >
                 <Plane size={48} className="transform rotate-90" />
             </motion.div>
@@ -63,7 +63,7 @@ export default function BackgroundAnimation() {
                     ease: "linear",
                     delay: 10,
                 }}
-                className="absolute text-gray-700/10 dark:text-gray-500/10"
+                className="absolute text-gray-500/30 dark:text-gray-400/10"
             >
                 <Plane size={32} />
             </motion.div>
@@ -89,7 +89,7 @@ export default function BackgroundAnimation() {
                         delay: Math.random() * 10,
                         ease: "easeIn",
                     }}
-                    className="absolute text-yellow-500/30"
+                    className="absolute text-yellow-500/60"
                 >
                     <Star size={16} fill="currentColor" />
                 </motion.div>
@@ -114,7 +114,7 @@ export default function BackgroundAnimation() {
                         ease: "easeInOut",
                         delay: Math.random() * 5,
                     }}
-                    className="absolute text-white/20"
+                    className="absolute text-white/40"
                 >
                     <div className="w-1 h-1 bg-current rounded-full" />
                 </motion.div>
