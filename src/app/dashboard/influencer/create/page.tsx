@@ -10,6 +10,9 @@ import PreTripSection from "@/components/itinerary-builder/PreTripSection";
 import LogisticsSection from "@/components/itinerary-builder/LogisticsSection";
 import DailyItineraryBuilder from "@/components/itinerary-builder/DailyItineraryBuilder";
 import PlaceholderSection from "@/components/itinerary-builder/PlaceholderSection";
+import MobileItineraryNav from "@/components/itinerary-builder/MobileItineraryNav";
+import TransportSection from "@/components/itinerary-builder/TransportSection";
+import SecretsSection from "@/components/itinerary-builder/SecretsSection";
 
 export default function CreateItineraryPage() {
     const router = useRouter();
@@ -37,8 +40,8 @@ export default function CreateItineraryPage() {
                 price: content.cover.price || 0,
                 currency: content.cover.currency || "USD",
                 description: `A ${content.cover.tripType} trip to ${content.cover.destination} for ${content.cover.duration}.`,
-                content: content, // Store the full rich object in JSONB
-                // Add default fields if needed by API
+                duration: content.cover.duration,
+                content: content,
             };
 
             const response = await fetch('/api/itineraries', {
@@ -77,9 +80,10 @@ export default function CreateItineraryPage() {
             case 6:
                 return <PlaceholderSection title="Local Food Guide" />;
             case 7:
-                return <PlaceholderSection title="Transport Playbook" />;
+            case 7:
+                return <TransportSection data={content.transport} onChange={(d) => setContent({ ...content, transport: d })} />;
             case 8:
-                return <PlaceholderSection title="Hidden Gems & Secrets" />;
+                return <SecretsSection data={content.secrets} onChange={(d) => setContent({ ...content, secrets: d })} />;
             case 9:
                 return <PlaceholderSection title="Safety & Culture" />;
             case 10:
@@ -138,9 +142,18 @@ export default function CreateItineraryPage() {
                 </div>
 
                 <div className="lg:col-span-3">
-                    {/* Mobile Step Selector could go here */}
+                    {/* Mobile Navigation */}
+                    <MobileItineraryNav
+                        activeStep={activeStep}
+                        onStepChange={setActiveStep}
+                        completedSteps={getCompletedSteps()}
+                    />
 
-                    <div className="min-h-[60vh]">
+                    <div className="min-h-[60vh] glass rounded-2xl p-6 md:p-8 border border-white/10 relative overflow-hidden">
+                        {/* Background Decor */}
+                        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl -z-10 pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl -z-10 pointer-events-none" />
+
                         {renderSection()}
                     </div>
 

@@ -1,10 +1,9 @@
 "use client";
-
 import React from "react";
 import {
     Book, Plane, CreditCard, MapPin, Calendar, Utensils,
     Bus, Star, Shield, Sliders, AlertTriangle, ShoppingBag,
-    LogOut, Image as ImageIcon, Gift
+    LogOut, Image as ImageIcon, Gift, CheckCircle2, ChevronRight, Circle
 } from "lucide-react";
 
 interface BuilderSidebarProps {
@@ -14,67 +13,110 @@ interface BuilderSidebarProps {
 }
 
 const SECTIONS = [
-    { id: 1, label: "Cover & Basic Info", icon: Book },
-    { id: 2, label: "Before You Travel", icon: Plane },
-    { id: 3, label: "Money & Connectivity", icon: CreditCard },
-    { id: 4, label: "Arrival Experience", icon: MapPin },
-    { id: 5, label: "Day-by-Day Itinerary", icon: Calendar },
-    { id: 6, label: "Local Food Guide", icon: Utensils },
-    { id: 7, label: "Transport Playbook", icon: Bus },
-    { id: 8, label: "Hidden Gems", icon: Star },
-    { id: 9, label: "Safety & Culture", icon: Shield },
-    { id: 10, label: "Customization", icon: Sliders },
-    { id: 11, label: "Emergency Info", icon: AlertTriangle },
-    { id: 12, label: "Shopping Guide", icon: ShoppingBag },
-    { id: 13, label: "Departure Plan", icon: LogOut },
-    { id: 14, label: "Post-Trip & Reflection", icon: ImageIcon },
-    { id: 15, label: "Bonus & Extras", icon: Gift },
+    { id: 1, label: "Cover & Basic Info", icon: Book, desc: "Title, Price & Look" },
+    { id: 2, label: "Before You Travel", icon: Plane, desc: "Flights, Packing, Prep" },
+    { id: 3, label: "Money & Connectivity", icon: CreditCard, desc: "Sims, Cash, Budget" },
+    { id: 4, label: "Arrival Experience", icon: MapPin, desc: "First Impressions" },
+    { id: 5, label: "Day-by-Day Itinerary", icon: Calendar, desc: "The Core Journey" },
+    { id: 6, label: "Local Food Guide", icon: Utensils, desc: "Must-eats & Dining" },
+    { id: 7, label: "Transport Playbook", icon: Bus, desc: "Getting Around" },
+    { id: 8, label: "Hidden Gems", icon: Star, desc: "Secret Spots" },
+    { id: 9, label: "Safety & Culture", icon: Shield, desc: "Stay Safe & Respectful" },
+    { id: 10, label: "Customization", icon: Sliders, desc: "Couples, Families, Solos" },
+    { id: 11, label: "Emergency Info", icon: AlertTriangle, desc: "Better safe than sorry" },
+    { id: 12, label: "Shopping Guide", icon: ShoppingBag, desc: "Souvenirs & Markets" },
+    { id: 13, label: "Departure Plan", icon: LogOut, desc: "Leaving smoothly" },
+    { id: 14, label: "Post-Trip & Reflection", icon: ImageIcon, desc: "Memories & sharing" },
+    { id: 15, label: "Bonus & Extras", icon: Gift, desc: "Freebies & Links" },
 ];
 
 export default function ItinerarySidebar({ activeStep, onStepChange, completedSteps }: BuilderSidebarProps) {
+    const progress = Math.round((completedSteps.length / SECTIONS.length) * 100);
+
     return (
-        <div className="glass p-4 rounded-2xl h-fit sticky top-24 overflow-y-auto max-h-[85vh]">
-            <h3 className="text-lg font-bold mb-4 px-2 text-gradient">Itinerary Builder</h3>
-            <nav className="space-y-1">
-                {SECTIONS.map((section) => {
+        <div className="glass rounded-2xl h-fit sticky top-24 overflow-hidden border border-white/10 shadow-2xl flex flex-col max-h-[85vh]">
+            {/* Header */}
+            <div className="p-6 border-b border-white/10 bg-black/20 backdrop-blur-md">
+                <h3 className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                    Itinerary Builder
+                </h3>
+                <div className="mt-4">
+                    <div className="flex justify-between text-xs text-gray-400 mb-1">
+                        <span>Completion</span>
+                        <span className="text-white font-medium">{progress}%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-500 ease-out"
+                            style={{ width: `${progress}%` }}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* Scrollable List */}
+            <div className="overflow-y-auto flex-1 p-2 space-y-0.5 custom-scrollbar">
+                {SECTIONS.map((section, index) => {
                     const Icon = section.icon;
                     const isActive = activeStep === section.id;
                     const isCompleted = completedSteps.includes(section.id);
+                    const isNext = activeStep + 1 === section.id;
 
                     return (
                         <button
                             key={section.id}
                             onClick={() => onStepChange(section.id)}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
-                ${isActive
-                                    ? "bg-white/10 text-white shadow-lg border border-white/10"
-                                    : "text-gray-400 hover:bg-white/5 hover:text-white"
+                            className={`
+                                group w-full flex items-center gap-4 px-4 py-3 text-left transition-all duration-200 relative
+                                ${isActive
+                                    ? "bg-white/10"
+                                    : "hover:bg-white/5"
                                 }
-              `}
+                            `}
                         >
-                            <div className={`p-1.5 rounded-lg ${isActive ? "bg-white/20" : "bg-transparent"} ${isCompleted && !isActive ? "text-green-400" : ""}`}>
-                                <Icon size={16} />
+                            {/* Left Highlight Line for Active State */}
+                            {isActive && (
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 to-purple-500" />
+                            )}
+
+                            {/* Icon Container */}
+                            <div className={`
+                                relative z-10 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 border
+                                ${isActive
+                                    ? "bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-blue-400/30 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                                    : isCompleted
+                                        ? "bg-green-500/10 border-green-500/30 text-green-400"
+                                        : "bg-white/5 border-white/5 text-gray-500 group-hover:text-gray-300 group-hover:border-white/10"
+                                }
+                            `}>
+                                {isCompleted && !isActive ? (
+                                    <CheckCircle2 size={18} />
+                                ) : (
+                                    <Icon size={18} />
+                                )}
                             </div>
-                            <span className="text-left flex-1">{section.label}</span>
-                            {isCompleted && (
-                                <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+
+                            {/* Text Content */}
+                            <div className="flex-1 min-w-0">
+                                <p className={`text-sm font-semibold truncate transition-colors ${isActive ? "text-white" : isCompleted ? "text-green-100/80" : "text-gray-400 group-hover:text-gray-200"}`}>
+                                    {section.label}
+                                </p>
+                                <p className={`text-[10px] truncate ${isActive ? "text-blue-200/70" : "text-gray-600 group-hover:text-gray-500"}`}>
+                                    {section.desc}
+                                </p>
+                            </div>
+
+                            {/* Active Chevron */}
+                            {isActive && (
+                                <ChevronRight size={14} className="text-white/50 animate-pulse" />
                             )}
                         </button>
                     );
                 })}
-            </nav>
-
-            <div className="mt-8 px-3">
-                <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                    <div
-                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
-                        style={{ width: `${(completedSteps.length / SECTIONS.length) * 100}%` }}
-                    />
-                </div>
-                <p className="text-xs text-center mt-2 text-gray-500">
-                    {Math.round((completedSteps.length / SECTIONS.length) * 100)}% Complete
-                </p>
             </div>
+
+            {/* Bottom Fade Effect */}
+            <div className="h-6 bg-gradient-to-t from-black/50 to-transparent pointer-events-none absolute bottom-0 left-0 right-0" />
         </div>
     );
 }

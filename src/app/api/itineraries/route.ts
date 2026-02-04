@@ -12,12 +12,15 @@ export async function POST(req: Request) {
         const body = await req.json();
         const {
             title,
+            location, // Map to location from destination if provided
             destination,
             price,
             currency,
             duration,
             ...rest
         } = body;
+
+        const finalLocation = location || destination;
 
         // 1. Ensure profile exists (Upsert)
         // In a real app, you'd do this via Webhooks, but for now we'll do it on-the-fly
@@ -38,10 +41,11 @@ export async function POST(req: Request) {
             .insert({
                 creator_id: userId,
                 title,
-                location: destination,
+                location: finalLocation, // Use the resolved location
                 price,
-                description: body.priceIncludes, // Using priceIncludes as description for now or rest
-                content: rest, // Store all the complex fields in the JSONB column
+                currency: currency || "USD",
+                description: body.description || `A trip to ${finalLocation}`,
+                content: rest,
                 is_published: true
             })
             .select()
@@ -74,12 +78,12 @@ export async function GET() {
             .order('created_at', { ascending: false });
 
         if (error) {
-            return new NextResponse("Database Error", { status: 500 });
+            return NextResponse.json({ error: "Database Error", details: error.message }, { status: 500 });
         }
 
         return NextResponse.json(data);
-    } catch (error) {
+    } catch (error: any) {
         console.error("[ITINERARIES_GET]", error);
-        return new NextResponse("Internal Error", { status: 500 });
+        return NextResponse.json({ error: "Internal Error", message: error.message }, { status: 500 });
     }
 }

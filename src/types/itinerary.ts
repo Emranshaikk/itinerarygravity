@@ -80,10 +80,13 @@ export interface ItineraryContent {
         dayNumber: number;
         title: string;
         description: string;
+        wakeUpTime?: string;
+        crowdTips?: string;
         morning: {
             time: string;
             activity: string;
             location?: string;
+            travelTime?: string;
             food?: string; // Breakfast spot
             tips?: string;
         };
@@ -91,14 +94,19 @@ export interface ItineraryContent {
             time: string;
             activity: string; // Main attraction or secondary
             location?: string;
+            travelTime?: string;
             food?: string; // Lunch spot
+            foodType?: string; // Cuisine
             tips?: string;
         };
         evening: {
             time: string;
             activity: string;
             location?: string;
+            travelTime?: string;
             food?: string; // Dinner
+            foodBudget?: string;
+            foodPremium?: string;
             tips?: string; // Nightlife or chill
         };
         logistics: {
@@ -118,14 +126,27 @@ export interface ItineraryContent {
 
     // 7. Transport Playbook
     transport: {
-        modes: { type: string; tips: string; cost?: string }[]; // Metro, Cab, Walking
+        cityLayout: string;
+        modes: { type: string; tips: string; cost?: string; bestFor?: string }[]; // Metro, Cab, Walking
         passes: string; // Day passes etc
         walkingAdvice: string;
+        apps: string[];
+        scams: string;
+        airportTransfer: string;
+        dailyStrategy: string;
     };
 
     // 8. Hidden Gems (Secrets)
     secrets: {
-        places: { name: string; description: string; type: 'Viewpoint' | 'Cafe' | 'Experience' | string }[];
+        places: {
+            name: string;
+            description: string;
+            type: string;
+            bestTime?: string;
+            idealFor?: string;
+            tips?: string;
+            locationUrl?: string;
+        }[];
     };
 
     // 9. Safety, Scams & Culture
@@ -164,9 +185,15 @@ export interface ItineraryContent {
     };
 
     // 13. Bonus
+    // 13. Bonus & Value Adds
     bonus: {
-        links: { label: string; url: string }[]; // Google Maps, PDF downloads
-        checklist?: string[]; // Quick summary
+        googleMapsLink: string;
+        reservationTips: string;
+        commonMistakes: string;
+        tripUpgrades: string;
+        includePackingChecklist: boolean;
+        includeBudgetPlanner: boolean;
+        externalLinks: { label: string; url: string }[];
     };
 }
 
@@ -208,12 +235,20 @@ export const initialItineraryContent: ItineraryContent = {
         }
     ],
     food: { mustTryDishes: [], restaurantRecommendations: [], foodSafety: "" },
-    transport: { modes: [], passes: "", walkingAdvice: "" },
+    transport: { cityLayout: "", modes: [], passes: "", walkingAdvice: "", apps: [], scams: "", airportTransfer: "", dailyStrategy: "" },
     secrets: { places: [] },
     safety: { commonScams: [], safetyTips: [], culturalDosAndDonts: [], emergencyNumbers: [] },
     customization: {},
     shopping: { whatToBuy: [], bestMarkets: [] },
     departure: { checkoutTips: "", airportBuffer: "" },
     postTrip: {},
-    bonus: { links: [] },
+    bonus: {
+        googleMapsLink: "",
+        reservationTips: "",
+        commonMistakes: "",
+        tripUpgrades: "",
+        includePackingChecklist: true,
+        includeBudgetPlanner: true,
+        externalLinks: []
+    },
 };
