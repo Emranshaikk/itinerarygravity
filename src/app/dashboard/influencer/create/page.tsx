@@ -13,6 +13,11 @@ import PlaceholderSection from "@/components/itinerary-builder/PlaceholderSectio
 import MobileItineraryNav from "@/components/itinerary-builder/MobileItineraryNav";
 import TransportSection from "@/components/itinerary-builder/TransportSection";
 import SecretsSection from "@/components/itinerary-builder/SecretsSection";
+import BonusSection from "@/components/itinerary-builder/BonusSection";
+import FoodSection from "@/components/itinerary-builder/FoodSection";
+import SafetySection from "@/components/itinerary-builder/SafetySection";
+import ArrivalSection from "@/components/itinerary-builder/ArrivalSection";
+import ShoppingSection from "@/components/itinerary-builder/ShoppingSection";
 
 export default function CreateItineraryPage() {
     const router = useRouter();
@@ -74,30 +79,29 @@ export default function CreateItineraryPage() {
             case 3:
                 return <LogisticsSection data={content.logistics} onChange={(d) => setContent({ ...content, logistics: d })} />;
             case 4:
-                return <PlaceholderSection title="Arrival Day Experience" />;
+                return <ArrivalSection data={content.arrival} onChange={(d) => setContent({ ...content, arrival: d })} />;
             case 5:
                 return <DailyItineraryBuilder data={content.dailyItinerary} onChange={(d) => setContent({ ...content, dailyItinerary: d })} />;
             case 6:
-                return <PlaceholderSection title="Local Food Guide" />;
-            case 7:
+                return <FoodSection data={content.food} onChange={(d) => setContent({ ...content, food: d })} />;
             case 7:
                 return <TransportSection data={content.transport} onChange={(d) => setContent({ ...content, transport: d })} />;
             case 8:
                 return <SecretsSection data={content.secrets} onChange={(d) => setContent({ ...content, secrets: d })} />;
             case 9:
-                return <PlaceholderSection title="Safety & Culture" />;
+                return <SafetySection data={content.safety} onChange={(d) => setContent({ ...content, safety: d })} />;
             case 10:
                 return <PlaceholderSection title="Customization Options" />;
             case 11:
                 return <PlaceholderSection title="Emergency Info" />;
             case 12:
-                return <PlaceholderSection title="Shopping Guide" />;
+                return <ShoppingSection data={content.shopping} onChange={(d) => setContent({ ...content, shopping: d })} />;
             case 13:
                 return <PlaceholderSection title="Departure Plan" />;
             case 14:
                 return <PlaceholderSection title="Post-Trip Section" />;
             case 15:
-                return <PlaceholderSection title="Bonus Value" />;
+                return <BonusSection data={content.bonus} onChange={(d) => setContent({ ...content, bonus: d })} />;
             default:
                 return <ItineraryCover data={content.cover} onChange={(d) => setContent({ ...content, cover: d })} />;
         }

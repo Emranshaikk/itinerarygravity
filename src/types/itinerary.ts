@@ -61,18 +61,11 @@ export interface ItineraryContent {
 
     // 4. Arrival Day Experience
     arrival: {
-        airportTransfer: {
-            options: { mode: string; cost: string; time: string }[];
-            scamsToAvoid: string;
-        };
-        hotelCheckIn: {
-            tips: string;
-            earlyCheckInHack?: string;
-        };
-        firstDayExploration: {
-            activity: string;
-            foodSuggestion: string; // First dinner
-        };
+        airportToCity: string;
+        checkInProcess: string;
+        firstMealSuggestion: string;
+        orientationTips: string;
+        simCardPickUp: string;
     };
 
     // 5. Day-by-Day Itinerary (Core)
@@ -218,19 +211,15 @@ export const initialItineraryContent: ItineraryContent = {
         connectivity: { simOptions: [], wifiTips: "", powerAdapters: "" },
         apps: [],
     },
-    arrival: {
-        airportTransfer: { options: [], scamsToAvoid: "" },
-        hotelCheckIn: { tips: "" },
-        firstDayExploration: { activity: "", foodSuggestion: "" },
-    },
+    arrival: { airportToCity: "", checkInProcess: "", firstMealSuggestion: "", orientationTips: "", simCardPickUp: "" },
     dailyItinerary: [
         {
             dayNumber: 1,
             title: "",
             description: "",
-            morning: { time: "09:00", activity: "" },
-            afternoon: { time: "13:00", activity: "" },
-            evening: { time: "18:00", activity: "" },
+            morning: { time: "09:00", activity: "", travelTime: "15m" },
+            afternoon: { time: "13:00", activity: "", travelTime: "20m" },
+            evening: { time: "18:00", activity: "", travelTime: "10m" },
             logistics: { transport: "", travelTime: "" }
         }
     ],
