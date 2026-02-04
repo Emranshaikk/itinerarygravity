@@ -7,13 +7,14 @@ export default function Home() {
       {/* Hero Section */}
       <section style={{
         position: 'relative',
-        minHeight: '80vh',
+        minHeight: '60vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
         overflow: 'hidden',
-        padding: '40px 20px'
+        padding: '20px 20px',
+        paddingTop: '40px'
       }}>
         {/* Abstract Background Elements */}
         <div style={{

@@ -31,42 +31,7 @@ export default function BackgroundAnimation() {
     return (
         <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
             {/* Flying Plane */}
-            <motion.div
-                initial={{ x: -100, y: windowSize.height * 0.2, opacity: 0 }}
-                animate={{
-                    x: windowSize.width + 100,
-                    y: [windowSize.height * 0.2, windowSize.height * 0.1, windowSize.height * 0.3],
-                    opacity: [0, 1, 1, 0],
-                }}
-                transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "linear",
-                    delay: 2,
-                }}
-                className="absolute text-gray-500/40 dark:text-gray-300/20"
-            >
-                <Plane size={48} className="transform rotate-90" />
-            </motion.div>
 
-            {/* Second Plane (slower, lower) */}
-            <motion.div
-                initial={{ x: windowSize.width + 100, y: windowSize.height * 0.6, rotate: 180, opacity: 0 }}
-                animate={{
-                    x: -100,
-                    y: [windowSize.height * 0.6, windowSize.height * 0.7, windowSize.height * 0.5],
-                    opacity: [0, 1, 1, 0],
-                }}
-                transition={{
-                    duration: 35,
-                    repeat: Infinity,
-                    ease: "linear",
-                    delay: 10,
-                }}
-                className="absolute text-gray-500/30 dark:text-gray-400/10"
-            >
-                <Plane size={32} />
-            </motion.div>
 
             {/* Falling Stars / Shooting Stars */}
             {[...Array(3)].map((_, i) => (
