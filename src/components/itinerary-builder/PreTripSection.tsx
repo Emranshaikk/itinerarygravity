@@ -1,16 +1,5 @@
 "use client";
 
-import React from "react";
-import { ItineraryContent } from "@/types/itinerary";
-import { Plus, Trash, Plane, CheckSquare } from "lucide-react";
-
-interface PreTripSectionProps {
-    data: ItineraryContent["preTrip"];
-    onChange: (data: ItineraryContent["preTrip"]) => void;
-}
-
-"use client";
-
 import React, { useState } from "react";
 import { ItineraryContent } from "@/types/itinerary";
 import { Plane, CheckSquare, Wand2, Smartphone, CreditCard, AlertTriangle, Briefcase, Shirt, Zap } from "lucide-react";

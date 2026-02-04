@@ -2,15 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, Eye } from "lucide-react";
+import { ArrowLeft, Save, Eye, ChevronRight } from "lucide-react";
 import { ItineraryContent, initialItineraryContent } from "@/types/itinerary";
-import ItinerarySidebar from "@/components/itinerary-builder/ItinerarySidebar";
+import BuilderStepper from "@/components/itinerary-builder/BuilderStepper";
 import ItineraryCover from "@/components/itinerary-builder/ItineraryCover";
 import PreTripSection from "@/components/itinerary-builder/PreTripSection";
 import LogisticsSection from "@/components/itinerary-builder/LogisticsSection";
 import DailyItineraryBuilder from "@/components/itinerary-builder/DailyItineraryBuilder";
 import PlaceholderSection from "@/components/itinerary-builder/PlaceholderSection";
-import MobileItineraryNav from "@/components/itinerary-builder/MobileItineraryNav";
 import TransportSection from "@/components/itinerary-builder/TransportSection";
 import SecretsSection from "@/components/itinerary-builder/SecretsSection";
 import BonusSection from "@/components/itinerary-builder/BonusSection";
@@ -18,6 +17,32 @@ import FoodSection from "@/components/itinerary-builder/FoodSection";
 import SafetySection from "@/components/itinerary-builder/SafetySection";
 import ArrivalSection from "@/components/itinerary-builder/ArrivalSection";
 import ShoppingSection from "@/components/itinerary-builder/ShoppingSection";
+import CustomizationSection from "@/components/itinerary-builder/CustomizationSection";
+import EmergencySection from "@/components/itinerary-builder/EmergencySection";
+import DepartureSection from "@/components/itinerary-builder/DepartureSection";
+import PostTripSection from "@/components/itinerary-builder/PostTripSection";
+
+// To make percentage more alive, we check more fields
+const checkSectionCompletion = (step: number, content: ItineraryContent) => {
+    switch (step) {
+        case 1: return !!content.cover.title && !!content.cover.destination;
+        case 2: return content.preTrip.packingList.length > 0 || !!content.preTrip.flightGuide.arrivalDepartureStats;
+        case 3: return !!content.logistics.currency.code && content.logistics.apps.length > 0;
+        case 4: return !!content.arrival.airportToCity;
+        case 5: return content.dailyItinerary.some(d => !!d.title && !!d.morning.activity);
+        case 6: return content.food.mustTryDishes.length > 0 || content.food.restaurantRecommendations.length > 0;
+        case 7: return content.transport.modes.length > 0;
+        case 8: return content.secrets.places.length > 0;
+        case 9: return content.safety.commonScams.length > 0 || content.safety.safetyTips.length > 0;
+        case 10: return !!content.customization.coupleTips || !!content.customization.familyTips;
+        case 11: return content.safety.emergencyNumbers.length > 0;
+        case 12: return content.shopping.whatToBuy.length > 0 || content.shopping.bestMarkets.length > 0;
+        case 13: return !!content.departure.checkoutTips;
+        case 14: return !!content.postTrip.jetLagRecovery || (content.postTrip.nextDestinationIdeas?.length ?? 0) > 0;
+        case 15: return !!content.bonus.googleMapsLink || content.bonus.externalLinks.length > 0;
+        default: return false;
+    }
+};
 
 export default function CreateItineraryPage() {
     const router = useRouter();
@@ -25,13 +50,11 @@ export default function CreateItineraryPage() {
     const [content, setContent] = useState<ItineraryContent>(initialItineraryContent);
     const [isSaving, setIsSaving] = useState(false);
 
-    // Helper to track which sections are "started/completed" (basic check)
     const getCompletedSteps = () => {
         const steps: number[] = [];
-        if (content.cover.title) steps.push(1);
-        if (content.preTrip.flightGuide.bestAirports.length > 0) steps.push(2);
-        if (content.logistics.currency.code) steps.push(3);
-        if (content.dailyItinerary.length > 0 && content.dailyItinerary[0].title) steps.push(5);
+        for (let i = 1; i <= 15; i++) {
+            if (checkSectionCompletion(i, content)) steps.push(i);
+        }
         return steps;
     };
 
@@ -91,15 +114,15 @@ export default function CreateItineraryPage() {
             case 9:
                 return <SafetySection data={content.safety} onChange={(d) => setContent({ ...content, safety: d })} />;
             case 10:
-                return <PlaceholderSection title="Customization Options" />;
+                return <CustomizationSection data={content.customization} onChange={(d) => setContent({ ...content, customization: d })} />;
             case 11:
-                return <PlaceholderSection title="Emergency Info" />;
+                return <EmergencySection data={content.safety} onChange={(d) => setContent({ ...content, safety: d })} />;
             case 12:
                 return <ShoppingSection data={content.shopping} onChange={(d) => setContent({ ...content, shopping: d })} />;
             case 13:
-                return <PlaceholderSection title="Departure Plan" />;
+                return <DepartureSection data={content.departure} onChange={(d) => setContent({ ...content, departure: d })} />;
             case 14:
-                return <PlaceholderSection title="Post-Trip Section" />;
+                return <PostTripSection data={content.postTrip} onChange={(d) => setContent({ ...content, postTrip: d })} />;
             case 15:
                 return <BonusSection data={content.bonus} onChange={(d) => setContent({ ...content, bonus: d })} />;
             default:
@@ -136,49 +159,47 @@ export default function CreateItineraryPage() {
                 </div>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
-                <div className="lg:col-span-1 hidden lg:block">
-                    <ItinerarySidebar
-                        activeStep={activeStep}
-                        onStepChange={setActiveStep}
-                        completedSteps={getCompletedSteps()}
-                    />
+            <div className="max-w-4xl mx-auto">
+                <BuilderStepper
+                    activeStep={activeStep}
+                    onStepChange={setActiveStep}
+                    completedSteps={getCompletedSteps()}
+                />
+
+                <div className="min-h-[60vh] glass rounded-3xl p-6 md:p-10 border border-white/10 relative overflow-hidden shadow-2xl">
+                    {/* Background Decor */}
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
+
+                    {renderSection()}
                 </div>
 
-                <div className="lg:col-span-3">
-                    {/* Mobile Navigation */}
-                    <MobileItineraryNav
-                        activeStep={activeStep}
-                        onStepChange={setActiveStep}
-                        completedSteps={getCompletedSteps()}
-                    />
+                <div className="mt-8 flex justify-between items-center px-4">
+                    <button
+                        className={`btn btn-ghost hover:bg-white/5 text-gray-400 hover:text-white transition-all ${activeStep === 1 ? 'invisible' : ''}`}
+                        onClick={() => setActiveStep(prev => Math.max(1, prev - 1))}
+                    >
+                        <ArrowLeft size={18} className="mr-2" />
+                        <span className="hidden sm:inline">Previous Section</span>
+                        <span className="sm:hidden">Back</span>
+                    </button>
 
-                    <div className="min-h-[60vh] glass rounded-2xl p-6 md:p-8 border border-white/10 relative overflow-hidden">
-                        {/* Background Decor */}
-                        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl -z-10 pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl -z-10 pointer-events-none" />
-
-                        {renderSection()}
+                    <div className="flex items-center gap-1">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className={`h-1 rounded-full transition-all duration-500 ${Math.ceil(activeStep / 5) === i ? 'w-8 bg-blue-500' : 'w-2 bg-white/10'}`} />
+                        ))}
                     </div>
 
-                    <div className="mt-8 flex justify-between pt-6 border-t border-white/10">
-                        <button
-                            className={`btn btn-outline ${activeStep === 1 ? 'invisible' : ''}`}
-                            onClick={() => setActiveStep(prev => Math.max(1, prev - 1))}
-                        >
-                            <ArrowLeft size={16} className="mr-2" /> Previous Step
-                        </button>
-
-                        <button
-                            className="btn btn-primary"
-                            onClick={() => {
-                                if (activeStep < 15) setActiveStep(prev => prev + 1);
-                                else handleSave();
-                            }}
-                        >
-                            {activeStep === 15 ? "Finish & Save" : "Next Step"}
-                        </button>
-                    </div>
+                    <button
+                        className="btn btn-primary bg-gradient-to-r from-blue-600 to-indigo-600 border-none px-8 py-6 h-auto text-lg hover:shadow-lg hover:shadow-blue-500/20 active:scale-95 transition-all"
+                        onClick={() => {
+                            if (activeStep < 15) setActiveStep(prev => prev + 1);
+                            else handleSave();
+                        }}
+                    >
+                        {activeStep === 15 ? "Complete & Save" : "Next Section"}
+                        {activeStep !== 15 && <ChevronRight size={20} className="ml-2" />}
+                    </button>
                 </div>
             </div>
         </div>
