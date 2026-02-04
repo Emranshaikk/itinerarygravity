@@ -3,6 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import BackgroundAnimation from "@/components/BackgroundAnimation";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -38,6 +39,7 @@ export default function RootLayout({
         </head>
         <body suppressHydrationWarning>
           <ThemeProvider>
+            <BackgroundAnimation />
             <Navbar />
             <main style={{ paddingTop: '80px', minHeight: '100vh' }}>
               {children}
