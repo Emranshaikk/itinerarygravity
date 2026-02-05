@@ -58,74 +58,80 @@ export default function PreTripSection({ data, onChange }: PreTripSectionProps) 
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-start">
-                <div className="prose dark:prose-invert">
-                    <h2 className="text-3xl font-bold flex items-center gap-3">
-                        <Plane className="text-blue-400" size={32} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1.5rem' }}>
+                <div>
+                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                        <Plane style={{ color: '#2563eb' }} size={32} />
                         Before You Travel
                     </h2>
-                    <p className="text-gray-400 max-w-2xl">
+                    <p style={{ color: '#78716c' }}>
                         A stress-free checklist from 7 days out until boarding. Cover flights, packing, and quick prep.
                     </p>
                 </div>
                 <button
                     onClick={generateAIContent}
                     disabled={isGenerating}
-                    className="btn btn-primary bg-gradient-to-r from-blue-600 to-purple-600 border-none hover:shadow-lg hover:shadow-blue-500/20"
+                    className="btn btn-primary"
+                    style={{ backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '0.75rem', padding: '0.75rem 1.5rem', fontWeight: '600', cursor: 'pointer' }}
                 >
-                    {isGenerating ? "Generating..." : <><Wand2 size={16} className="mr-2" /> Auto-Fill with AI</>}
+                    {isGenerating ? "Generating..." : <><Wand2 size={16} style={{ marginRight: '0.5rem' }} /> Auto-Fill with AI</>}
                 </button>
             </div>
 
             {/* Flight Guide */}
-            <div className="card glass p-6 space-y-6">
-                <h3 className="text-xl font-semibold flex items-center gap-2">
-                    <Plane className="text-blue-400" size={20} /> Flight Strategy
+            <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                    <Plane style={{ color: '#2563eb' }} size={20} /> Flight Strategy
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="form-group">
-                        <label className="form-label text-gray-300">Best Airports</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Best Airports</label>
                         <input
-                            className="form-input bg-black/20"
+                            className="form-input"
+                            style={{ backgroundColor: '#fdfbf7' }}
                             placeholder="e.g. NRT or KIX"
                             value={data.flightGuide.bestAirports.join(", ")}
                             onChange={e => handleFlightChange("bestAirports", handleArrayInput(e.target.value))}
                         />
                     </div>
-                    <div className="form-group">
-                        <label className="form-label text-gray-300">Arrival Strategy</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Arrival Strategy</label>
                         <input
-                            className="form-input bg-black/20"
-                            placeholder="e.g. Arrive before noon to catch the train..."
+                            className="form-input"
+                            style={{ backgroundColor: '#fdfbf7' }}
+                            placeholder="e.g. Arrive before noon..."
                             value={data.flightGuide.arrivalDepartureStats}
                             onChange={e => handleFlightChange("arrivalDepartureStats", e.target.value)}
                         />
                     </div>
-                    <div className="form-group">
-                        <label className="form-label text-gray-300">Seat Selection Secret</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Seat Selection Secret</label>
                         <textarea
-                            className="form-input bg-black/20 h-24"
+                            className="form-input"
+                            style={{ backgroundColor: '#fdfbf7', minHeight: '100px' }}
                             placeholder="e.g. Sit on the left for views..."
                             value={data.flightGuide.seatTips || ""}
                             onChange={e => handleFlightChange("seatTips", e.target.value)}
                         />
                     </div>
-                    <div className="space-y-4">
-                        <div className="form-group">
-                            <label className="form-label text-gray-300">Baggage Tips</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Baggage Tips</label>
                             <input
-                                className="form-input bg-black/20"
-                                placeholder="e.g. Pack light, trains are small."
+                                className="form-input"
+                                style={{ backgroundColor: '#fdfbf7' }}
+                                placeholder="e.g. Pack light..."
                                 value={data.flightGuide.baggageTips || ""}
                                 onChange={e => handleFlightChange("baggageTips", e.target.value)}
                             />
                         </div>
-                        <div className="form-group">
-                            <label className="form-label text-gray-300">Jet Lag Hack</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Jet Lag Hack</label>
                             <input
-                                className="form-input bg-black/20"
-                                placeholder="e.g. Stay awake until 9PM local."
+                                className="form-input"
+                                style={{ backgroundColor: '#fdfbf7' }}
+                                placeholder="e.g. Stay awake until 9PM..."
                                 value={data.flightGuide.jetLagTips || ""}
                                 onChange={e => handleFlightChange("jetLagTips", e.target.value)}
                             />
@@ -134,82 +140,73 @@ export default function PreTripSection({ data, onChange }: PreTripSectionProps) 
                 </div>
             </div>
 
-            {/* Quick Prep: Connectivity & Money (Brief) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="card glass p-6 space-y-4 border-l-4 border-l-purple-500">
-                    <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <Smartphone className="text-purple-400" size={20} /> Tech & Connectivity Prep
+            {/* Quick Prep: Connectivity & Money */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderLeft: '4px solid #9333ea', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.25rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                        <Smartphone style={{ color: '#9333ea' }} size={20} /> Tech & Connectivity Prep
                     </h3>
-                    <p className="text-sm text-gray-400">Quick checklist ensuring they are online immediately.</p>
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
-                            <input type="checkbox" className="w-5 h-5 rounded border-gray-500 text-purple-600 focus:ring-purple-500 bg-transparent" defaultChecked />
-                            <span className="text-sm">Download eSIM App (e.g. Airalo/Ubigi)</span>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
-                            <input type="checkbox" className="w-5 h-5 rounded border-gray-500 text-purple-600 focus:ring-purple-500 bg-transparent" defaultChecked />
-                            <span className="text-sm">Download Offline Maps</span>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
-                            <input type="checkbox" className="w-5 h-5 rounded border-gray-500 text-purple-600 focus:ring-purple-500 bg-transparent" defaultChecked />
-                            <span className="text-sm">Pack Universal Adapter</span>
-                        </div>
+                    <p style={{ fontSize: '0.875rem', color: '#78716c', margin: 0 }}>Quick checklist ensuring they are online immediately.</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {["Download eSIM App (e.g. Airalo/Ubigi)", "Download Offline Maps", "Pack Universal Adapter"].map((item, idx) => (
+                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem', borderRadius: '0.75rem', backgroundColor: '#fdfbf7', border: '1px solid #f5f5f4' }}>
+                                <input type="checkbox" style={{ width: '1.25rem', height: '1.25rem', cursor: 'pointer' }} defaultChecked />
+                                <span style={{ fontSize: '0.875rem', color: '#1c1917' }}>{item}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
-                <div className="card glass p-6 space-y-4 border-l-4 border-l-green-500">
-                    <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <CreditCard className="text-green-400" size={20} /> Money Prep
+                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderLeft: '4px solid #16a34a', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.25rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                        <CreditCard style={{ color: '#16a34a' }} size={20} /> Money Prep
                     </h3>
-                    <p className="text-sm text-gray-400">Avoid frozen cards and high fees.</p>
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
-                            <input type="checkbox" className="w-5 h-5 rounded border-gray-500 text-green-600 focus:ring-green-500 bg-transparent" defaultChecked />
-                            <span className="text-sm">Notify Bank of Travel Dates</span>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
-                            <input type="checkbox" className="w-5 h-5 rounded border-gray-500 text-green-600 focus:ring-green-500 bg-transparent" defaultChecked />
-                            <span className="text-sm">Carry roughly $200 in USD/EUR as backup</span>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
-                            <input type="checkbox" className="w-5 h-5 rounded border-gray-500 text-green-600 focus:ring-green-500 bg-transparent" defaultChecked />
-                            <span className="text-sm">Check Exchange Rates</span>
-                        </div>
+                    <p style={{ fontSize: '0.875rem', color: '#78716c', margin: 0 }}>Avoid frozen cards and high fees.</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {["Notify Bank of Travel Dates", "Carry roughly $200 in USD/EUR as backup", "Check Exchange Rates"].map((item, idx) => (
+                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem', borderRadius: '0.75rem', backgroundColor: '#fdfbf7', border: '1px solid #f5f5f4' }}>
+                                <input type="checkbox" style={{ width: '1.25rem', height: '1.25rem', cursor: 'pointer' }} defaultChecked />
+                                <span style={{ fontSize: '0.875rem', color: '#1c1917' }}>{item}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
 
             {/* Essentials */}
-            <div className="card glass p-6 space-y-4">
-                <h3 className="text-xl font-semibold flex items-center gap-2">
-                    <AlertTriangle className="text-yellow-400" size={20} /> Documents & Verification
+            <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                    <AlertTriangle style={{ color: '#ca8a04' }} size={20} /> Documents & Verification
                 </h3>
-                <div className="grid grid-cols-1 gap-4">
-                    <div className="form-group">
-                        <label className="form-label text-gray-300">Required Documents Checklist</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Required Documents Checklist</label>
                         <textarea
-                            className="form-input bg-black/20"
+                            className="form-input"
+                            style={{ backgroundColor: '#fdfbf7' }}
                             placeholder="e.g. Passport, Visa, Hotel Booking (Comma separated)"
                             value={data.essentials.documents.join(", ")}
                             onChange={e => handleEssentialsChange("documents", handleArrayInput(e.target.value))}
                         />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="form-group">
-                            <label className="form-label text-gray-300">Health & Vaccines</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Health & Vaccines</label>
                             <input
-                                className="form-input bg-black/20"
-                                placeholder="e.g. Covid Vax, Yellow Fever"
+                                className="form-input"
+                                style={{ backgroundColor: '#fdfbf7' }}
+                                placeholder="e.g. Covid Vax"
                                 value={data.essentials.health.join(", ")}
                                 onChange={e => handleEssentialsChange("health", handleArrayInput(e.target.value))}
                             />
                         </div>
-                        <div className="form-group">
-                            <label className="form-label text-gray-300">Travel Insurance Advice</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Travel Insurance Advice</label>
                             <input
-                                className="form-input bg-black/20"
-                                placeholder="e.g. Essential. Ensure it covers cancellation."
+                                className="form-input"
+                                style={{ backgroundColor: '#fdfbf7' }}
+                                placeholder="e.g. Essential. Ensure coverage."
                                 value={data.essentials.insurance}
                                 onChange={e => handleEssentialsChange("insurance", e.target.value)}
                             />
@@ -219,96 +216,43 @@ export default function PreTripSection({ data, onChange }: PreTripSectionProps) 
             </div>
 
             {/* Packing List */}
-            <div className="card glass p-6 space-y-6">
-                <div className="flex justify-between items-center">
-                    <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <Briefcase className="text-orange-400" size={20} /> Ultimate Packing List
+            <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                        <Briefcase style={{ color: '#ea580c' }} size={20} /> Ultimate Packing List
                     </h3>
-                    <span className="text-xs bg-orange-500/10 text-orange-400 px-2 py-1 rounded-full border border-orange-500/20">
+                    <span style={{ padding: '0.25rem 0.75rem', backgroundColor: '#fdfbf7', color: '#0891b2', fontSize: '0.75rem', borderRadius: '1rem', border: '1px solid #f5f5f4', fontWeight: 'bold' }}>
                         Zero Stress
                     </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Clothes */}
-                    <div className="space-y-2">
-                        <label className="flex items-center gap-2 font-semibold text-gray-200">
-                            <Shirt size={16} className="text-pink-400" /> Clothes & Wearables
-                        </label>
-                        <textarea
-                            className="form-input bg-black/20 font-mono text-sm h-32"
-                            placeholder="One item per line..."
-                            value={data.packingList.find(p => p.category === "Clothes")?.items.join("\n") || ""}
-                            onChange={(e) => {
-                                const newItems = e.target.value.split("\n");
-                                const newPackingList = [...data.packingList];
-                                const index = newPackingList.findIndex(p => p.category === "Clothes");
-                                if (index >= 0) newPackingList[index] = { ...newPackingList[index], items: newItems };
-                                else newPackingList.push({ category: "Clothes", items: newItems });
-                                onChange({ ...data, packingList: newPackingList });
-                            }}
-                        />
-                    </div>
-
-                    {/* Tech */}
-                    <div className="space-y-2">
-                        <label className="flex items-center gap-2 font-semibold text-gray-200">
-                            <Zap size={16} className="text-yellow-400" /> Tech & Gadgets
-                        </label>
-                        <textarea
-                            className="form-input bg-black/20 font-mono text-sm h-32"
-                            placeholder="One item per line..."
-                            value={data.packingList.find(p => p.category === "Tech")?.items.join("\n") || ""}
-                            onChange={(e) => {
-                                const newItems = e.target.value.split("\n");
-                                const newPackingList = [...data.packingList];
-                                const index = newPackingList.findIndex(p => p.category === "Tech");
-                                if (index >= 0) newPackingList[index] = { ...newPackingList[index], items: newItems };
-                                else newPackingList.push({ category: "Tech", items: newItems });
-                                onChange({ ...data, packingList: newPackingList });
-                            }}
-                        />
-                    </div>
-
-                    {/* Toiletries */}
-                    <div className="space-y-2">
-                        <label className="flex items-center gap-2 font-semibold text-gray-200">
-                            <CheckSquare size={16} className="text-cyan-400" /> Toiletries & Meds
-                        </label>
-                        <textarea
-                            className="form-input bg-black/20 font-mono text-sm h-32"
-                            placeholder="One item per line..."
-                            value={data.packingList.find(p => p.category === "Toiletries")?.items.join("\n") || ""}
-                            onChange={(e) => {
-                                const newItems = e.target.value.split("\n");
-                                const newPackingList = [...data.packingList];
-                                const index = newPackingList.findIndex(p => p.category === "Toiletries");
-                                if (index >= 0) newPackingList[index] = { ...newPackingList[index], items: newItems };
-                                else newPackingList.push({ category: "Toiletries", items: newItems });
-                                onChange({ ...data, packingList: newPackingList });
-                            }}
-                        />
-                    </div>
-
-                    {/* Misc */}
-                    <div className="space-y-2">
-                        <label className="flex items-center gap-2 font-semibold text-gray-200">
-                            <CheckSquare size={16} className="text-gray-400" /> Miscellaneous
-                        </label>
-                        <textarea
-                            className="form-input bg-black/20 font-mono text-sm h-32"
-                            placeholder="One item per line..."
-                            value={data.packingList.find(p => p.category === "Misc")?.items.join("\n") || ""}
-                            onChange={(e) => {
-                                const newItems = e.target.value.split("\n");
-                                const newPackingList = [...data.packingList];
-                                const index = newPackingList.findIndex(p => p.category === "Misc");
-                                if (index >= 0) newPackingList[index] = { ...newPackingList[index], items: newItems };
-                                else newPackingList.push({ category: "Misc", items: newItems });
-                                onChange({ ...data, packingList: newPackingList });
-                            }}
-                        />
-                    </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
+                    {[
+                        { title: "Clothes & Wearables", icon: Shirt, color: '#ec4899', category: "Clothes" },
+                        { title: "Tech & Gadgets", icon: Zap, color: '#eab308', category: "Tech" },
+                        { title: "Toiletries & Meds", icon: CheckSquare, color: '#06b6d4', category: "Toiletries" },
+                        { title: "Miscellaneous", icon: CheckSquare, color: '#78716c', category: "Misc" }
+                    ].map((sec, idx) => (
+                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <label style={{ fontSize: '0.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#44403c' }}>
+                                <sec.icon size={16} style={{ color: sec.color }} /> {sec.title}
+                            </label>
+                            <textarea
+                                className="form-input"
+                                style={{ minHeight: '120px', backgroundColor: '#fdfbf7', fontSize: '0.875rem' }}
+                                placeholder="One item per line..."
+                                value={data.packingList.find(p => p.category === sec.category)?.items.join("\n") || ""}
+                                onChange={(e) => {
+                                    const newItems = e.target.value.split("\n");
+                                    const newPackingList = [...data.packingList];
+                                    const index = newPackingList.findIndex(p => p.category === sec.category);
+                                    if (index >= 0) newPackingList[index] = { ...newPackingList[index], items: newItems };
+                                    else newPackingList.push({ category: sec.category, items: newItems });
+                                    onChange({ ...data, packingList: newPackingList });
+                                }}
+                            />
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

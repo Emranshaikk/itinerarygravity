@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Eye, ChevronRight } from "lucide-react";
 import { ItineraryContent, initialItineraryContent } from "@/types/itinerary";
@@ -49,6 +49,11 @@ export default function CreateItineraryPage() {
     const [activeStep, setActiveStep] = useState(1);
     const [content, setContent] = useState<ItineraryContent>(initialItineraryContent);
     const [isSaving, setIsSaving] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const getCompletedSteps = () => {
         const steps: number[] = [];
@@ -61,7 +66,6 @@ export default function CreateItineraryPage() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            // Map the complex content to the DB schema
             const payload = {
                 title: content.cover.title,
                 location: content.cover.destination,
@@ -79,7 +83,6 @@ export default function CreateItineraryPage() {
             });
 
             if (response.ok) {
-                // alert("Itinerary Saved Successfully!"); // Use toast if available
                 router.push("/dashboard/influencer");
             } else {
                 const error = await response.text();
@@ -130,75 +133,74 @@ export default function CreateItineraryPage() {
         }
     };
 
-    return (
-        <div className="container mx-auto max-w-7xl pb-24 px-4 sm:px-6">
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-8">
-                <div>
-                    <button
-                        onClick={() => router.back()}
-                        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-2"
-                    >
-                        <ArrowLeft size={16} /> Back to Dashboard
-                    </button>
-                    <h1 className="text-3xl font-bold text-gradient">Itinerary Builder</h1>
-                    <p className="text-gray-400 text-sm">Create a premium guide that sells.</p>
-                </div>
+    if (!mounted) {
+        return <div style={{ minHeight: '100vh', backgroundColor: '#fafaf9' }} />;
+    }
 
-                <div className="flex items-center gap-3">
-                    <button className="btn btn-outline gap-2 hidden sm:flex">
-                        <Eye size={18} /> Preview
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        disabled={isSaving}
-                        className="btn btn-primary gap-2"
-                    >
-                        <Save size={18} />
-                        {isSaving ? "Saving..." : "Save Itinerary"}
+    return (
+        <div suppressHydrationWarning style={{ minHeight: '100vh', backgroundColor: '#fafaf9', color: '#1c1917', paddingBottom: '6rem', paddingLeft: '1rem', paddingRight: '1rem', fontFamily: 'sans-serif' }}>
+            <header className="container" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingTop: '2rem', paddingBottom: '2rem', maxWidth: '1100px', margin: '0 auto' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                        <button
+                            onClick={() => router.back()}
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#78716c', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '0.5rem', fontSize: '0.875rem' }}
+                        >
+                            <ArrowLeft size={16} /> Back
+                        </button>
+                        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.025em', fontStyle: 'italic', margin: 0 }}>Plan Your Trip</h1>
+                    </div>
+                    <button className="btn btn-outline" style={{ borderRadius: '0.75rem', backgroundColor: 'white', padding: '0.5rem 1.5rem', fontSize: '0.875rem' }}>
+                        <Eye size={16} style={{ marginRight: '0.5rem' }} /> Preview
                     </button>
                 </div>
             </header>
 
-            <div className="max-w-4xl mx-auto">
+            <div style={{ maxWidth: '900px', margin: '2rem auto 0' }}>
                 <BuilderStepper
                     activeStep={activeStep}
                     onStepChange={setActiveStep}
                     completedSteps={getCompletedSteps()}
                 />
 
-                <div className="min-h-[60vh] glass rounded-3xl p-6 md:p-10 border border-white/10 relative overflow-hidden shadow-2xl">
-                    {/* Background Decor */}
-                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
-
+                <div className="card" style={{ minHeight: '60vh', backgroundColor: 'white', borderRadius: '2rem', padding: '2rem', border: '2px solid #f5f5f4', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', marginTop: '2rem' }}>
                     {renderSection()}
                 </div>
 
-                <div className="mt-8 flex justify-between items-center px-4">
+                <div style={{ marginTop: '3rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
+                    {activeStep > 1 && (
+                        <button
+                            className="btn"
+                            style={{ minWidth: '140px', padding: '1rem 2rem', borderRadius: '1.5rem', border: '2px solid #e7e5e4', backgroundColor: 'white', color: '#1c1917', fontWeight: 'bold', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', cursor: 'pointer' }}
+                            onClick={() => setActiveStep(prev => Math.max(1, prev - 1))}
+                        >
+                            <ChevronRight size={20} style={{ marginRight: '0.5rem', transform: 'rotate(180deg)' }} />
+                            Back
+                        </button>
+                    )}
+
                     <button
-                        className={`btn btn-ghost hover:bg-white/5 text-gray-400 hover:text-white transition-all ${activeStep === 1 ? 'invisible' : ''}`}
-                        onClick={() => setActiveStep(prev => Math.max(1, prev - 1))}
+                        onClick={handleSave}
+                        disabled={isSaving}
+                        className="btn"
+                        style={{ minWidth: '140px', padding: '1rem 2rem', borderRadius: '1.5rem', border: '2px solid #86efac', backgroundColor: '#f0fdf4', color: '#166534', fontWeight: 'bold', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', cursor: 'pointer' }}
                     >
-                        <ArrowLeft size={18} className="mr-2" />
-                        <span className="hidden sm:inline">Previous Section</span>
-                        <span className="sm:hidden">Back</span>
+                        <Save size={20} style={{ marginRight: '0.5rem' }} />
+                        {isSaving ? "Saving..." : "Save"}
                     </button>
 
-                    <div className="flex items-center gap-1">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className={`h-1 rounded-full transition-all duration-500 ${Math.ceil(activeStep / 5) === i ? 'w-8 bg-blue-500' : 'w-2 bg-white/10'}`} />
-                        ))}
-                    </div>
-
                     <button
-                        className="btn btn-primary bg-gradient-to-r from-blue-600 to-indigo-600 border-none px-8 py-6 h-auto text-lg hover:shadow-lg hover:shadow-blue-500/20 active:scale-95 transition-all"
+                        className="btn"
+                        style={{ minWidth: '140px', padding: '1rem 2rem', borderRadius: '1.5rem', border: '2px solid #86efac', backgroundColor: '#f0fdf4', color: '#166534', fontWeight: 'bold', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', cursor: 'pointer' }}
                         onClick={() => {
-                            if (activeStep < 15) setActiveStep(prev => prev + 1);
+                            if (activeStep < 15) {
+                                setActiveStep(prev => prev + 1);
+                            }
                             else handleSave();
                         }}
                     >
-                        {activeStep === 15 ? "Complete & Save" : "Next Section"}
-                        {activeStep !== 15 && <ChevronRight size={20} className="ml-2" />}
+                        {activeStep === 15 ? "Finish" : "Next"}
+                        {activeStep !== 15 && <ChevronRight size={20} style={{ marginLeft: '0.5rem' }} />}
                     </button>
                 </div>
             </div>

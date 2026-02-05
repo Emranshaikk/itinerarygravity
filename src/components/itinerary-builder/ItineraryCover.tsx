@@ -43,7 +43,7 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div suppressHydrationWarning className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex justify-between items-start">
                 <div className="prose dark:prose-invert">
                     <h2 className="text-3xl font-bold flex items-center gap-3">
@@ -63,43 +63,41 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-8">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
                 {/* Main Identity */}
-                <div className="card glass p-8 space-y-6 border border-white/5 bg-white/5">
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-gray-400">Itinerary Title</label>
+                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '2rem', backgroundColor: '#fdfbf7' }}>
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label className="form-label" style={{ fontWeight: 'bold', color: '#a8a29e', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Itinerary Title</label>
                         <input
                             name="title"
                             value={data.title}
                             onChange={handleChange}
-                            className="bg-transparent border-none text-3xl font-black placeholder-gray-700 focus:ring-0 w-full p-0"
+                            style={{ background: 'transparent', border: 'none', fontSize: '2.5rem', fontWeight: 900, color: '#1c1917', width: '100%', padding: 0 }}
                             placeholder="e.g. The Ultimate Bali Escape"
                         />
-                        <div className="h-0.5 w-full bg-gradient-to-r from-blue-500 via-purple-500 to-transparent opacity-30" />
+                        <div style={{ height: '4px', width: '80px', backgroundColor: '#22d3ee', borderRadius: '9999px', marginTop: '1rem' }} />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-400 flex items-center gap-2">
-                                <MapPin size={14} /> Destination
-                            </label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', paddingTop: '1rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label className="form-label" style={{ fontWeight: '600', color: '#78716c' }}>Destination</label>
                             <input
                                 name="destination"
                                 value={data.destination}
                                 onChange={handleChange}
-                                className="form-input bg-black/20"
+                                className="form-input"
+                                style={{ backgroundColor: 'white' }}
                                 placeholder="e.g. Kyoto, Japan"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-400 flex items-center gap-2">
-                                <Clock size={14} /> Duration
-                            </label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label className="form-label" style={{ fontWeight: '600', color: '#78716c' }}>Duration</label>
                             <input
                                 name="duration"
                                 value={data.duration}
                                 onChange={handleChange}
-                                className="form-input bg-black/20"
+                                className="form-input"
+                                style={{ backgroundColor: 'white' }}
                                 placeholder="e.g. 7 Days / 6 Nights"
                             />
                         </div>
@@ -107,19 +105,18 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                 </div>
 
                 {/* Classification */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="card glass p-6 space-y-4 border border-white/5">
-                        <h3 className="text-lg font-semibold flex items-center gap-2">
-                            <Tag className="text-purple-400" size={18} /> Trip Details
-                        </h3>
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <label className="text-xs text-gray-500 uppercase font-bold">Trip Type</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                    <div style={{ padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1rem', backgroundColor: '#fdfbf7' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#1c1917', marginBottom: '1rem' }}>Trip Details</h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: '#a8a29e', textTransform: 'uppercase', fontWeight: 'bold' }}>Trip Type</label>
                                 <select
                                     name="tripType"
                                     value={data.tripType}
                                     onChange={handleChange}
-                                    className="form-input bg-black/20"
+                                    className="form-input"
+                                    style={{ backgroundColor: 'white' }}
                                 >
                                     <option value="Luxury">Luxury</option>
                                     <option value="Budget">Budget</option>
@@ -130,69 +127,63 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                                     <option value="Cultural">Cultural</option>
                                 </select>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-xs text-gray-500 uppercase font-bold">Perfect For</label>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: '#a8a29e', textTransform: 'uppercase', fontWeight: 'bold' }}>Perfect For</label>
                                 <input
                                     name="targetAudience"
                                     value={data.targetAudience}
                                     onChange={handleChange}
-                                    className="form-input bg-black/20"
+                                    className="form-input"
+                                    style={{ backgroundColor: 'white' }}
                                     placeholder="e.g. Foodies, Couples, Solo ladies"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="card glass p-6 space-y-4 border border-white/5">
-                        <h3 className="text-lg font-semibold flex items-center gap-2">
-                            <Star className="text-yellow-400" size={18} /> Seasonal Info
-                        </h3>
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <label className="text-xs text-gray-500 uppercase font-bold">Best Time to Visit</label>
+                    <div style={{ padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1rem', backgroundColor: '#fdfbf7' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#1c1917', marginBottom: '1rem' }}>Seasonal Info</h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: '#a8a29e', textTransform: 'uppercase', fontWeight: 'bold' }}>Best Time to Visit</label>
                                 <input
                                     name="bestTimeToVisit"
                                     value={data.bestTimeToVisit}
                                     onChange={handleChange}
-                                    className="form-input bg-black/20"
+                                    className="form-input"
+                                    style={{ backgroundColor: 'white' }}
                                     placeholder="e.g. March - May (Sakura Season)"
                                 />
-                            </div>
-                            <div className="p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/10 text-xs text-yellow-200/60 leading-relaxed">
-                                Tip: Be specific about the "why". Instead of "Summer", try "Late June for the Lavender bloom".
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Branding & Pricing */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                     {/* Branding */}
-                    <div className="lg:col-span-2 card glass p-6 space-y-6 border border-white/5 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-5">
-                            <User size={100} />
-                        </div>
-                        <h3 className="text-lg font-semibold flex items-center gap-2">
-                            <User className="text-blue-400" size={18} /> Creator Branding
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-xs text-gray-500 uppercase font-bold">Brand Name</label>
+                    <div style={{ gridColumn: 'span 2', padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1rem', backgroundColor: '#fdfbf7' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#1c1917', marginBottom: '1.5rem' }}>Creator Branding</h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: '#a8a29e', textTransform: 'uppercase', fontWeight: 'bold' }}>Brand Name</label>
                                 <input
                                     name="brandName"
                                     value={data.brandName || ""}
                                     onChange={handleChange}
-                                    className="form-input bg-black/20"
+                                    className="form-input"
+                                    style={{ backgroundColor: 'white' }}
                                     placeholder="Your Name or Brand"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-xs text-gray-500 uppercase font-bold">Tagline</label>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: '#a8a29e', textTransform: 'uppercase', fontWeight: 'bold' }}>Tagline</label>
                                 <input
                                     name="tagline"
                                     value={data.tagline || ""}
                                     onChange={handleChange}
-                                    className="form-input bg-black/20"
+                                    className="form-input"
+                                    style={{ backgroundColor: 'white' }}
                                     placeholder="Something catchy..."
                                 />
                             </div>
@@ -200,29 +191,29 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                     </div>
 
                     {/* Pricing */}
-                    <div className="card glass p-6 space-y-4 border-l-4 border-l-green-500 bg-green-500/5">
-                        <h3 className="text-lg font-semibold flex items-center gap-2 text-green-400">
-                            <DollarSign size={18} /> Monetization
-                        </h3>
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <label className="text-xs text-gray-500 uppercase font-bold">Listing Price</label>
+                    <div style={{ padding: '1.5rem', border: '2px solid #cffafe', borderRadius: '1rem', backgroundColor: '#ecfeff' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#164e63', marginBottom: '1rem' }}>Pricing</h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: '#0891b2', textTransform: 'uppercase', fontWeight: 'bold' }}>Listing Price</label>
                                 <input
                                     name="price"
                                     type="number"
                                     value={data.price}
                                     onChange={handlePriceChange}
-                                    className="form-input bg-black/20 text-xl font-bold text-white"
+                                    className="form-input"
+                                    style={{ backgroundColor: 'white', fontSize: '1.5rem', fontWeight: 900, color: '#164e63', padding: '1rem' }}
                                     placeholder="0"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-xs text-gray-500 uppercase font-bold">Currency</label>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: '#0891b2', textTransform: 'uppercase', fontWeight: 'bold' }}>Currency</label>
                                 <select
                                     name="currency"
                                     value={data.currency || "USD"}
                                     onChange={handleChange}
-                                    className="form-input bg-black/20"
+                                    className="form-input"
+                                    style={{ backgroundColor: 'white', color: '#164e63' }}
                                 >
                                     <option value="USD">USD ($)</option>
                                     <option value="EUR">EUR (€)</option>

@@ -93,235 +93,166 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-start">
-                <div className="prose dark:prose-invert">
-                    <h2 className="text-3xl font-bold flex items-center gap-2">
-                        <Calendar className="text-purple-400" size={32} />
-                        Day-by-Day Itinerary
-                    </h2>
-                    <p className="text-gray-400">
-                        Design a time-optimized, stress-free flow. Detail is the difference between a good trip and a great one.
-                    </p>
-                </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ paddingBottom: '1rem' }}>
+                <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                    <Calendar style={{ color: '#9333ea' }} size={32} />
+                    Day-by-Day Itinerary
+                </h2>
+                <p style={{ color: '#78716c' }}>
+                    Design a time-optimized, stress-free flow. Detail is the difference between a good trip and a great one.
+                </p>
             </div>
 
-            <div className="space-y-8">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
                 {data.map((day, index) => (
-                    <div key={index} className="card glass p-0 border border-white/5 relative overflow-hidden">
+                    <div key={index} style={{ border: '1px solid #f5f5f4', borderRadius: '2rem', backgroundColor: 'white', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)' }}>
                         {/* Day Header */}
-                        <div className="p-6 border-b border-white/5 bg-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div className="flex items-center gap-4">
-                                <div className="text-4xl font-black text-white/10">0{day.dayNumber}</div>
-                                <div className="flex-1">
-                                    <input
-                                        className="bg-transparent border-none text-xl font-bold placeholder-gray-500 focus:ring-0 w-full md:w-[400px]"
-                                        placeholder={`Day ${day.dayNumber} Title (e.g. Temples & Tea)`}
-                                        value={day.title}
-                                        onChange={(e) => updateDay(index, 'title', e.target.value)}
-                                    />
-                                </div>
+                        <div style={{ padding: '2rem', borderBottom: '1px solid #f5f5f4', backgroundColor: '#fdfbf7', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1 }}>
+                                <div style={{ fontSize: '3rem', fontWeight: 900, color: '#e7e5e4', lineHeight: 1 }}>{day.dayNumber < 10 ? `0${day.dayNumber}` : day.dayNumber}</div>
+                                <input
+                                    style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', fontWeight: 'bold', color: '#1c1917', width: '100%', outline: 'none' }}
+                                    placeholder={`Day ${day.dayNumber} Title`}
+                                    value={day.title}
+                                    onChange={(e) => updateDay(index, 'title', e.target.value)}
+                                />
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 <button
                                     onClick={() => autoFillDay(index)}
                                     disabled={generatingDay === index}
-                                    className="btn btn-outline text-xs py-2 h-9"
+                                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '0.75rem', border: '1px solid #e7e5e4', backgroundColor: 'white', color: '#78716c', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}
                                 >
-                                    {generatingDay === index ? "Building..." : <><Wand2 size={12} className="mr-2" /> Auto-Fill Day</>}
+                                    <Wand2 size={14} /> {generatingDay === index ? "Generating..." : "Auto-Fill Day"}
                                 </button>
                                 {data.length > 1 && (
-                                    <button onClick={() => removeDay(index)} className="p-2 hover:bg-red-500/10 text-red-400 rounded-lg transition-colors">
-                                        <Trash2 size={16} />
+                                    <button onClick={() => removeDay(index)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
+                                        <Trash2 size={20} />
                                     </button>
                                 )}
                             </div>
                         </div>
 
                         {/* Top Logistics Bar */}
-                        <div className="bg-black/20 p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-sm border-b border-white/5">
-                            <div className="flex flex-col gap-1">
-                                <label className="text-gray-500 flex items-center gap-1"><Sun size={12} /> Ideal Wake Up</label>
+                        <div style={{ backgroundColor: '#fafaf9', padding: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', borderBottom: '1px solid #f5f5f4' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label style={{ color: '#78716c', fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                    <Clock size={14} /> Wake Up
+                                </label>
                                 <input
                                     type="time"
-                                    className="bg-transparent border-b border-white/10 focus:border-purple-400 focus:outline-none w-full"
+                                    className="form-input"
+                                    style={{ backgroundColor: 'white' }}
                                     value={day.wakeUpTime || "08:00"}
                                     onChange={(e) => updateDay(index, 'wakeUpTime', e.target.value)}
                                 />
                             </div>
-                            <div className="flex flex-col gap-1 md:col-span-2">
-                                <label className="text-gray-500 flex items-center gap-1"><Users size={12} /> Crowd Avoidance / Insider Tip</label>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label style={{ color: '#78716c', fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                    <Info size={14} /> Insider Tip
+                                </label>
                                 <input
-                                    className="bg-transparent border-b border-white/10 focus:border-purple-400 focus:outline-none w-full placeholder-gray-600"
-                                    placeholder="e.g. Arrive before 8am to avoid tour buses..."
+                                    className="form-input"
+                                    style={{ backgroundColor: 'white' }}
+                                    placeholder="e.g. Arrive before 8am..."
                                     value={day.crowdTips || ""}
                                     onChange={(e) => updateDay(index, 'crowdTips', e.target.value)}
                                 />
                             </div>
-                            <div className="flex flex-col gap-1">
-                                <label className="text-gray-500 flex items-center gap-1"><Clock size={12} /> Total Transit</label>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label style={{ color: '#78716c', fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                    <MapPin size={14} /> Transit Plan
+                                </label>
                                 <input
-                                    className="bg-transparent border-b border-white/10 focus:border-purple-400 focus:outline-none w-full placeholder-gray-600"
-                                    placeholder="e.g. 1.5h"
-                                    value={day.logistics.travelTime}
-                                    onChange={(e) => updateDay(index, 'logistics.travelTime', e.target.value)}
+                                    className="form-input"
+                                    style={{ backgroundColor: 'white' }}
+                                    placeholder="e.g. Metro + Walking"
+                                    value={day.logistics.transport}
+                                    onChange={(e) => updateDay(index, 'logistics.transport', e.target.value)}
                                 />
                             </div>
                         </div>
 
-                        <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div style={{ padding: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                             {/* Morning Block */}
-                            <div className="space-y-4 relative">
-                                <div className="absolute left-[-11px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-yellow-300 via-yellow-500/20 to-transparent"></div>
-                                <div className="flex items-center justify-between text-yellow-300 mb-2 pl-4">
-                                    <h4 className="font-bold flex items-center gap-2"><Sun size={18} /> Morning</h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <h4 style={{ fontWeight: 'bold', color: '#ca8a04', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <Sun size={18} /> Morning
+                                    </h4>
                                     <input
                                         type="time"
-                                        className="bg-transparent text-sm w-20 text-right focus:outline-none"
+                                        style={{ background: 'transparent', border: 'none', fontSize: '0.875rem', color: '#78716c', textAlign: 'right', fontWeight: '600' }}
                                         value={day.morning.time}
                                         onChange={(e) => updateDay(index, 'morning.time', e.target.value)}
                                     />
                                 </div>
-                                <div className="pl-4 space-y-3">
-                                    <textarea
-                                        className="form-input text-sm bg-white/5 min-h-[100px]"
-                                        placeholder="Morning activity..."
-                                        value={day.morning.activity}
-                                        onChange={(e) => updateDay(index, 'morning.activity', e.target.value)}
-                                    />
-                                    <div className="flex gap-2">
-                                        <input
-                                            className="form-input text-xs py-1 flex-1 bg-white/5"
-                                            placeholder="Location..."
-                                            value={day.morning.location || ""}
-                                            onChange={(e) => updateDay(index, 'morning.location', e.target.value)}
-                                        />
-                                        <input
-                                            className="form-input text-xs py-1 w-24 bg-white/5"
-                                            placeholder="Transit..."
-                                            value={day.morning.travelTime || ""}
-                                            onChange={(e) => updateDay(index, 'morning.travelTime', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Coffee size={14} className="text-gray-400" />
-                                        <input
-                                            className="bg-transparent border-b border-white/10 text-xs w-full focus:outline-none placeholder-gray-600"
-                                            placeholder="Breakfast spot..."
-                                            value={day.morning.food || ""}
-                                            onChange={(e) => updateDay(index, 'morning.food', e.target.value)}
-                                        />
-                                    </div>
-                                </div>
+                                <textarea
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', border: '1px solid #f5f5f4', fontSize: '0.875rem', minHeight: '140px' }}
+                                    placeholder="Morning activity details..."
+                                    value={day.morning.activity}
+                                    onChange={(e) => updateDay(index, 'morning.activity', e.target.value)}
+                                />
                             </div>
 
                             {/* Afternoon Block */}
-                            <div className="space-y-4 relative">
-                                <div className="absolute left-[-11px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-orange-400 via-orange-500/20 to-transparent"></div>
-                                <div className="flex items-center justify-between text-orange-400 mb-2 pl-4">
-                                    <h4 className="font-bold flex items-center gap-2"><Sun size={18} /> Afternoon</h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <h4 style={{ fontWeight: 'bold', color: '#ea580c', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <Utensils size={18} /> Afternoon
+                                    </h4>
                                     <input
                                         type="time"
-                                        className="bg-transparent text-sm w-20 text-right focus:outline-none"
+                                        style={{ background: 'transparent', border: 'none', fontSize: '0.875rem', color: '#78716c', textAlign: 'right', fontWeight: '600' }}
                                         value={day.afternoon.time}
                                         onChange={(e) => updateDay(index, 'afternoon.time', e.target.value)}
                                     />
                                 </div>
-                                <div className="pl-4 space-y-3">
-                                    <textarea
-                                        className="form-input text-sm bg-white/5 min-h-[100px]"
-                                        placeholder="Afternoon activity..."
-                                        value={day.afternoon.activity}
-                                        onChange={(e) => updateDay(index, 'afternoon.activity', e.target.value)}
-                                    />
-                                    <div className="flex gap-2">
-                                        <input
-                                            className="form-input text-xs py-1 flex-1 bg-white/5"
-                                            placeholder="Location..."
-                                            value={day.afternoon.location || ""}
-                                            onChange={(e) => updateDay(index, 'afternoon.location', e.target.value)}
-                                        />
-                                        <input
-                                            className="form-input text-xs py-1 w-24 bg-white/5"
-                                            placeholder="Transit..."
-                                            value={day.afternoon.travelTime || ""}
-                                            onChange={(e) => updateDay(index, 'afternoon.travelTime', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="bg-white/5 p-3 rounded-lg space-y-2">
-                                        <div className="flex items-center gap-2 text-xs text-gray-400 font-semibold uppercase">
-                                            <Utensils size={12} /> Lunch Recommendation
-                                        </div>
-                                        <input
-                                            className="bg-transparent border-b border-white/10 text-sm w-full focus:outline-none mb-1 placeholder-gray-600"
-                                            placeholder="Restaurant Name..."
-                                            value={day.afternoon.food || ""}
-                                            onChange={(e) => updateDay(index, 'afternoon.food', e.target.value)}
-                                        />
-                                        <input
-                                            className="bg-transparent text-xs text-gray-400 w-full focus:outline-none placeholder-gray-600"
-                                            placeholder="Cuisine Type (e.g. Italian, Sushi)"
-                                            value={day.afternoon.foodType || ""}
-                                            onChange={(e) => updateDay(index, 'afternoon.foodType', e.target.value)}
-                                        />
-                                    </div>
-                                </div>
+                                <textarea
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', border: '1px solid #f5f5f4', fontSize: '0.875rem', minHeight: '140px' }}
+                                    placeholder="Afternoon activity details..."
+                                    value={day.afternoon.activity}
+                                    onChange={(e) => updateDay(index, 'afternoon.activity', e.target.value)}
+                                />
                             </div>
 
                             {/* Evening Block */}
-                            <div className="space-y-4 relative">
-                                <div className="absolute left-[-11px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-indigo-400 via-indigo-500/20 to-transparent"></div>
-                                <div className="flex items-center justify-between text-indigo-400 mb-2 pl-4">
-                                    <h4 className="font-bold flex items-center gap-2"><Moon size={18} /> Evening</h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <h4 style={{ fontWeight: 'bold', color: '#4f46e5', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <Moon size={18} /> Evening
+                                    </h4>
                                     <input
                                         type="time"
-                                        className="bg-transparent text-sm w-20 text-right focus:outline-none"
+                                        style={{ background: 'transparent', border: 'none', fontSize: '0.875rem', color: '#78716c', textAlign: 'right', fontWeight: '600' }}
                                         value={day.evening.time}
                                         onChange={(e) => updateDay(index, 'evening.time', e.target.value)}
                                     />
                                 </div>
-                                <div className="pl-4 space-y-3">
-                                    <textarea
-                                        className="form-input text-sm bg-white/5 min-h-[100px]"
-                                        placeholder="Nightlife, Shows, Sunset..."
-                                        value={day.evening.activity}
-                                        onChange={(e) => updateDay(index, 'evening.activity', e.target.value)}
-                                    />
-                                    <div className="bg-white/5 p-3 rounded-lg space-y-2">
-                                        <div className="flex items-center gap-2 text-xs text-gray-400 font-semibold uppercase">
-                                            <Utensils size={12} /> Dinner Options
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            <div>
-                                                <label className="text-[10px] text-green-400 block">BUDGET SAVER</label>
-                                                <input
-                                                    className="bg-transparent border-b border-white/10 text-xs w-full focus:outline-none"
-                                                    placeholder="Name & Price"
-                                                    value={day.evening.foodBudget || ""}
-                                                    onChange={(e) => updateDay(index, 'evening.foodBudget', e.target.value)}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-[10px] text-amber-400 block">PREMIUM SPLURGE</label>
-                                                <input
-                                                    className="bg-transparent border-b border-white/10 text-xs w-full focus:outline-none"
-                                                    placeholder="Name & Price"
-                                                    value={day.evening.foodPremium || ""}
-                                                    onChange={(e) => updateDay(index, 'evening.foodPremium', e.target.value)}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <textarea
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', border: '1px solid #f5f5f4', fontSize: '0.875rem', minHeight: '140px' }}
+                                    placeholder="Evening activity details..."
+                                    value={day.evening.activity}
+                                    onChange={(e) => updateDay(index, 'evening.activity', e.target.value)}
+                                />
                             </div>
                         </div>
-
                     </div>
                 ))}
 
-                <button onClick={addDay} className="w-full btn btn-outline border-dashed py-8 hover:bg-white/5 hover:border-white/20 hover:text-white transition-all">
-                    <Plus size={20} className="mr-2" />
-                    Add Day {data.length + 1} to Itinerary
+                <button
+                    onClick={addDay}
+                    className="btn"
+                    style={{ width: '100%', padding: '2.5rem', borderRadius: '2rem', border: '2px dashed #e7e5e4', color: '#78716c', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', backgroundColor: 'white', cursor: 'pointer', fontSize: '1.25rem', transition: 'all 0.2s ease' }}
+                >
+                    <div style={{ backgroundColor: '#f5f5f4', padding: '0.5rem', borderRadius: '50%' }}>
+                        <Plus size={24} />
+                    </div>
+                    Add Day {data.length + 1}
                 </button>
             </div>
         </div>

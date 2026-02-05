@@ -54,47 +54,48 @@ export default function FoodSection({ data, onChange }: FoodSectionProps) {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-start">
-                <div className="prose dark:prose-invert">
-                    <h2 className="text-3xl font-bold flex items-center gap-3">
-                        <Utensils className="text-orange-400" size={32} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1.5rem' }}>
+                <div>
+                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                        <Utensils style={{ color: '#ea580c' }} size={32} />
                         Local Food Guide
                     </h2>
-                    <p className="text-gray-400 max-w-2xl">
+                    <p style={{ color: '#78716c' }}>
                         Travelers explore with their stomachs. Give them the flavors they'll never forget.
                     </p>
                 </div>
                 <button
                     onClick={generateAIContent}
                     disabled={isGenerating}
-                    className="btn btn-primary bg-gradient-to-r from-orange-600 to-red-600 border-none hover:shadow-lg hover:shadow-orange-500/20"
+                    className="btn btn-primary"
+                    style={{ backgroundColor: '#ea580c', color: 'white', border: 'none', borderRadius: '0.75rem', padding: '0.75rem 1.5rem', fontWeight: '600', cursor: 'pointer' }}
                 >
-                    {isGenerating ? "Cooking..." : <><Wand2 size={16} className="mr-2" /> Auto-Fill Food</>}
+                    {isGenerating ? "Cooking..." : <><Wand2 size={16} style={{ marginRight: '0.5rem' }} /> Auto-Fill Food</>}
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-8">
-
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                 {/* Must Try Dishes */}
-                <div className="card glass p-6 space-y-6 border border-white/5 bg-white/5">
-                    <div className="flex justify-between items-center">
-                        <h3 className="text-xl font-semibold flex items-center gap-2 text-orange-400">
-                            <Heart size={20} /> Iconic Local Dishes
+                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                            <Heart style={{ color: '#ef4444' }} size={20} /> Iconic Local Dishes
                         </h3>
-                        <button onClick={addDish} className="text-xs text-orange-400 hover:text-orange-300 flex items-center gap-1">
+                        <button onClick={addDish} style={{ fontSize: '0.75rem', color: '#ea580c', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                             <Plus size={14} /> Add Dish
                         </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
                         {data.mustTryDishes.map((dish, i) => (
-                            <div key={i} className="p-4 rounded-xl bg-black/20 border border-white/5 space-y-3 relative group">
-                                <button onClick={() => removeDish(i)} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-red-400">
+                            <div key={i} style={{ padding: '1.5rem', borderRadius: '1rem', border: '1px solid #f5f5f4', backgroundColor: '#fdfbf7', display: 'flex', flexDirection: 'column', gap: '1rem', position: 'relative' }}>
+                                <button onClick={() => removeDish(i)} style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', background: 'none', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>
                                     <Trash2 size={14} />
                                 </button>
                                 <input
-                                    className="bg-transparent border-b border-white/10 text-lg font-bold w-full focus:outline-none focus:border-orange-400 placeholder-gray-700"
+                                    className="form-input"
+                                    style={{ border: 'none', borderBottom: '1px solid #e7e5e4', fontSize: '1.125rem', fontWeight: 'bold', width: '100%', padding: '0.25rem 0', background: 'transparent' }}
                                     placeholder="Dish Name (e.g. Sushi)"
                                     value={dish.name}
                                     onChange={(e) => {
@@ -104,7 +105,8 @@ export default function FoodSection({ data, onChange }: FoodSectionProps) {
                                     }}
                                 />
                                 <textarea
-                                    className="form-input bg-transparent text-sm min-h-[60px]"
+                                    className="form-input"
+                                    style={{ background: 'white', fontSize: '0.875rem', minHeight: '80px', border: '1px solid #e7e5e4' }}
                                     placeholder="Describe why they must try it..."
                                     value={dish.description}
                                     onChange={(e) => {
@@ -113,10 +115,11 @@ export default function FoodSection({ data, onChange }: FoodSectionProps) {
                                         updateField("mustTryDishes", newDishes);
                                     }}
                                 />
-                                <div className="flex items-center gap-2 text-xs text-gray-500">
-                                    <MapPin size={12} />
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <MapPin size={14} style={{ color: '#a8a29e' }} />
                                     <input
-                                        className="bg-transparent border-b border-white/10 w-full focus:outline-none focus:border-orange-400"
+                                        className="form-input"
+                                        style={{ border: 'none', borderBottom: '1px solid #e7e5e4', fontSize: '0.75rem', width: '100%', padding: '0.25rem 0', background: 'transparent' }}
                                         placeholder="Best place to find it..."
                                         value={dish.bestPlace || ""}
                                         onChange={(e) => {
@@ -132,33 +135,34 @@ export default function FoodSection({ data, onChange }: FoodSectionProps) {
                 </div>
 
                 {/* Restaurant Recommendations */}
-                <div className="card glass p-6 space-y-6 border border-white/5 bg-white/5 text-sm">
-                    <div className="flex justify-between items-center">
-                        <h3 className="text-xl font-semibold flex items-center gap-2 text-red-400">
-                            <Coffee size={20} /> Handpicked Restaurants
+                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                            <Coffee style={{ color: '#8b4513' }} size={20} /> Handpicked Restaurants
                         </h3>
-                        <button onClick={addRestaurant} className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1">
+                        <button onClick={addRestaurant} style={{ fontSize: '0.75rem', color: '#ea580c', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                             <Plus size={14} /> Add Restaurant
                         </button>
                     </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="text-gray-500 text-xs uppercase">
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
+                            <thead style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#78716c', borderBottom: '1px solid #f5f5f4' }}>
                                 <tr>
-                                    <th className="pb-4 pr-4">Name</th>
-                                    <th className="pb-4 pr-4 w-24">Price</th>
-                                    <th className="pb-4 pr-4 w-40">Cuisine</th>
-                                    <th className="pb-4 pr-4">Expert Notes</th>
-                                    <th className="pb-4 w-10"></th>
+                                    <th style={{ padding: '1rem', fontWeight: 'bold' }}>Name</th>
+                                    <th style={{ padding: '1rem', fontWeight: 'bold', width: '120px' }}>Price</th>
+                                    <th style={{ padding: '1rem', fontWeight: 'bold', width: '180px' }}>Cuisine</th>
+                                    <th style={{ padding: '1rem', fontWeight: 'bold' }}>Expert Notes</th>
+                                    <th style={{ padding: '1rem', width: '50px' }}></th>
                                 </tr>
                             </thead>
-                            <tbody className="space-y-2">
+                            <tbody>
                                 {data.restaurantRecommendations.map((rest, i) => (
-                                    <tr key={i} className="border-t border-white/5">
-                                        <td className="py-3 pr-4">
+                                    <tr key={i} style={{ borderBottom: '1px solid #f5f5f4' }}>
+                                        <td style={{ padding: '0.75rem' }}>
                                             <input
-                                                className="bg-transparent border-b border-white/10 w-full focus:outline-none focus:border-red-400 font-bold"
+                                                className="form-input"
+                                                style={{ border: 'none', fontWeight: 'bold', width: '100%', background: 'transparent' }}
                                                 placeholder="Restaurant Name"
                                                 value={rest.name}
                                                 onChange={(e) => {
@@ -168,25 +172,27 @@ export default function FoodSection({ data, onChange }: FoodSectionProps) {
                                                 }}
                                             />
                                         </td>
-                                        <td className="py-3 pr-4">
+                                        <td style={{ padding: '0.75rem' }}>
                                             <select
-                                                className="bg-transparent border-b border-white/10 w-full focus:outline-none"
-                                                value={rest.priceRange}
+                                                className="form-input"
+                                                style={{ border: 'none', width: '100%', background: 'transparent', cursor: 'pointer' }}
+                                                value={rest.priceRange || "$$"}
                                                 onChange={(e) => {
                                                     const newRests = [...data.restaurantRecommendations];
                                                     newRests[i].priceRange = e.target.value;
                                                     updateField("restaurantRecommendations", newRests);
                                                 }}
                                             >
-                                                <option value="$">$ (Cheap)</option>
-                                                <option value="$$">$$ (Mid-range)</option>
-                                                <option value="$$$">$$$ (Fine Dining)</option>
-                                                <option value="$$$$">$$$$ (Ultra Luxury)</option>
+                                                <option value="$">$ (Economy)</option>
+                                                <option value="$$">$$ (Standard)</option>
+                                                <option value="$$$">$$$ (Premium)</option>
+                                                <option value="$$$$">$$$$ (Luxury)</option>
                                             </select>
                                         </td>
-                                        <td className="py-3 pr-4">
+                                        <td style={{ padding: '0.75rem' }}>
                                             <input
-                                                className="bg-transparent border-b border-white/10 w-full focus:outline-none"
+                                                className="form-input"
+                                                style={{ border: 'none', width: '100%', background: 'transparent' }}
                                                 placeholder="e.g. Italian"
                                                 value={rest.cuisine}
                                                 onChange={(e) => {
@@ -196,10 +202,11 @@ export default function FoodSection({ data, onChange }: FoodSectionProps) {
                                                 }}
                                             />
                                         </td>
-                                        <td className="py-3 pr-4">
+                                        <td style={{ padding: '0.75rem' }}>
                                             <input
-                                                className="bg-transparent border-b border-white/10 w-full focus:outline-none italic text-gray-400"
-                                                placeholder="e.g. Try the Truffle Pasta..."
+                                                className="form-input"
+                                                style={{ border: 'none', width: '100%', background: 'transparent', fontStyle: 'italic', color: '#78716c' }}
+                                                placeholder="e.g. Try the pasta..."
                                                 value={rest.notes || ""}
                                                 onChange={(e) => {
                                                     const newRests = [...data.restaurantRecommendations];
@@ -208,9 +215,9 @@ export default function FoodSection({ data, onChange }: FoodSectionProps) {
                                                 }}
                                             />
                                         </td>
-                                        <td className="py-3 text-right">
-                                            <button onClick={() => removeRestaurant(i)} className="text-gray-500 hover:text-red-400">
-                                                <Trash2 size={14} />
+                                        <td style={{ padding: '0.75rem', textAlign: 'right' }}>
+                                            <button onClick={() => removeRestaurant(i)} style={{ background: 'none', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>
+                                                <Trash2 size={16} />
                                             </button>
                                         </td>
                                     </tr>
@@ -220,27 +227,29 @@ export default function FoodSection({ data, onChange }: FoodSectionProps) {
                     </div>
                 </div>
 
-                {/* Safety & Dietary */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="card glass p-6 space-y-4 border border-white/5 bg-white/5">
-                        <h3 className="text-lg font-semibold flex items-center gap-2 text-blue-400">
-                            <Info size={18} /> Dietary Options (Veg/Vegan/Alergies)
+                {/* Dietary & Safety */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                    <div style={{ padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1d4ed8', margin: 0 }}>
+                            <Info size={18} /> Dietary Options
                         </h3>
                         <textarea
-                            className="form-input bg-black/20 h-24"
-                            placeholder="How easy is it for vegetarians? Are allergies taken seriously?"
+                            className="form-input"
+                            style={{ minHeight: '100px', backgroundColor: '#fdfbf7' }}
+                            placeholder="How easy is it for vegetarians? Allergies?"
                             value={data.dietaryOptions || ""}
                             onChange={(e) => updateField("dietaryOptions", e.target.value)}
                         />
                     </div>
-                    <div className="card glass p-6 space-y-4 border border-white/5 bg-white/5">
-                        <h3 className="text-lg font-semibold flex items-center gap-2 text-yellow-500">
-                            <AlertTriangle size={18} /> Food Safety & Standards
+                    <div style={{ padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ca8a04', margin: 0 }}>
+                            <AlertTriangle size={18} /> Food Safety
                         </h3>
                         <textarea
-                            className="form-input bg-black/20 h-24"
-                            placeholder="Is tap water safe? Is street food generally clean?"
-                            value={data.foodSafety}
+                            className="form-input"
+                            style={{ minHeight: '100px', backgroundColor: '#fdfbf7' }}
+                            placeholder="Tap water? Street food standards?"
+                            value={data.foodSafety || ""}
                             onChange={(e) => updateField("foodSafety", e.target.value)}
                         />
                     </div>

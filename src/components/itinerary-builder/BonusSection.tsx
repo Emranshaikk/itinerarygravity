@@ -55,40 +55,42 @@ export default function BonusSection({ data, onChange }: BonusSectionProps) {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-start">
-                <div className="prose dark:prose-invert">
-                    <h2 className="text-3xl font-bold flex items-center gap-2">
-                        <Gift className="text-pink-400" size={32} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1.5rem' }}>
+                <div>
+                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                        <Gift style={{ color: '#ec4899' }} size={32} />
                         Bonus & Value Adds
                     </h2>
-                    <p className="text-gray-400 max-w-2xl">
+                    <p style={{ color: '#78716c' }}>
                         This is where you over-deliver. Add resources, maps, and insider warnings to increase the itinerary's perceived value.
                     </p>
                 </div>
                 <button
                     onClick={generateAIContent}
                     disabled={isGenerating}
-                    className="btn btn-primary bg-gradient-to-r from-pink-500 to-rose-500 border-none hover:shadow-lg hover:shadow-rose-500/20"
+                    className="btn btn-primary"
+                    style={{ backgroundColor: '#ec4899', color: 'white', border: 'none', borderRadius: '0.75rem', padding: '0.75rem 1.5rem', fontWeight: '600', cursor: 'pointer' }}
                 >
-                    {isGenerating ? "Adding Value..." : <><Wand2 size={16} className="mr-2" /> Auto-Fill Bonus</>}
+                    {isGenerating ? "Adding Value..." : <><Wand2 size={16} style={{ marginRight: '0.5rem' }} /> Auto-Fill Bonus</>}
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
 
                 {/* Master Map & Downloads */}
-                <div className="card glass p-6 space-y-6 border-l-4 border-l-green-400">
-                    <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <Map className="text-green-400" size={20} /> Master Resources
+                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', borderLeft: '4px solid #10b981' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                        <Map style={{ color: '#10b981' }} size={20} /> Master Resources
                     </h3>
 
-                    <div className="space-y-4">
-                        <div className="form-group">
-                            <label className="form-label text-gray-300">Google Maps Master List URL</label>
-                            <div className="flex gap-2">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold' }}>Google Maps Master List URL</label>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 <input
-                                    className="form-input bg-black/20 flex-1"
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', flex: 1 }}
                                     placeholder="https://goo.gl/maps/..."
                                     value={data.googleMapsLink}
                                     onChange={(e) => updateField("googleMapsLink", e.target.value)}
@@ -97,36 +99,36 @@ export default function BonusSection({ data, onChange }: BonusSectionProps) {
                                     href={data.googleMapsLink || "#"}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className={`p-3 rounded-lg border border-white/10 flex items-center justify-center transition-colors ${data.googleMapsLink ? "hover:bg-green-500/20 text-green-400" : "text-gray-600 cursor-not-allowed"}`}
+                                    style={{ padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid #e7e5e4', display: 'flex', alignItems: 'center', justifyContent: 'center', color: data.googleMapsLink ? '#10b981' : '#a8a29e', backgroundColor: 'white' }}
                                 >
                                     <ExternalLink size={18} />
                                 </a>
                             </div>
-                            <p className="text-xs text-gray-500 mt-1">Create a saved list in Google Maps and share the link here.</p>
+                            <p style={{ fontSize: '0.7rem', color: '#a8a29e' }}>Create a saved list in Google Maps and share the link here.</p>
                         </div>
 
-                        <div className="bg-white/5 rounded-xl p-4 space-y-3">
-                            <label className="text-sm font-semibold text-gray-300">Include Auto-Generated Resources?</label>
-                            <div className="flex items-center justify-between p-3 bg-black/20 rounded-lg border border-white/5">
-                                <div className="flex items-center gap-3">
-                                    <FileCheck className="text-blue-400" size={20} />
-                                    <span className="text-sm">Printable Packing Checklist PDF</span>
+                        <div style={{ backgroundColor: '#fdfbf7', borderRadius: '1rem', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#1c1917' }}>Include Auto-Generated Resources?</label>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #f5f5f4' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                    <FileCheck style={{ color: '#3b82f6' }} size={20} />
+                                    <span style={{ fontSize: '0.875rem', color: '#1c1917' }}>Packing Checklist PDF</span>
                                 </div>
                                 <input
                                     type="checkbox"
-                                    className="toggle toggle-success toggle-sm"
+                                    style={{ width: '1.25rem', height: '1.25rem', accentColor: '#10b981' }}
                                     checked={data.includePackingChecklist}
                                     onChange={(e) => updateField("includePackingChecklist", e.target.checked)}
                                 />
                             </div>
-                            <div className="flex items-center justify-between p-3 bg-black/20 rounded-lg border border-white/5">
-                                <div className="flex items-center gap-3">
-                                    <DollarSign className="text-yellow-400" size={20} />
-                                    <span className="text-sm">Editable Budget Planner Template</span>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #f5f5f4' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                    <DollarSign style={{ color: '#eab308' }} size={20} />
+                                    <span style={{ fontSize: '0.875rem', color: '#1c1917' }}>Budget Planner Template</span>
                                 </div>
                                 <input
                                     type="checkbox"
-                                    className="toggle toggle-success toggle-sm"
+                                    style={{ width: '1.25rem', height: '1.25rem', accentColor: '#10b981' }}
                                     checked={data.includeBudgetPlanner}
                                     onChange={(e) => updateField("includeBudgetPlanner", e.target.checked)}
                                 />
@@ -136,25 +138,27 @@ export default function BonusSection({ data, onChange }: BonusSectionProps) {
                 </div>
 
                 {/* Reservation & Upgrades */}
-                <div className="card glass p-6 space-y-6 border-l-4 border-l-purple-400">
-                    <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <Crown className="text-purple-400" size={20} /> Expert Advice
+                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', borderLeft: '4px solid #9333ea' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                        <Crown style={{ color: '#9333ea' }} size={20} /> Expert Advice
                     </h3>
 
-                    <div className="space-y-4">
-                        <div className="form-group">
-                            <label className="form-label text-gray-300">Reservation & Booking Tips</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold' }}>Reservation & Booking Tips</label>
                             <textarea
-                                className="form-input bg-black/20 h-24"
+                                className="form-input"
+                                style={{ backgroundColor: '#fdfbf7', minHeight: '100px' }}
                                 placeholder="e.g. Book X restaurant 2 months ahead..."
                                 value={data.reservationTips}
                                 onChange={(e) => updateField("reservationTips", e.target.value)}
                             />
                         </div>
-                        <div className="form-group">
-                            <label className="form-label text-gray-300">Suggested Trip Upgrades</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold' }}>Suggested Trip Upgrades</label>
                             <textarea
-                                className="form-input bg-black/20 h-24"
+                                className="form-input"
+                                style={{ backgroundColor: '#fdfbf7', minHeight: '100px' }}
                                 placeholder="e.g. Upgrade to Green Car on Shinkansen ($50)..."
                                 value={data.tripUpgrades}
                                 onChange={(e) => updateField("tripUpgrades", e.target.value)}
@@ -164,12 +168,13 @@ export default function BonusSection({ data, onChange }: BonusSectionProps) {
                 </div>
 
                 {/* Common Mistakes */}
-                <div className="card glass p-6 space-y-6 md:col-span-2 border-l-4 border-l-red-400">
-                    <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <AlertTriangle className="text-red-400" size={20} /> "Don't Do This" - Common Mistakes
+                <div style={{ gridColumn: '1 / -1', padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', borderLeft: '4px solid #ef4444' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                        <AlertTriangle style={{ color: '#ef4444' }} size={20} /> "Don't Do This" - Common Mistakes
                     </h3>
                     <textarea
-                        className="form-input bg-black/20 h-24 text-lg"
+                        className="form-input"
+                        style={{ backgroundColor: '#fdfbf7', minHeight: '100px', fontSize: '1.125rem' }}
                         placeholder="e.g. Do not tip in Japan. Avoid visiting Kyoto on weekends..."
                         value={data.commonMistakes}
                         onChange={(e) => updateField("commonMistakes", e.target.value)}
@@ -177,38 +182,40 @@ export default function BonusSection({ data, onChange }: BonusSectionProps) {
                 </div>
 
                 {/* External Links */}
-                <div className="card glass p-6 space-y-6 md:col-span-2">
-                    <div className="flex justify-between items-center">
-                        <h3 className="text-xl font-semibold flex items-center gap-2">
-                            <ExternalLink className="text-blue-400" size={20} /> Helpful External Links
+                <div style={{ gridColumn: '1 / -1', padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                            <ExternalLink style={{ color: '#3b82f6' }} size={20} /> Helpful External Links
                         </h3>
-                        <button onClick={addLink} className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1">
-                            <Plus size={16} /> Add Link
+                        <button onClick={addLink} style={{ fontSize: '0.75rem', color: '#3b82f6', background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
+                            + Add Link
                         </button>
                     </div>
 
-                    <div className="space-y-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {data.externalLinks.map((link, index) => (
-                            <div key={index} className="flex gap-4 items-center">
+                            <div key={index} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                 <input
-                                    className="form-input bg-black/20 flex-1"
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', flex: 1 }}
                                     placeholder="Label (e.g. Official Train Site)"
                                     value={link.label}
                                     onChange={(e) => updateLink(index, "label", e.target.value)}
                                 />
                                 <input
-                                    className="form-input bg-black/20 flex-[2]"
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', flex: 2 }}
                                     placeholder="URL (https://...)"
                                     value={link.url}
                                     onChange={(e) => updateLink(index, "url", e.target.value)}
                                 />
-                                <button onClick={() => removeLink(index)} className="text-gray-500 hover:text-red-400 p-2">
+                                <button onClick={() => removeLink(index)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>
                                     <Trash2 size={18} />
                                 </button>
                             </div>
                         ))}
                         {data.externalLinks.length === 0 && (
-                            <div className="text-center py-6 text-gray-500 bg-white/5 rounded-lg border border-dashed border-white/10">
+                            <div style={{ textAlign: 'center', padding: '2rem', color: '#a8a29e', backgroundColor: '#fdfbf7', borderRadius: '1rem', border: '1px dashed #e7e5e4' }}>
                                 No external resources added.
                             </div>
                         )}

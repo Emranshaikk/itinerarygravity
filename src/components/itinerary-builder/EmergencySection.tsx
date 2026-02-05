@@ -47,54 +47,57 @@ export default function EmergencySection({ data, onChange }: EmergencySectionPro
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-start">
-                <div className="prose dark:prose-invert">
-                    <h2 className="text-3xl font-bold flex items-center gap-3">
-                        <AlertCircle className="text-red-500" size={32} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1.5rem' }}>
+                <div>
+                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                        <AlertCircle style={{ color: '#ef4444' }} size={32} />
                         Emergency Reference
                     </h2>
-                    <p className="text-gray-400 max-w-2xl">
+                    <p style={{ color: '#78716c' }}>
                         Critical information for when things go wrong. Quick-access numbers and medical locations.
                     </p>
                 </div>
                 <button
                     onClick={generateAIContent}
                     disabled={isGenerating}
-                    className="btn btn-primary bg-gradient-to-r from-red-600 to-orange-600 border-none hover:shadow-lg hover:shadow-red-500/20"
+                    className="btn btn-primary"
+                    style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '0.75rem', padding: '0.75rem 1.5rem', fontWeight: '600', cursor: 'pointer' }}
                 >
-                    {isGenerating ? "Preparing..." : <><Wand2 size={16} className="mr-2" /> Auto-Fill Essentials</>}
+                    {isGenerating ? "Preparing..." : <><Wand2 size={16} style={{ marginRight: '0.5rem' }} /> Auto-Fill Essentials</>}
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
 
                 {/* Emergency Numbers */}
-                <div className="card glass p-6 space-y-4 border border-white/5 bg-white/5">
-                    <div className="flex justify-between items-center">
-                        <h3 className="text-xl font-semibold flex items-center gap-2 text-red-500">
+                <div style={{ padding: '2.25rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ef4444', margin: 0 }}>
                             <Phone size={20} /> Emergency Contacts
                         </h3>
-                        <button onClick={addNumber} className="text-xs text-red-400 hover:text-red-300">
+                        <button onClick={addNumber} style={{ fontSize: '0.75rem', color: '#ef4444', background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
                             + Add Contact
                         </button>
                     </div>
-                    <div className="space-y-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {data.emergencyNumbers.map((entry, i) => (
-                            <div key={i} className="flex gap-2">
+                            <div key={i} style={{ display: 'flex', gap: '0.5rem' }}>
                                 <input
-                                    className="form-input bg-black/20 text-sm flex-1"
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', flex: 1, fontSize: '0.875rem' }}
                                     placeholder="e.g. Police"
                                     value={entry.name}
                                     onChange={(e) => updateNumber(i, "name", e.target.value)}
                                 />
                                 <input
-                                    className="form-input bg-black/20 text-sm w-40"
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', width: '120px', fontSize: '0.875rem' }}
                                     placeholder="Number"
                                     value={entry.number}
                                     onChange={(e) => updateNumber(i, "number", e.target.value)}
                                 />
-                                <button onClick={() => removeNumber(i)} className="text-gray-500 hover:text-red-400 p-2">
+                                <button onClick={() => removeNumber(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>
                                     <Trash2 size={16} />
                                 </button>
                             </div>
@@ -103,46 +106,44 @@ export default function EmergencySection({ data, onChange }: EmergencySectionPro
                 </div>
 
                 {/* Medical & Hospital Info */}
-                <div className="card glass p-6 space-y-6 border border-white/5 bg-white/5">
-                    <h3 className="text-xl font-semibold flex items-center gap-2 text-blue-400">
+                <div style={{ padding: '2.25rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#3b82f6', margin: 0 }}>
                         <Hospital size={20} /> Hospitals (English Speaking)
                     </h3>
-                    <div className="space-y-4">
-                        <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 space-y-3">
-                            <div className="flex justify-between items-start">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                        <div style={{ padding: '1.25rem', borderRadius: '1rem', backgroundColor: '#fdfbf7', border: '1px solid #f5f5f4', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                                 <div>
-                                    <h4 className="font-bold text-blue-300">Kyoto University Hospital</h4>
-                                    <p className="text-xs text-gray-500">Major center with English support.</p>
+                                    <h4 style={{ fontSize: '0.925rem', fontWeight: 'bold', color: '#1c1917', margin: 0 }}>Kyoto University Hospital</h4>
+                                    <p style={{ fontSize: '0.75rem', color: '#78716c', margin: '0.25rem 0 0 0' }}>Major center with English support.</p>
                                 </div>
-                                <MapPin size={16} className="text-blue-400" />
+                                <MapPin size={16} style={{ color: '#3b82f6' }} />
                             </div>
-                            <p className="text-sm text-gray-400">54 Shogoin Kawaharacho, Sakyo Ward, Kyoto.</p>
+                            <p style={{ fontSize: '0.825rem', color: '#1c1917', margin: 0 }}>54 Shogoin Kawaharacho, Sakyo Ward, Kyoto.</p>
                         </div>
-                        <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 space-y-3">
-                            <div className="flex justify-between items-start">
+                        <div style={{ padding: '1.25rem', borderRadius: '1rem', backgroundColor: '#fdfbf7', border: '1px solid #f5f5f4', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                                 <div>
-                                    <h4 className="font-bold text-blue-300">Japan Health Info (Service)</h4>
-                                    <p className="text-xs text-gray-500">Call to find the nearest clinic.</p>
+                                    <h4 style={{ fontSize: '0.925rem', fontWeight: 'bold', color: '#1c1917', margin: 0 }}>Japan Health Info (Service)</h4>
+                                    <p style={{ fontSize: '0.75rem', color: '#78716c', margin: '0.25rem 0 0 0' }}>Call to find the nearest clinic.</p>
                                 </div>
-                                <ExternalLink size={16} className="text-blue-400" />
+                                <ExternalLink size={16} style={{ color: '#3b82f6' }} />
                             </div>
-                            <p className="text-sm text-gray-400">Website: japanhealthinfo.com</p>
+                            <p style={{ fontSize: '0.825rem', color: '#1c1917', margin: 0 }}>Website: japanhealthinfo.com</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Insurance Info */}
-                <div className="md:col-span-2 card glass p-6 border-l-4 border-l-emerald-500 bg-emerald-500/5">
-                    <div className="flex items-start gap-4">
-                        <div className="p-3 rounded-full bg-emerald-500/20 text-emerald-400">
-                            <AlertCircle size={24} />
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-bold text-emerald-400 mb-1">Travel Insurance Quick-Reference</h3>
-                            <p className="text-sm text-gray-400">
-                                This section in the final PDF will include a space for the traveler to write their policy number and the 24/7 global assistance number. Remind them to keep a physical copy in their day-pack.
-                            </p>
-                        </div>
+                <div style={{ gridColumn: '1 / -1', padding: '2.5rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: '#fdfbf7', borderLeft: '6px solid #10b981', display: 'flex', gap: '1.5rem', alignItems: 'center', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <div style={{ padding: '1rem', borderRadius: '100%', backgroundColor: 'white', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #e7e5e4' }}>
+                        <AlertCircle size={28} />
+                    </div>
+                    <div>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#1c1917', margin: '0 0 0.5rem 0' }}>Travel Insurance Quick-Reference</h3>
+                        <p style={{ fontSize: '0.925rem', color: '#78716c', margin: 0, lineHeight: 1.5 }}>
+                            This section in the final PDF will include a space for the traveler to write their policy number and the 24/7 global assistance number. Remind them to keep a physical copy in their day-pack.
+                        </p>
                     </div>
                 </div>
 

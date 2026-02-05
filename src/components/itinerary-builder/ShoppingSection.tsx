@@ -44,43 +44,45 @@ export default function ShoppingSection({ data, onChange }: ShoppingSectionProps
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-start">
-                <div className="prose dark:prose-invert">
-                    <h2 className="text-3xl font-bold flex items-center gap-3">
-                        <ShoppingBag className="text-pink-400" size={32} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1.5rem' }}>
+                <div>
+                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                        <ShoppingBag style={{ color: '#ec4899' }} size={32} />
                         Shopping & Souvenirs
                     </h2>
-                    <p className="text-gray-400 max-w-2xl">
+                    <p style={{ color: '#78716c' }}>
                         Help them find unique, high-quality items and avoid the "cheap plastic" tourist traps.
                     </p>
                 </div>
                 <button
                     onClick={generateAIContent}
                     disabled={isGenerating}
-                    className="btn btn-primary bg-gradient-to-r from-pink-600 to-purple-600 border-none hover:shadow-lg hover:shadow-pink-500/20"
+                    className="btn btn-primary"
+                    style={{ backgroundColor: '#ec4899', color: 'white', border: 'none', borderRadius: '0.75rem', padding: '0.75rem 1.5rem', fontWeight: '600', cursor: 'pointer' }}
                 >
-                    {isGenerating ? "Stocking up..." : <><Wand2 size={16} className="mr-2" /> Auto-Fill Shopping</>}
+                    {isGenerating ? "Stocking up..." : <><Wand2 size={16} style={{ marginRight: '0.5rem' }} /> Auto-Fill Shopping</>}
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
 
                 {/* What to Buy */}
-                <div className="card glass p-6 space-y-4 border border-white/5 bg-white/5">
-                    <div className="flex justify-between items-center">
-                        <h3 className="text-xl font-semibold flex items-center gap-2 text-pink-400">
+                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ec4899', margin: 0 }}>
                             <Tag size={20} /> What to Buy (Unique Items)
                         </h3>
-                        <button onClick={addBuy} className="text-xs text-pink-400 hover:text-pink-300">
+                        <button onClick={addBuy} style={{ fontSize: '0.75rem', color: '#ec4899', background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
                             + Add Item
                         </button>
                     </div>
-                    <div className="space-y-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {data.whatToBuy.map((item, i) => (
-                            <div key={i} className="flex gap-2">
+                            <div key={i} style={{ display: 'flex', gap: '0.5rem' }}>
                                 <textarea
-                                    className="form-input bg-black/20 text-sm flex-1 min-h-[60px]"
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', fontSize: '0.875rem', flex: 1, minHeight: '60px' }}
                                     placeholder="e.g. Local ceramics from [Shop Name]..."
                                     value={item}
                                     onChange={(e) => {
@@ -89,7 +91,7 @@ export default function ShoppingSection({ data, onChange }: ShoppingSectionProps
                                         updateField("whatToBuy", newItems);
                                     }}
                                 />
-                                <button onClick={() => removeBuy(i)} className="text-gray-500 hover:text-red-400 p-2">
+                                <button onClick={() => removeBuy(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>
                                     <Trash2 size={16} />
                                 </button>
                             </div>
@@ -98,20 +100,21 @@ export default function ShoppingSection({ data, onChange }: ShoppingSectionProps
                 </div>
 
                 {/* Best Markets */}
-                <div className="card glass p-6 space-y-4 border border-white/5 bg-white/5">
-                    <div className="flex justify-between items-center">
-                        <h3 className="text-xl font-semibold flex items-center gap-2 text-purple-400">
+                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#9333ea', margin: 0 }}>
                             <MapPin size={20} /> Best Markets & Areas
                         </h3>
-                        <button onClick={addMarket} className="text-xs text-purple-400 hover:text-purple-300">
+                        <button onClick={addMarket} style={{ fontSize: '0.75rem', color: '#9333ea', background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
                             + Add Market
                         </button>
                     </div>
-                    <div className="space-y-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {data.bestMarkets.map((market, i) => (
-                            <div key={i} className="flex gap-2">
+                            <div key={i} style={{ display: 'flex', gap: '0.5rem' }}>
                                 <textarea
-                                    className="form-input bg-black/20 text-sm flex-1 min-h-[60px]"
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', fontSize: '0.875rem', flex: 1, minHeight: '60px' }}
                                     placeholder="e.g. Sunday Flea Market at [Place]..."
                                     value={market}
                                     onChange={(e) => {
@@ -120,7 +123,7 @@ export default function ShoppingSection({ data, onChange }: ShoppingSectionProps
                                         updateField("bestMarkets", newMarkets);
                                     }}
                                 />
-                                <button onClick={() => removeMarket(i)} className="text-gray-500 hover:text-red-400 p-2">
+                                <button onClick={() => removeMarket(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>
                                     <Trash2 size={16} />
                                 </button>
                             </div>
@@ -129,12 +132,13 @@ export default function ShoppingSection({ data, onChange }: ShoppingSectionProps
                 </div>
 
                 {/* Tax Free Tips */}
-                <div className="md:col-span-2 card glass p-6 space-y-4 border-l-4 border-l-green-400 bg-green-500/5">
-                    <h3 className="text-xl font-semibold flex items-center gap-2 text-green-400">
+                <div style={{ gridColumn: '1 / -1', padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', borderLeft: '4px solid #10b981', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981', margin: 0 }}>
                         <Info size={20} /> Tax-Free & Savings Tips
                     </h3>
                     <textarea
-                        className="form-input bg-black/20 h-24"
+                        className="form-input"
+                        style={{ backgroundColor: '#fdfbf7', minHeight: '100px' }}
                         placeholder="Explain how to get the 8-10% tax back. (e.g. Bring your passport!)"
                         value={data.taxFreeTips || ""}
                         onChange={(e) => updateField("taxFreeTips", e.target.value)}

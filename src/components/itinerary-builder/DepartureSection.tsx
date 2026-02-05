@@ -28,38 +28,37 @@ export default function DepartureSection({ data, onChange }: DepartureSectionPro
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-start">
-                <div className="prose dark:prose-invert">
-                    <h2 className="text-3xl font-bold flex items-center gap-3">
-                        <LogOut className="text-orange-400" size={32} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1.5rem' }}>
+                <div>
+                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                        <LogOut style={{ color: '#f97316' }} size={32} />
                         Departure Plan
                     </h2>
-                    <p className="text-gray-400 max-w-2xl">
+                    <p style={{ color: '#78716c' }}>
                         Make the last day as smooth as the first. Help them leave without the "Airport Panic."
                     </p>
                 </div>
                 <button
                     onClick={generateAIContent}
                     disabled={isGenerating}
-                    className="btn btn-primary bg-gradient-to-r from-orange-600 to-rose-600 border-none hover:shadow-lg hover:shadow-orange-500/20"
+                    className="btn btn-primary"
+                    style={{ backgroundColor: '#f97316', color: 'white', border: 'none', borderRadius: '0.75rem', padding: '0.75rem 1.5rem', fontWeight: '600', cursor: 'pointer' }}
                 >
-                    {isGenerating ? "Packing up..." : <><Wand2 size={16} className="mr-2" /> Auto-Fill Departure</>}
+                    {isGenerating ? "Packing up..." : <><Wand2 size={16} style={{ marginRight: '0.5rem' }} /> Auto-Fill Departure</>}
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
 
                 {/* Checkout Experience */}
-                <div className="card glass p-6 space-y-6 border border-white/5 bg-white/5 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-5">
-                        <Clock size={100} />
-                    </div>
-                    <h3 className="text-xl font-semibold flex items-center gap-2 text-blue-400">
+                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#3b82f6', margin: 0 }}>
                         <Luggage size={20} /> Checkout & Bags
                     </h3>
                     <textarea
-                        className="form-input bg-black/20 h-40"
+                        className="form-input"
+                        style={{ backgroundColor: '#fdfbf7', minHeight: '160px' }}
                         placeholder="Checkout times, bag storage, early morning taxi booking..."
                         value={data.checkoutTips}
                         onChange={(e) => updateField("checkoutTips", e.target.value)}
@@ -67,28 +66,26 @@ export default function DepartureSection({ data, onChange }: DepartureSectionPro
                 </div>
 
                 {/* Getting Out */}
-                <div className="card glass p-6 space-y-6 border border-white/5 bg-white/5 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-5">
-                        <Train size={100} />
-                    </div>
-                    <h3 className="text-xl font-semibold flex items-center gap-2 text-rose-400">
+                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#f43f5e', margin: 0 }}>
                         <Train size={20} /> Getting to the Airport
                     </h3>
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-xs text-gray-500 font-bold uppercase">Buffer Time Suggestion</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold' }}>Buffer Time Suggestion</label>
                             <input
-                                className="form-input bg-black/20"
+                                className="form-input"
+                                style={{ backgroundColor: '#fdfbf7' }}
                                 placeholder="e.g. 3-4 Hours"
                                 value={data.airportBuffer}
                                 onChange={(e) => updateField("airportBuffer", e.target.value)}
                             />
                         </div>
-                        <div className="p-4 bg-black/20 rounded-xl space-y-3">
-                            <h4 className="text-sm font-bold flex items-center gap-2 text-gray-300">
-                                <Coffee size={16} /> The "Last Meal" Tradition
+                        <div style={{ padding: '1.25rem', backgroundColor: '#fdfbf7', borderRadius: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <h4 style={{ fontSize: '0.875rem', fontWeight: 'bold', color: '#1c1917', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                                <Coffee size={16} style={{ color: '#ca8a04' }} /> The "Last Meal" Tradition
                             </h4>
-                            <p className="text-xs text-gray-500 italic">
+                            <p style={{ fontSize: '0.75rem', color: '#78716c', fontStyle: 'italic', margin: 0 }}>
                                 Suggest one last spot for their final meal before heading to the airport.
                             </p>
                         </div>
@@ -96,10 +93,10 @@ export default function DepartureSection({ data, onChange }: DepartureSectionPro
                 </div>
 
                 {/* Final Goodbye */}
-                <div className="md:col-span-2 card glass p-8 border-l-4 border-l-orange-500 flex flex-col items-center text-center space-y-4">
-                    <HandMetal size={40} className="text-orange-400 animate-bounce" />
-                    <h3 className="text-2xl font-black text-white italic">"Arigato Gozaimasu"</h3>
-                    <p className="text-gray-400 max-w-xl">
+                <div style={{ gridColumn: '1 / -1', padding: '3rem 2rem', border: '1px solid #f5f5f4', borderRadius: '2rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '1.5rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', borderBottom: '6px solid #f97316' }}>
+                    <HandMetal size={48} style={{ color: '#f97316' }} />
+                    <h3 style={{ fontSize: '2.5rem', fontWeight: 900, color: '#1c1917', fontStyle: 'italic', margin: 0 }}>"Arigato Gozaimasu"</h3>
+                    <p style={{ color: '#78716c', maxWidth: '600px', fontSize: '1.125rem' }}>
                         Encourage them to leave a review for the hotels/restaurants they loved, or suggest a final scenic spot to sit and reflect on the journey.
                     </p>
                 </div>

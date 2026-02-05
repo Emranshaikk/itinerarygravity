@@ -45,7 +45,7 @@ export async function POST(req: Request) {
                 price,
                 currency: currency || "USD",
                 description: body.description || `A trip to ${finalLocation}`,
-                content: rest,
+                content: body.content, // Use the content directly from body
                 is_published: true
             })
             .select()

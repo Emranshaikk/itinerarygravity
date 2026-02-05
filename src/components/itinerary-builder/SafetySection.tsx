@@ -59,43 +59,45 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-start">
-                <div className="prose dark:prose-invert">
-                    <h2 className="text-3xl font-bold flex items-center gap-3">
-                        <Shield className="text-yellow-400" size={32} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1.5rem' }}>
+                <div>
+                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                        <Shield style={{ color: '#eab308' }} size={32} />
                         Safety, Scams & Culture
                     </h2>
-                    <p className="text-gray-400 max-w-2xl">
+                    <p style={{ color: '#78716c' }}>
                         Empower your travelers with confidence. Knowing what NOT to do is as important as knowing what to do.
                     </p>
                 </div>
                 <button
                     onClick={generateAIContent}
                     disabled={isGenerating}
-                    className="btn btn-primary bg-gradient-to-r from-yellow-600 to-amber-600 border-none hover:shadow-lg hover:shadow-yellow-500/20 text-black font-bold"
+                    className="btn btn-primary"
+                    style={{ backgroundColor: '#eab308', color: 'black', border: 'none', borderRadius: '0.75rem', padding: '0.75rem 1.5rem', fontWeight: '600', cursor: 'pointer' }}
                 >
-                    {isGenerating ? "Securing..." : <><Wand2 size={16} className="mr-2" /> Auto-Fill Safety</>}
+                    {isGenerating ? "Securing..." : <><Wand2 size={16} style={{ marginRight: '0.5rem' }} /> Auto-Fill Safety</>}
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
 
                 {/* Common Scams */}
-                <div className="card glass p-6 space-y-4 border border-white/5 bg-white/5">
-                    <div className="flex justify-between items-center">
-                        <h3 className="text-xl font-semibold flex items-center gap-2 text-red-400">
+                <div style={{ padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ef4444', margin: 0 }}>
                             <UserX size={20} /> Common Scams & Traps
                         </h3>
-                        <button onClick={addScam} className="text-xs text-red-400 hover:text-red-300">
+                        <button onClick={addScam} style={{ fontSize: '0.75rem', color: '#ef4444', background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
                             + Add Scam
                         </button>
                     </div>
-                    <div className="space-y-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {data.commonScams.map((scam, i) => (
-                            <div key={i} className="flex gap-2">
+                            <div key={i} style={{ display: 'flex', gap: '0.5rem' }}>
                                 <textarea
-                                    className="form-input bg-black/20 text-sm flex-1 min-h-[60px]"
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', fontSize: '0.875rem', flex: 1, minHeight: '60px' }}
                                     placeholder="e.g. 'Broken' taxi meters..."
                                     value={scam}
                                     onChange={(e) => {
@@ -104,7 +106,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                                         updateField("commonScams", newScams);
                                     }}
                                 />
-                                <button onClick={() => removeScam(i)} className="text-gray-500 hover:text-red-400 p-2">
+                                <button onClick={() => removeScam(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>
                                     <Trash2 size={16} />
                                 </button>
                             </div>
@@ -113,20 +115,21 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                 </div>
 
                 {/* Culture Dos & Don'ts */}
-                <div className="card glass p-6 space-y-4 border border-white/5 bg-white/5">
-                    <div className="flex justify-between items-center">
-                        <h3 className="text-xl font-semibold flex items-center gap-2 text-blue-400">
+                <div style={{ padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#3b82f6', margin: 0 }}>
                             <Scale size={20} /> Cultural Dos & Don'ts
                         </h3>
-                        <button onClick={addDoDont} className="text-xs text-blue-400 hover:text-blue-300">
+                        <button onClick={addDoDont} style={{ fontSize: '0.75rem', color: '#3b82f6', background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
                             + Add Item
                         </button>
                     </div>
-                    <div className="space-y-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {data.culturalDosAndDonts.map((item, i) => (
-                            <div key={i} className="flex gap-2">
+                            <div key={i} style={{ display: 'flex', gap: '0.5rem' }}>
                                 <textarea
-                                    className="form-input bg-black/20 text-sm flex-1 min-h-[60px]"
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', fontSize: '0.875rem', flex: 1, minHeight: '60px' }}
                                     placeholder="e.g. DO: Bow slightly..."
                                     value={item}
                                     onChange={(e) => {
@@ -135,7 +138,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                                         updateField("culturalDosAndDonts", newItems);
                                     }}
                                 />
-                                <button onClick={() => removeDoDont(i)} className="text-gray-500 hover:text-red-400 p-2">
+                                <button onClick={() => removeDoDont(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>
                                     <Trash2 size={16} />
                                 </button>
                             </div>
@@ -144,20 +147,21 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                 </div>
 
                 {/* Safety Tips */}
-                <div className="card glass p-6 space-y-4 border border-white/5 bg-white/5">
-                    <div className="flex justify-between items-center">
-                        <h3 className="text-xl font-semibold flex items-center gap-2 text-yellow-500">
+                <div style={{ padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#eab308', margin: 0 }}>
                             <AlertTriangle size={20} /> General Safety Tips
                         </h3>
-                        <button onClick={addTip} className="text-xs text-yellow-500 hover:text-yellow-400">
+                        <button onClick={addTip} style={{ fontSize: '0.75rem', color: '#eab308', background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
                             + Add Tip
                         </button>
                     </div>
-                    <div className="space-y-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {data.safetyTips.map((tip, i) => (
-                            <div key={i} className="flex gap-2">
+                            <div key={i} style={{ display: 'flex', gap: '0.5rem' }}>
                                 <input
-                                    className="form-input bg-black/20 text-sm flex-1"
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', fontSize: '0.875rem', flex: 1 }}
                                     placeholder="e.g. Keep a copy of your passport..."
                                     value={tip}
                                     onChange={(e) => {
@@ -166,7 +170,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                                         updateField("safetyTips", newTips);
                                     }}
                                 />
-                                <button onClick={() => removeTip(i)} className="text-gray-500 hover:text-red-400 p-2">
+                                <button onClick={() => removeTip(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>
                                     <Trash2 size={16} />
                                 </button>
                             </div>
@@ -175,20 +179,21 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                 </div>
 
                 {/* Emergency Numbers */}
-                <div className="card glass p-6 space-y-4 border border-white/5 bg-white/5">
-                    <div className="flex justify-between items-center">
-                        <h3 className="text-xl font-semibold flex items-center gap-2 text-emerald-400">
+                <div style={{ padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981', margin: 0 }}>
                             <Phone size={20} /> Emergency Numbers
                         </h3>
-                        <button onClick={addEmergency} className="text-xs text-emerald-400 hover:text-emerald-300">
+                        <button onClick={addEmergency} style={{ fontSize: '0.75rem', color: '#10b981', background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
                             + Add Number
                         </button>
                     </div>
-                    <div className="space-y-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {data.emergencyNumbers.map((entry, i) => (
-                            <div key={i} className="flex gap-2">
+                            <div key={i} style={{ display: 'flex', gap: '1rem' }}>
                                 <input
-                                    className="form-input bg-black/20 text-sm flex-1"
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', fontSize: '0.875rem', flex: 1 }}
                                     placeholder="Agency Name"
                                     value={entry.name}
                                     onChange={(e) => {
@@ -198,7 +203,8 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                                     }}
                                 />
                                 <input
-                                    className="form-input bg-black/20 text-sm w-32"
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7', fontSize: '0.875rem', width: '120px' }}
                                     placeholder="Number"
                                     value={entry.number}
                                     onChange={(e) => {
@@ -207,7 +213,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                                         updateField("emergencyNumbers", newNums);
                                     }}
                                 />
-                                <button onClick={() => removeEmergency(i)} className="text-gray-500 hover:text-red-400 p-2">
+                                <button onClick={() => removeEmergency(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>
                                     <Trash2 size={16} />
                                 </button>
                             </div>

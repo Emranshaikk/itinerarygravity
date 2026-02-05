@@ -47,116 +47,101 @@ export default function LogisticsSection({ data, onChange }: LogisticsSectionPro
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-start">
-                <div className="prose dark:prose-invert">
-                    <h2 className="text-3xl font-bold flex items-center gap-3">
-                        <CreditCard className="text-green-400" size={32} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1.5rem' }}>
+                <div>
+                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                        <CreditCard style={{ color: '#16a34a' }} size={32} />
                         Money & Connectivity
                     </h2>
-                    <p className="text-gray-400 max-w-2xl">
+                    <p style={{ color: '#78716c' }}>
                         Solve the two biggest traveler stresses: How to pay and how to stay online.
                     </p>
                 </div>
                 <button
                     onClick={generateAIContent}
                     disabled={isGenerating}
-                    className="btn btn-primary bg-gradient-to-r from-emerald-600 to-teal-600 border-none hover:shadow-lg hover:shadow-emerald-500/20"
+                    className="btn btn-primary"
+                    style={{ backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '0.75rem', padding: '0.75rem 1.5rem', fontWeight: '600', cursor: 'pointer' }}
                 >
-                    {isGenerating ? "Setting up..." : <><Wand2 size={16} className="mr-2" /> Auto-Fill Logistics</>}
+                    {isGenerating ? "Setting up..." : <><Wand2 size={16} style={{ marginRight: '0.5rem' }} /> Auto-Fill Logistics</>}
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                 {/* Money Management */}
-                <div className="card glass p-6 space-y-6 border border-white/5 bg-white/5 relative overflow-hidden">
-                    <div className="absolute -top-4 -right-4 opacity-5">
-                        <DollarSign size={120} />
-                    </div>
-                    <h3 className="text-xl font-semibold flex items-center gap-2 text-emerald-400">
-                        <DollarSign size={20} /> Money Strategy
+                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                        <DollarSign style={{ color: '#16a34a' }} size={20} /> Money Strategy
                     </h3>
-
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-xs text-gray-500 font-bold uppercase">Currency Code</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold' }}>Currency Code</label>
                                 <input
-                                    className="form-input bg-black/20"
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7' }}
                                     placeholder="e.g. JPY"
                                     value={data.currency.code}
                                     onChange={(e) => handleCurrencyChange("code", e.target.value)}
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-xs text-gray-500 font-bold uppercase">Daily Budget</label>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold' }}>Daily Budget</label>
                                 <input
-                                    className="form-input bg-black/20"
+                                    className="form-input"
+                                    style={{ backgroundColor: '#fdfbf7' }}
                                     placeholder="e.g. $100/day"
                                     value={data.currency.dailyBudgetEstimate}
                                     onChange={(e) => handleCurrencyChange("dailyBudgetEstimate", e.target.value)}
                                 />
                             </div>
                         </div>
-
-                        <div className="space-y-2">
-                            <label className="text-xs text-gray-500 font-bold uppercase">Cash vs Card Advice</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold' }}>Cash vs Card Advice</label>
                             <textarea
-                                className="form-input bg-black/20 h-24"
-                                placeholder="When should they use cash? Is tapping common?"
+                                className="form-input"
+                                style={{ backgroundColor: '#fdfbf7', minHeight: '100px' }}
+                                placeholder="When should they use cash?"
                                 value={data.currency.cashVsCard}
                                 onChange={(e) => handleCurrencyChange("cashVsCard", e.target.value)}
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-xs text-gray-500 font-bold uppercase">Withdrawal / ATM Tips</label>
-                            <input
-                                className="form-input bg-black/20"
-                                placeholder="e.g. Use 7-Eleven ATMs..."
-                                value={data.currency.exchangeTips}
-                                onChange={(e) => handleCurrencyChange("exchangeTips", e.target.value)}
                             />
                         </div>
                     </div>
                 </div>
 
-                {/* Connectivity & Power */}
-                <div className="card glass p-6 space-y-6 border border-white/5 bg-white/5 relative overflow-hidden">
-                    <div className="absolute -top-4 -right-4 opacity-5">
-                        <Wifi size={120} />
-                    </div>
-                    <h3 className="text-xl font-semibold flex items-center gap-2 text-blue-400">
-                        <Wifi size={20} /> Connectivity & Tech
+                {/* Connectivity & Tech */}
+                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                        <Zap style={{ color: '#eab308' }} size={20} /> Connectivity & Tech
                     </h3>
-
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-xs text-gray-500 font-bold uppercase flex items-center gap-1"><Smartphone size={12} /> SIM / eSIM Options</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold' }}>SIM / eSIM Options</label>
                             <input
-                                className="form-input bg-black/20"
-                                placeholder="e.g. Airalo, Local SIM at Arrivals"
+                                className="form-input"
+                                style={{ backgroundColor: '#fdfbf7' }}
+                                placeholder="e.g. Airalo, Ubigi..."
                                 value={data.connectivity.simOptions.join(", ")}
                                 onChange={(e) => handleConnectivityChange("simOptions", e.target.value.split(","))}
                             />
-                            <p className="text-[10px] text-gray-500">Separate by commas</p>
                         </div>
-
-                        <div className="space-y-2">
-                            <label className="text-xs text-gray-500 font-bold uppercase flex items-center gap-1"><Power size={12} /> Power Adapters</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold' }}>Power Adapters</label>
                             <input
-                                className="form-input bg-black/20"
-                                placeholder="e.g. Type C / G required"
+                                className="form-input"
+                                style={{ backgroundColor: '#fdfbf7' }}
+                                placeholder="e.g. Type A & B..."
                                 value={data.connectivity.powerAdapters}
                                 onChange={(e) => handleConnectivityChange("powerAdapters", e.target.value)}
                             />
                         </div>
-
-                        <div className="space-y-2">
-                            <label className="text-xs text-gray-500 font-bold uppercase flex items-center gap-1"><Globe size={12} /> WiFi Tips</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold' }}>WiFi Strategy</label>
                             <textarea
-                                className="form-input bg-black/20 h-24"
-                                placeholder="How is public WiFi? Should they rent a router?"
+                                className="form-input"
+                                style={{ backgroundColor: '#fdfbf7', minHeight: '80px' }}
+                                placeholder="Free WiFi spots vs Pocket WiFi..."
                                 value={data.connectivity.wifiTips}
                                 onChange={(e) => handleConnectivityChange("wifiTips", e.target.value)}
                             />
@@ -165,39 +150,26 @@ export default function LogisticsSection({ data, onChange }: LogisticsSectionPro
                 </div>
 
                 {/* Essential Apps */}
-                <div className="md:col-span-2 card glass p-6 space-y-4 border border-white/5 bg-white/5">
-                    <h3 className="text-xl font-semibold flex items-center gap-2 text-purple-400">
-                        <Zap size={20} /> Essential Apps to Download
+                <div style={{ gridColumn: '1 / -1', padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                        <Smartphone style={{ color: '#9333ea' }} size={20} /> Essential Apps
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold' }}>Format: App Name (Purpose) - one per line</label>
                         <textarea
-                            className="form-input bg-black/20 h-32 font-mono text-sm"
-                            placeholder="App Name (Purpose) - one per line"
+                            className="form-input"
+                            style={{ backgroundColor: '#fdfbf7', minHeight: '120px', fontFamily: 'monospace', fontSize: '0.875rem' }}
+                            placeholder="e.g. Google Maps (Navigation)"
                             value={data.apps.map(a => `${a.name} (${a.purpose})`).join("\n")}
                             onChange={(e) => {
                                 const apps = e.target.value.split("\n").filter(Boolean).map(line => {
                                     const match = line.match(/^(.*)\s\((.*)\)$/);
-                                    if (match) return { name: match[1], purpose: match[2] };
+                                    if (match) return { name: match[1].trim(), purpose: match[2].trim() };
                                     return { name: line.split('(')[0].trim(), purpose: line.split('(')[1]?.replace(')', '').trim() || "General" };
                                 });
                                 onChange({ ...data, apps });
                             }}
                         />
-                        <div className="space-y-4">
-                            <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10 text-sm space-y-2">
-                                <p className="font-bold text-purple-300">Why this matters?</p>
-                                <p className="text-gray-400 text-xs leading-relaxed">
-                                    Travelers often forget to download apps like local ride-sharing or translation tools until they are stuck without data. Giving them a list before they fly is a huge value-add.
-                                </p>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                                {data.apps.map((app, i) => (
-                                    <span key={i} className="px-3 py-1 bg-white/5 rounded-full text-[10px] border border-white/10 uppercase font-bold text-gray-400">
-                                        {app.name}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
