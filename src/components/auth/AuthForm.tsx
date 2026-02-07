@@ -68,6 +68,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="name@example.com"
                         required
+                        suppressHydrationWarning
                         style={{
                             width: '100%',
                             padding: '12px 16px',
@@ -88,6 +89,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
                         required
+                        suppressHydrationWarning
                         style={{
                             width: '100%',
                             padding: '12px 16px',
