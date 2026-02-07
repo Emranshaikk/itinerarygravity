@@ -29,59 +29,65 @@ export default function BackgroundAnimation() {
     if (!mounted) return null;
 
     return (
-        <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
-            {/* Flying Plane */}
-
-
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            pointerEvents: 'none',
+            zIndex: -1,
+            overflow: 'hidden'
+        }}>
             {/* Falling Stars / Shooting Stars */}
-            {[...Array(3)].map((_, i) => (
+            {mounted && [...Array(3)].map((_, i) => (
                 <motion.div
                     key={i}
                     initial={{
                         x: Math.random() * windowSize.width,
-                        y: -20,
+                        y: -50,
                         opacity: 0,
-                        scale: 0.5,
                     }}
                     animate={{
-                        x: Math.random() * windowSize.width, // varied ending x for diagonal effect
-                        y: windowSize.height + 50,
-                        opacity: [0, 1, 0],
+                        x: (Math.random() - 0.5) * 200 + (Math.random() * windowSize.width),
+                        y: windowSize.height + 100,
+                        opacity: [0, 0.4, 0],
                     }}
                     transition={{
-                        duration: 2 + Math.random() * 3,
+                        duration: 5 + Math.random() * 5,
                         repeat: Infinity,
-                        delay: Math.random() * 10,
-                        ease: "easeIn",
+                        delay: Math.random() * 15,
+                        ease: "linear",
                     }}
-                    className="absolute text-yellow-500/60"
+                    style={{ position: 'absolute', color: 'rgba(255, 255, 255, 0.2)' }}
                 >
-                    <Star size={16} fill="currentColor" />
+                    <Star size={12} fill="currentColor" />
                 </motion.div>
             ))}
 
             {/* Twinkling Static Stars */}
-            {[...Array(15)].map((_, i) => (
+            {mounted && [...Array(20)].map((_, i) => (
                 <motion.div
                     key={`static-${i}`}
-                    initial={{
-                        x: Math.random() * windowSize.width,
-                        y: Math.random() * windowSize.height,
+                    style={{
+                        position: 'absolute',
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 100}%`,
                         opacity: 0.1,
-                        scale: Math.random() * 0.5 + 0.5,
+                        color: 'white'
                     }}
                     animate={{
-                        opacity: [0.1, 0.4, 0.1],
+                        opacity: [0.05, 0.2, 0.05],
+                        scale: [1, 1.2, 1]
                     }}
                     transition={{
-                        duration: 3 + Math.random() * 4,
+                        duration: 4 + Math.random() * 6,
                         repeat: Infinity,
                         ease: "easeInOut",
                         delay: Math.random() * 5,
                     }}
-                    className="absolute text-white/40"
                 >
-                    <div className="w-1 h-1 bg-current rounded-full" />
+                    <div style={{ width: '2px', height: '2px', background: 'currentColor', borderRadius: '50%' }} />
                 </motion.div>
             ))}
         </div>

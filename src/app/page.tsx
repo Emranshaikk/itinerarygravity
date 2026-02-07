@@ -23,60 +23,60 @@ export default async function Home() {
       {/* Hero Section */}
       <section style={{
         position: 'relative',
-        minHeight: '60vh',
+        minHeight: '80vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
         overflow: 'hidden',
-        padding: '20px 20px',
-        paddingTop: '40px'
+        padding: '80px 20px',
+        width: '100%'
       }}>
         {/* Abstract Background Elements */}
         <div style={{
           position: 'absolute',
-          top: '0%',
-          left: '0%',
-          width: '60vw',
-          height: '60vw',
-          background: 'radial-gradient(circle, var(--border) 0%, transparent 70%)',
-          filter: 'blur(100px)',
+          top: '-20%',
+          left: '-10%',
+          width: '50vw',
+          height: '50vw',
+          background: 'radial-gradient(circle, var(--primary) 0%, transparent 70%)',
+          opacity: 0.08,
+          filter: 'blur(120px)',
           zIndex: -1,
-          animation: 'floating 20s infinite alternate'
+          animation: 'floating 15s infinite alternate'
         }} />
         <div style={{
           position: 'absolute',
-          bottom: '0%',
-          right: '0%',
-          width: '60vw',
-          height: '60vw',
-          background: 'radial-gradient(circle, var(--border) 0%, transparent 70%)',
-          filter: 'blur(100px)',
+          bottom: '-20%',
+          right: '-10%',
+          width: '50vw',
+          height: '50vw',
+          background: 'radial-gradient(circle, var(--primary) 0%, transparent 70%)',
+          opacity: 0.08,
+          filter: 'blur(120px)',
           zIndex: -1,
-          animation: 'floating 25s infinite alternate-reverse'
+          animation: 'floating 20s infinite alternate-reverse'
         }} />
 
-        <div className="container">
-          <h1 style={{
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+          <h1 className="text-gradient" style={{
             fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
             fontWeight: 800,
             marginBottom: '24px',
-            lineHeight: 1.05,
-            background: 'linear-gradient(to bottom, var(--foreground) 40%, var(--gray-400))',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
+            lineHeight: 1.1,
+            display: 'block'
           }}>
             Travel Like Your <br />
-            <span style={{ color: 'var(--foreground)', WebkitTextFillColor: 'initial' }}>Favorite Creator</span>
+            Favorite Creator
           </h1>
           <p style={{
-            fontSize: 'clamp(1rem, 3vw, 1.25rem)',
+            fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
             color: 'var(--gray-400)',
-            marginBottom: '40px',
-            maxWidth: '600px',
+            marginBottom: '48px',
+            maxWidth: '700px',
             marginLeft: 'auto',
             marginRight: 'auto',
-            padding: '0 20px'
+            lineHeight: '1.8'
           }}>
             Access detailed, verified itineraries from top travel influencers.
             Experience the world through their eyes, with curated tips for hotels, food, and hidden gems.
@@ -85,8 +85,7 @@ export default async function Home() {
             display: 'flex',
             gap: '16px',
             justifyContent: 'center',
-            flexWrap: 'wrap',
-            padding: '0 20px'
+            flexWrap: 'wrap'
           }}>
             <Link href="/explore" className="btn btn-primary" style={{ padding: '16px 40px', fontSize: '1.1rem', minWidth: '200px' }}>
               Explore Itineraries
