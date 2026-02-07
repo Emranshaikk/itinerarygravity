@@ -1,67 +1,124 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export default function DiagnosticPage() {
-    const [status, setStatus] = useState<any>({
-        url: "checking...",
-        keyStatus: "checking...",
-        testResult: "not started...",
-    });
-
+export default function DiagPage() {
+    const [user, setUser] = useState<any>(null);
+    const [profile, setProfile] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
     const supabase = createClient();
 
     useEffect(() => {
-        const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "NOT FOUND";
-        const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "NOT FOUND";
+        async function fetchData() {
+            const { data: { user: authUser } } = await supabase.auth.getUser();
+            setUser(authUser);
 
-        setStatus((prev: any) => ({
-            ...prev,
-            url: url,
-            keyStatus: key === "NOT FOUND" ? "NOT FOUND" : `FOUND (${key.length} chars)`,
-        }));
-
-        async function testSupabase() {
-            try {
-                // Try a simple health check or fetch session
-                const { data, error } = await supabase.auth.getSession();
-                if (error) {
-                    setStatus((prev: any) => ({ ...prev, testResult: `Auth Error: ${error.message} (Code: ${error.code})` }));
-                } else {
-                    setStatus((prev: any) => ({ ...prev, testResult: "Auth Check Passed: Connection established." }));
-                }
-
-                // Try to fetch from a presumably public table
-                const { error: dbError } = await supabase.from('profiles').select('count', { count: 'exact', head: true });
-                if (dbError) {
-                    console.log("DB Test Error:", dbError);
-                    setStatus((prev: any) => ({ ...prev, dbTestResult: `DB Error: ${dbError.message} (Is RLS blocking?)` }));
-                } else {
-                    setStatus((prev: any) => ({ ...prev, dbTestResult: "DB Check Passed: API Key is valid for database access." }));
-                }
-            } catch (err: any) {
-                setStatus((prev: any) => ({ ...prev, testResult: `Fatal Error: ${err.message}` }));
+            if (authUser) {
+                const { data: profileData } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', authUser.id)
+                    .single();
+                setProfile(profileData);
             }
+            setLoading(false);
         }
-
-        testSupabase();
+        fetchData();
     }, []);
 
+    if (loading) {
+        return <div className="container" style={{ padding: '40px' }}>Loading...</div>;
+    }
+
+    if (!user) {
+        return (
+            <div className="container" style={{ padding: '40px' }}>
+                <h1 className="text-gradient" style={{ fontSize: '2rem', marginBottom: '20px' }}>Not Logged In</h1>
+                <p style={{ color: 'var(--gray-400)', marginBottom: '20px' }}>
+                    You need to log in first. <a href="/login" style={{ color: 'var(--primary)' }}>Go to Login</a>
+                </p>
+            </div>
+        );
+    }
+
     return (
-        <div style={{ padding: '40px', color: 'white', background: '#111', minHeight: '100vh', fontFamily: 'monospace' }}>
-            <h1 style={{ color: '#00ff00' }}>Supabase Advanced Diagnostic</h1>
-            <div style={{ background: '#222', padding: '20px', borderRadius: '8px', border: '1px solid #333' }}>
-                <p><strong>Supabase URL:</strong> {status.url}</p>
-                <p><strong>Anon Key Status:</strong> {status.keyStatus}</p>
-                <hr style={{ borderColor: '#444' }} />
-                <p><strong>Auth Test Result:</strong> <span style={{ color: status.testResult.includes('Passed') ? '#00ff00' : '#ff4444' }}>{status.testResult}</span></p>
-                <p><strong>DB Test Result:</strong> <span style={{ color: status.dbTestResult?.includes('Passed') ? '#00ff00' : '#ffaa44' }}>{status.dbTestResult}</span></p>
+        <div className="container" style={{ padding: '40px' }}>
+            <h1 className="text-gradient" style={{ fontSize: '2rem', marginBottom: '20px' }}>User Diagnostics</h1>
+
+            <div className="glass card" style={{ padding: '32px', marginBottom: '24px' }}>
+                <h2 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Auth User Info</h2>
+                <div style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                    <p style={{ marginBottom: '8px' }}><strong>User ID:</strong> {user.id}</p>
+                    <p style={{ marginBottom: '8px' }}><strong>Email:</strong> {user.email}</p>
+                    <p style={{ marginBottom: '8px' }}><strong>Email Confirmed:</strong> {user.email_confirmed_at ? '✅ Yes' : '❌ No'}</p>
+                    <p style={{ marginBottom: '8px' }}><strong>Created:</strong> {new Date(user.created_at).toLocaleString()}</p>
+                </div>
             </div>
 
-            <div style={{ marginTop: '20px', color: '#888' }}>
-                <p>If Auth Check says "Invalid API key", the key in your .env.local does not match this project URL.</p>
-                <p>If Auth Check passes but DB fails, your key is valid but the table might be locked by RLS.</p>
+            <div className="glass card" style={{ padding: '32px', marginBottom: '24px' }}>
+                <h2 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Profile Info</h2>
+                {profile ? (
+                    <div style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                        <p style={{ marginBottom: '8px' }}><strong>Profile ID:</strong> {profile.id}</p>
+                        <p style={{ marginBottom: '8px' }}><strong>Email:</strong> {profile.email || 'Not set'}</p>
+                        <p style={{ marginBottom: '8px' }}><strong>Full Name:</strong> {profile.full_name || 'Not set'}</p>
+                        <p style={{ marginBottom: '8px' }}><strong>Role:</strong> <span style={{
+                            color: profile.role === 'admin' ? '#10b981' : profile.role === 'influencer' ? '#ec4899' : '#6b7280',
+                            fontWeight: 700
+                        }}>{profile.role || 'buyer'}</span></p>
+                        <p style={{ marginBottom: '8px' }}><strong>Verified:</strong> {profile.is_verified ? '✅ Yes' : '❌ No'}</p>
+                        <p style={{ marginBottom: '8px' }}><strong>Verification Status:</strong> {profile.verification_status || 'none'}</p>
+                    </div>
+                ) : (
+                    <p style={{ color: '#ef4444' }}>❌ No profile found in database!</p>
+                )}
+            </div>
+
+            {profile && profile.role !== 'admin' && (
+                <div className="glass card" style={{ padding: '32px', background: 'rgba(234, 179, 8, 0.1)', border: '1px solid #eab308' }}>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: '16px', color: '#eab308' }}>⚠️ Set Yourself as Admin</h2>
+                    <p style={{ marginBottom: '16px', color: 'var(--gray-300)' }}>
+                        To access the admin dashboard, run this SQL in your Supabase SQL Editor:
+                    </p>
+                    <div style={{
+                        background: 'rgba(0,0,0,0.3)',
+                        padding: '16px',
+                        borderRadius: '8px',
+                        fontFamily: 'monospace',
+                        fontSize: '0.9rem',
+                        color: '#10b981',
+                        marginBottom: '16px'
+                    }}>
+                        UPDATE profiles<br />
+                        SET role = 'admin'<br />
+                        WHERE id = '{user.id}';
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--gray-400)' }}>
+                        After running this, refresh this page to verify the change.
+                    </p>
+                </div>
+            )}
+
+            {profile && profile.role === 'admin' && (
+                <div className="glass card" style={{ padding: '32px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981' }}>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: '16px', color: '#10b981' }}>✅ You're an Admin!</h2>
+                    <p style={{ marginBottom: '16px', color: 'var(--gray-300)' }}>
+                        You can now access the admin dashboard.
+                    </p>
+                    <a href="/dashboard/admin" className="btn btn-primary">Go to Admin Dashboard</a>
+                </div>
+            )}
+
+            <div style={{ marginTop: '32px', textAlign: 'center' }}>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="btn btn-outline"
+                    style={{ marginRight: '12px' }}
+                >
+                    Refresh Page
+                </button>
+                <a href="/dashboard" className="btn btn-outline">Go to Dashboard</a>
             </div>
         </div>
     );

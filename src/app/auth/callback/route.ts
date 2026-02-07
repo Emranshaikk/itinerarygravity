@@ -10,8 +10,35 @@ export async function GET(request: Request) {
 
     if (code) {
         const supabase = await createClient()
-        const { error } = await supabase.auth.exchangeCodeForSession(code)
-        if (!error) {
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+
+        if (error) {
+            console.error('[CALLBACK_AUTH_ERROR]', error);
+            return NextResponse.redirect(
+                `${origin}/auth/auth-code-error?error=${encodeURIComponent(error.message)}`
+            );
+        }
+
+        if (data.user) {
+            // Create profile with role from user metadata
+            const role = data.user.user_metadata?.role || 'buyer';
+
+            try {
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .upsert({
+                        id: data.user.id,
+                        email: data.user.email,
+                        role: role
+                    }, { onConflict: 'id' });
+
+                if (profileError) {
+                    console.error('[CALLBACK_PROFILE_ERROR]', profileError);
+                }
+            } catch (profileErr) {
+                console.error('[CALLBACK_PROFILE_EXCEPTION]', profileErr);
+            }
+
             const forwardedHost = request.headers.get('x-forwarded-host') // Hello, my name is...
             const isLocalEnv = process.env.NODE_ENV === 'development'
             if (isLocalEnv) {
@@ -26,5 +53,6 @@ export async function GET(request: Request) {
     }
 
     // return the user to an error page with instructions
-    return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+    console.error('[CALLBACK_NO_CODE]', 'No code provided in callback URL');
+    return NextResponse.redirect(`${origin}/auth/auth-code-error?error=No confirmation code provided`)
 }

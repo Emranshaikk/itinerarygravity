@@ -11,6 +11,7 @@ interface AuthFormProps {
 export default function AuthForm({ mode }: AuthFormProps) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [selectedRole, setSelectedRole] = useState<"buyer" | "influencer">("buyer");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
@@ -25,14 +26,18 @@ export default function AuthForm({ mode }: AuthFormProps) {
 
         try {
             if (mode === "signup") {
-                const { error } = await supabase.auth.signUp({
+                const { data, error } = await supabase.auth.signUp({
                     email,
                     password,
                     options: {
                         emailRedirectTo: `${window.location.origin}/auth/callback`,
+                        data: {
+                            role: selectedRole, // Store role in user metadata
+                        }
                     },
                 });
                 if (error) throw error;
+
                 setMessage("Check your email for the confirmation link!");
             } else {
                 const { error } = await supabase.auth.signInWithPassword({
@@ -80,6 +85,52 @@ export default function AuthForm({ mode }: AuthFormProps) {
                         }}
                     />
                 </div>
+
+                {mode === "signup" && (
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '12px', fontSize: '0.9rem', color: 'var(--gray-300)' }}>I want to</label>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            <button
+                                type="button"
+                                onClick={() => setSelectedRole("buyer")}
+                                style={{
+                                    flex: 1,
+                                    padding: '16px',
+                                    borderRadius: '12px',
+                                    background: selectedRole === "buyer" ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
+                                    border: selectedRole === "buyer" ? '2px solid var(--primary)' : '1px solid var(--border)',
+                                    color: 'white',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    fontWeight: selectedRole === "buyer" ? 600 : 400
+                                }}
+                            >
+                                <div style={{ fontSize: '1.2rem', marginBottom: '4px' }}>🌍</div>
+                                <div>Buy Itineraries</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--gray-400)', marginTop: '4px' }}>Explore travel guides</div>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setSelectedRole("influencer")}
+                                style={{
+                                    flex: 1,
+                                    padding: '16px',
+                                    borderRadius: '12px',
+                                    background: selectedRole === "influencer" ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
+                                    border: selectedRole === "influencer" ? '2px solid var(--primary)' : '1px solid var(--border)',
+                                    color: 'white',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    fontWeight: selectedRole === "influencer" ? 600 : 400
+                                }}
+                            >
+                                <div style={{ fontSize: '1.2rem', marginBottom: '4px' }}>✨</div>
+                                <div>Sell Itineraries</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--gray-400)', marginTop: '4px' }}>Become a creator</div>
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 <div>
                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', color: 'var(--gray-300)' }}>Password</label>
