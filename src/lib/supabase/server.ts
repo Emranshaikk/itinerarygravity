@@ -3,10 +3,16 @@ import { cookies } from 'next/headers'
 
 export async function createClient() {
     const cookieStore = await cookies()
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+        console.error('Supabase URL or Anon Key is missing on the server! Check your .env.local file.')
+    }
 
     return createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!.trim(),
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!.trim(),
+        supabaseUrl || '',
+        supabaseAnonKey || '',
         {
             cookies: {
                 getAll() {
