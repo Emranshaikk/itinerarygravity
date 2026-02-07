@@ -6,7 +6,7 @@ export async function updateSession(request: NextRequest) {
         request,
     })
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim().replace(/\/$/, '')
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
 
     if (!supabaseUrl || !supabaseAnonKey) {
@@ -22,7 +22,7 @@ export async function updateSession(request: NextRequest) {
                     return request.cookies.getAll()
                 },
                 setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+                    cookiesToSet.forEach(({ name, value, options }) => request.cookies.set({ name, value, ...options }))
                     supabaseResponse = NextResponse.next({
                         request,
                     })
