@@ -47,3 +47,7 @@ CREATE POLICY "Public itineraries are viewable by everyone" ON itineraries
 -- Allow creators to manage their own itineraries
 CREATE POLICY "Users can manage their own itineraries" ON itineraries
   FOR ALL USING (auth.uid()::text = creator_id);
+
+-- Allow users to manage their own profile
+CREATE POLICY "Users can manage their own profile" ON profiles
+  FOR ALL USING (auth.uid()::text = id);
