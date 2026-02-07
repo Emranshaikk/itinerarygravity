@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -17,6 +17,15 @@ export default function AuthForm({ mode }: AuthFormProps) {
     const [message, setMessage] = useState<string | null>(null);
     const router = useRouter();
     const supabase = createClient();
+
+    useEffect(() => {
+        const pendingRole = sessionStorage.getItem('pending_role');
+        if (pendingRole === 'influencer' || pendingRole === 'buyer') {
+            setSelectedRole(pendingRole as "buyer" | "influencer");
+            sessionStorage.removeItem('pending_role');
+        }
+    }, []);
+
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -38,7 +47,12 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 });
                 if (error) throw error;
 
-                setMessage("Check your email for the confirmation link!");
+                if (data.session) {
+                    router.push("/dashboard");
+                    router.refresh();
+                } else {
+                    setMessage("Check your email for the confirmation link!");
+                }
             } else {
                 const { error } = await supabase.auth.signInWithPassword({
                     email,
