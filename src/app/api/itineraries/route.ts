@@ -1,18 +1,20 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/lib/supabase/server';
 
 export async function POST(req: Request) {
     try {
-        const { userId } = await auth();
-        if (!userId) {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        const userId = user.id;
         const body = await req.json();
         const {
             title,
-            location, // Map to location from destination if provided
+            location,
             destination,
             price,
             currency,
@@ -23,12 +25,11 @@ export async function POST(req: Request) {
         const finalLocation = location || destination;
 
         // 1. Ensure profile exists (Upsert)
-        // In a real app, you'd do this via Webhooks, but for now we'll do it on-the-fly
         const { error: profileError } = await supabase
             .from('profiles')
             .upsert({
                 id: userId,
-                role: 'influencer' // Assuming only creators call this
+                role: 'influencer'
             });
 
         if (profileError) {
@@ -41,11 +42,11 @@ export async function POST(req: Request) {
             .insert({
                 creator_id: userId,
                 title,
-                location: finalLocation, // Use the resolved location
+                location: finalLocation,
                 price,
                 currency: currency || "USD",
                 description: body.description || `A trip to ${finalLocation}`,
-                content: body.content, // Use the content directly from body
+                content: body.content,
                 is_published: true
             })
             .select()
@@ -65,6 +66,7 @@ export async function POST(req: Request) {
 
 export async function GET() {
     try {
+        const supabase = await createClient();
         const { data, error } = await supabase
             .from('itineraries')
             .select(`

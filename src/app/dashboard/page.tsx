@@ -1,38 +1,34 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function DashboardPage() {
-    const { userId } = await auth();
+    const supabase = await createClient();
 
-    if (!userId) {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
         redirect("/login");
     }
 
-    const user = await currentUser();
-    let role = user?.publicMetadata?.role as string;
+    // Role check from Supabase
+    try {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
 
-    // If role is not in Clerk, check Supabase
-    if (!role) {
-        try {
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('role')
-                .eq('id', userId)
-                .single();
+        const role = profile?.role || "buyer";
 
-            role = profile?.role || "buyer";
-        } catch (e) {
-            console.error("Dashboard role check failed", e);
-            role = "buyer"; // Safe fallback
+        if (role === "admin") {
+            redirect("/dashboard/admin");
+        } else if (role === "influencer") {
+            redirect("/dashboard/influencer");
+        } else {
+            redirect("/dashboard/buyer");
         }
-    }
-
-    if (role === "admin") {
-        redirect("/dashboard/admin");
-    } else if (role === "influencer") {
-        redirect("/dashboard/influencer");
-    } else {
-        redirect("/dashboard/buyer");
+    } catch (e) {
+        console.error("Dashboard role check failed", e);
+        redirect("/dashboard/buyer"); // Safe fallback
     }
 }

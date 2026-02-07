@@ -1,16 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
 import { ShieldCheck, CheckCircle2, ArrowLeft, Camera } from "@/components/Icons";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 
 export default function VerificationPage() {
-    const { user } = useUser();
+    const [user, setUser] = useState<any>(null);
     const router = useRouter();
     const [status, setStatus] = useState<'idle' | 'processing' | 'success'>('idle');
     const [proof, setProof] = useState("");
+    const supabase = createClient();
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                setUser(user);
+            } else {
+                router.push("/login");
+            }
+        };
+        getUser();
+    }, []);
 
     const handleSubscribe = async () => {
         if (!proof.trim()) {
@@ -20,7 +32,6 @@ export default function VerificationPage() {
 
         setStatus('processing');
         try {
-            // 1. Submit the proof to the profile
             const { error: profileError } = await supabase
                 .from('profiles')
                 .update({
@@ -31,7 +42,6 @@ export default function VerificationPage() {
 
             if (profileError) throw profileError;
 
-            // 2. Open Razorpay for payment
             const response = await fetch('/api/verify', {
                 method: 'POST',
             });
@@ -47,12 +57,11 @@ export default function VerificationPage() {
                     description: "Influencer Verification Fee",
                     order_id: data.id,
                     handler: async function (response: any) {
-                        // In a real app, confirm payment on server
                         setStatus('success');
                     },
                     prefill: {
-                        name: user?.fullName || "",
-                        email: user?.primaryEmailAddress?.emailAddress || "",
+                        name: user?.user_metadata?.full_name || "",
+                        email: user?.email || "",
                     },
                     theme: {
                         color: "#ff00e5",

@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server';
 import { razorpay } from '@/lib/razorpay';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/lib/supabase/server';
 
 export async function POST() {
     try {
-        const { userId } = await auth();
-        if (!userId) {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const amount = 999 * 100; // $9.99 in cents/paise (Assuming 1:1 for now or fixed price in INR)
-        // Note: For India, Razorpay usually uses INR. If you want USD, you'd 
-        // need an international account. I'll stick to INR for now as it's common.
+        const userId = user.id;
 
         const options = {
             amount: 80000, // Fixed 800 INR for verification

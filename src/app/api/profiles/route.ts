@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/lib/supabase/server';
 
 export async function POST(req: Request) {
     try {
-        const { userId } = await auth();
-        if (!userId) {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        const userId = user.id;
         let role;
         try {
             const body = await req.json();
@@ -20,7 +22,6 @@ export async function POST(req: Request) {
 
         console.log("[PROFILES_UPDATING]", { userId, role });
 
-        // Try a simpler approach: update if exists, insert if not
         const { data, error } = await supabase
             .from('profiles')
             .upsert({ id: userId, role: role || 'buyer' }, { onConflict: 'id' })
@@ -28,11 +29,9 @@ export async function POST(req: Request) {
 
         if (error) {
             console.error("[PROFILE_UPSERT_ERROR]", error);
-            // If it's a permission error, it's likely RLS
             return NextResponse.json({
                 error: "Database Error",
                 details: error.message,
-                hint: "Ensure you have run the RLS policies in Supabase SQL editor."
             }, { status: 500 });
         }
 

@@ -3,41 +3,48 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { createClient } from "@/lib/supabase/client";
 import { PieChart, TrendingUp, Calendar, Star, DollarSign, MapPin } from "@/components/Icons";
-import { supabase } from "@/lib/supabase";
 
 export default function InfluencerDashboard() {
     const router = useRouter();
-    const { user, isLoaded } = useUser();
+    const [user, setUser] = useState<any>(null);
     const [profile, setProfile] = useState<any>(null);
     const [itineraries, setItineraries] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const supabase = createClient();
 
     useEffect(() => {
-        if (isLoaded && user) {
-            fetchDashboardData();
-        }
-    }, [isLoaded, user]);
+        const fetchUserAndData = async () => {
+            const { data: { user: authUser } } = await supabase.auth.getUser();
+            if (authUser) {
+                setUser(authUser);
+                await fetchDashboardData(authUser.id);
+            } else {
+                router.push("/login");
+            }
+        };
+        fetchUserAndData();
+    }, []);
 
-    async function fetchDashboardData() {
+    async function fetchDashboardData(userId: string) {
         try {
             setLoading(true);
 
             // 1. Fetch Profile
-            const { data: profileData, error: profileError } = await supabase
+            const { data: profileData } = await supabase
                 .from('profiles')
                 .select('*')
-                .eq('id', user?.id)
+                .eq('id', userId)
                 .single();
 
             if (profileData) setProfile(profileData);
 
             // 2. Fetch Itineraries
-            const { data: itineraryData, error: itineraryError } = await supabase
+            const { data: itineraryData } = await supabase
                 .from('itineraries')
                 .select('*')
-                .eq('creator_id', user?.id)
+                .eq('creator_id', userId)
                 .order('created_at', { ascending: false });
 
             if (itineraryData) setItineraries(itineraryData);
@@ -49,7 +56,7 @@ export default function InfluencerDashboard() {
         }
     }
 
-    if (!isLoaded || loading) {
+    if (loading) {
         return (
             <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
                 <div className="text-gradient" style={{ fontSize: '1.2rem', fontWeight: 600 }}>Loading Dashboard...</div>
@@ -74,10 +81,10 @@ export default function InfluencerDashboard() {
                         fontWeight: 800,
                         color: 'white'
                     }}>
-                        {!profile?.avatar_url && (user?.firstName?.charAt(0) || 'U')}
+                        {!profile?.avatar_url && (profile?.full_name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'U')}
                     </div>
                     <div>
-                        <h1 className="text-gradient" style={{ fontSize: '2rem' }}>Welcome back, {user?.firstName || 'Creator'}</h1>
+                        <h1 className="text-gradient" style={{ fontSize: '2rem' }}>Welcome back, {profile?.full_name || 'Creator'}</h1>
                         <p style={{ color: 'var(--gray-400)' }}>Manage your itineraries and track earnings.</p>
                     </div>
                 </div>

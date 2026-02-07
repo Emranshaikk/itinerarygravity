@@ -1,20 +1,25 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function TestDashboard() {
-    const { user, isLoaded } = useUser();
+    const [user, setUser] = useState<any>(null);
     const [profile, setProfile] = useState<any>(null);
     const [error, setError] = useState<string>("");
     const [loading, setLoading] = useState(true);
+    const supabase = createClient();
 
     useEffect(() => {
         async function checkProfile() {
-            if (!isLoaded || !user) {
+            const { data: { user: authUser } } = await supabase.auth.getUser();
+
+            if (!authUser) {
                 setLoading(false);
                 return;
             }
+
+            setUser(authUser);
 
             try {
                 const response = await fetch('/api/profiles', {
@@ -38,9 +43,9 @@ export default function TestDashboard() {
         }
 
         checkProfile();
-    }, [isLoaded, user]);
+    }, []);
 
-    if (!isLoaded || loading) {
+    if (loading) {
         return (
             <div style={{ padding: '40px', color: 'var(--foreground)' }}>
                 <h1>Loading...</h1>
@@ -50,14 +55,13 @@ export default function TestDashboard() {
 
     return (
         <div style={{ padding: '40px', color: 'var(--foreground)', maxWidth: '800px', margin: '0 auto' }}>
-            <h1 style={{ marginBottom: '20px' }}>Dashboard Diagnostic</h1>
+            <h1 style={{ marginBottom: '20px' }}>Dashboard Diagnostic (Supabase)</h1>
 
             <div style={{ background: 'var(--surface)', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
-                <h2>Clerk User Status</h2>
-                <p><strong>Loaded:</strong> {isLoaded ? 'Yes' : 'No'}</p>
+                <h2>Supabase Auth Status</h2>
+                <p><strong>Logged In:</strong> {user ? 'Yes' : 'No'}</p>
                 <p><strong>User ID:</strong> {user?.id || 'Not logged in'}</p>
-                <p><strong>Email:</strong> {user?.primaryEmailAddress?.emailAddress || 'N/A'}</p>
-                <p><strong>Name:</strong> {user?.firstName} {user?.lastName}</p>
+                <p><strong>Email:</strong> {user?.email || 'N/A'}</p>
             </div>
 
             <div style={{ background: 'var(--surface)', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
@@ -79,7 +83,7 @@ export default function TestDashboard() {
             <div style={{ background: 'var(--surface)', padding: '20px', borderRadius: '8px' }}>
                 <h2>Environment Check</h2>
                 <p><strong>Supabase URL:</strong> {process.env.NEXT_PUBLIC_SUPABASE_URL ? '✓ Set' : '✗ Missing'}</p>
-                <p><strong>Clerk Key:</strong> {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? '✓ Set' : '✗ Missing'}</p>
+                <p><strong>Supabase Key:</strong> {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✓ Set' : '✗ Missing'}</p>
             </div>
 
             <div style={{ marginTop: '20px' }}>
