@@ -1,66 +1,80 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Download } from "@/components/Icons";
+import { createClient } from "@/lib/supabase/client";
 
 export default function BuyerDashboard() {
     const router = useRouter();
+    const [purchases, setPurchases] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const supabase = createClient();
 
     useEffect(() => {
-        let isMounted = true;
-        const checkRole = async () => {
-            const pendingRole = typeof window !== 'undefined' ? sessionStorage.getItem('pending_role') : null;
-            if (pendingRole === 'influencer') {
-                try {
-                    const response = await fetch('/api/profiles', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ role: 'influencer' })
-                    });
-
-                    if (response.ok && isMounted) {
-                        sessionStorage.removeItem('pending_role');
-                        window.location.href = '/dashboard';
-                    } else if (isMounted) {
-                        const errorData = await response.json().catch(() => ({}));
-                        console.error("Profile update failed:", errorData.error || response.statusText);
-                    }
-                } catch (err) {
-                    console.error("Failed to update role", err);
+        const fetchPurchases = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    router.push("/login");
+                    return;
                 }
+
+                const { data, error } = await supabase
+                    .from('purchases')
+                    .select(`
+                        id,
+                        itinerary_id,
+                        created_at,
+                        itineraries (
+                            id,
+                            title,
+                            location,
+                            description,
+                            creator_id,
+                            profiles:creator_id (
+                                full_name
+                            )
+                        )
+                    `)
+                    .eq('user_id', user.id);
+
+                if (data) {
+                    const formatted = data.map((p: any) => ({
+                        id: p.id,
+                        itinerary_id: p.itinerary_id,
+                        title: p.itineraries?.title,
+                        creator: p.itineraries?.profiles?.full_name || "@Influencer",
+                        location: p.itineraries?.location,
+                        date: new Date(p.created_at).toLocaleDateString(),
+                        image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=600", // Fallback image
+                        description: p.itineraries?.description || ""
+                    }));
+                    setPurchases(formatted);
+                }
+            } catch (err) {
+                console.error("Error fetching purchases:", err);
+            } finally {
+                setLoading(false);
             }
         };
-        checkRole();
-        return () => { isMounted = false; };
+
+        fetchPurchases();
     }, []);
+
+    if (loading) {
+        return (
+            <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+                <div className="text-gradient" style={{ fontSize: '1.2rem', fontWeight: 600 }}>Loading Library...</div>
+            </div>
+        );
+    }
 
     const handleDownload = (title: string) => {
         alert(`Preparing PDF for "${title}"... Please select "Save as PDF" in the print dialog.`);
         window.print();
     };
-
-    const purchases = [
-        {
-            id: 1,
-            title: "7 Days in Kyoto: The Ultimate Guide",
-            creator: "@SarahTravels",
-            location: "Kyoto, Japan",
-            date: "Jan 24, 2026",
-            image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=600",
-            description: "A complete guide featuring hidden tea houses, Gion secrets, and best tempura spots."
-        },
-        {
-            id: 2,
-            title: "Bali: Hidden Gems",
-            creator: "@BaliExplorer",
-            location: "Ubud, Bali",
-            date: "Jan 12, 2026",
-            image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=600",
-            description: "Discover waterfalls, swings, and organic cafes away from the crowds."
-        }
-    ];
 
     return (
         <div className="container" style={{ padding: '40px 0' }}>
@@ -106,7 +120,7 @@ export default function BuyerDashboard() {
                                 by {item.creator} • {item.description}
                             </p>
                             <div style={{ marginTop: 'auto', display: 'flex', gap: '12px' }}>
-                                <Link href={`/itinerary/${item.id === 1 ? 'kyoto-traditional' : 'bali-hidden'}`} className="btn btn-outline" style={{ flex: 1, fontSize: '0.85rem' }}>
+                                <Link href={`/itinerary/${item.itinerary_id}`} className="btn btn-outline" style={{ flex: 1, fontSize: '0.85rem' }}>
                                     View Guide
                                 </Link>
                                 <button
@@ -130,7 +144,8 @@ export default function BuyerDashboard() {
                     textAlign: 'center',
                     borderStyle: 'dashed',
                     borderColor: 'var(--border)',
-                    background: 'transparent'
+                    background: 'transparent',
+                    minHeight: '300px'
                 }}>
                     <div style={{
                         width: '60px',
@@ -141,7 +156,8 @@ export default function BuyerDashboard() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         marginBottom: '16px',
-                        color: 'var(--primary)'
+                        color: 'var(--primary)',
+                        fontSize: '1.5rem'
                     }}>
                         +
                     </div>

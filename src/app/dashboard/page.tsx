@@ -10,7 +10,7 @@ export default async function DashboardPage() {
         redirect("/login");
     }
 
-    // Role check from Supabase
+    // Role check from Supabase - try Profile Table first, then User Metadata
     try {
         const { data: profile } = await supabase
             .from('profiles')
@@ -18,7 +18,8 @@ export default async function DashboardPage() {
             .eq('id', user.id)
             .single();
 
-        const role = profile?.role || "buyer";
+        // Source of truth prioritizing DB profile, then user metadata (set during signup)
+        const role = profile?.role || user.user_metadata?.role || "buyer";
 
         if (role === "admin") {
             redirect("/dashboard/admin");
@@ -28,6 +29,11 @@ export default async function DashboardPage() {
             redirect("/dashboard/buyer");
         }
     } catch (e) {
+        // Even if DB check fails, trust metadata as fallback during initial signup
+        const metaRole = user.user_metadata?.role;
+        if (metaRole === 'influencer') redirect("/dashboard/influencer");
+        if (metaRole === 'admin') redirect("/dashboard/admin");
+
         console.error("Dashboard role check failed", e);
         redirect("/dashboard/buyer"); // Safe fallback
     }
