@@ -2,141 +2,406 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { MapPin, Star, Search, Filter, X } from "@/components/Icons";
 
-const MOCK_ITINERARIES = [
-    {
-        id: "kyoto-traditional",
-        title: "Kyoto: Traditional Japan",
-        creator: "@SarahTravels",
-        location: "Kyoto, Japan",
-        price: 15.00,
-        rating: 4.9,
-        reviews: 124,
-        image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop",
-        tags: ["Cultural", "Food", "7 Days"]
-    },
-    {
-        id: "bali-hidden",
-        title: "Bali: Hidden Gems",
-        creator: "@BaliExplorer",
-        location: "Ubud, Bali",
-        price: 12.00,
-        rating: 5.0,
-        reviews: 210,
-        image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=800&auto=format&fit=crop",
-        tags: ["Nature", "Adventure", "5 Days"]
-    }
-];
+interface Itinerary {
+    id: string;
+    title: string;
+    creator: string;
+    creator_id: string;
+    location: string;
+    price: number;
+    average_rating: number;
+    review_count: number;
+    image: string;
+    tags: string[];
+    duration_days?: number;
+    difficulty_level?: string;
+}
 
 export default function ExplorePage() {
-    const [itineraries, setItineraries] = useState<any[]>([]);
+    const [itineraries, setItineraries] = useState<Itinerary[]>([]);
+    const [filteredItineraries, setFilteredItineraries] = useState<Itinerary[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [mounted, setMounted] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+    const [sortBy, setSortBy] = useState<"newest" | "price-low" | "price-high" | "rating">("rating");
+    const [showFilters, setShowFilters] = useState(false);
+    const supabase = createClient();
 
     useEffect(() => {
-        setMounted(true);
-        async function fetchItineraries() {
-            try {
-                const res = await fetch('/api/itineraries');
-                const data = await res.json();
-
-                // Combine mock + real data for a full-looking page
-                // In a real app, you'd just use 'data'
-                const formattedData = data.map((item: any) => ({
-                    id: item.id,
-                    title: item.title,
-                    creator: item.profiles?.full_name || "@Influencer",
-                    location: item.location,
-                    price: Number(item.price),
-                    rating: 4.5 + (Math.random() * 0.5), // Randomized for mock effect
-                    reviews: Math.floor(Math.random() * 200),
-                    image: item.image_url || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800&auto=format&fit=crop",
-                    tags: ["Verified", "New"]
-                }));
-
-                setItineraries([...formattedData, ...MOCK_ITINERARIES]);
-            } catch (error) {
-                console.error("Fetch error:", error);
-                setItineraries(MOCK_ITINERARIES);
-            } finally {
-                setIsLoading(false);
-            }
-        }
-
         fetchItineraries();
     }, []);
 
+    useEffect(() => {
+        filterAndSortItineraries();
+    }, [itineraries, searchQuery, selectedTags, priceRange, sortBy]);
+
+    async function fetchItineraries() {
+        try {
+            const { data, error } = await supabase
+                .from('itineraries')
+                .select(`
+                    *,
+                    profiles:creator_id (
+                        full_name,
+                        email
+                    )
+                `)
+                .eq('is_published', true)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            const formattedData: Itinerary[] = (data || []).map((item: any) => ({
+                id: item.id,
+                title: item.title,
+                creator: item.profiles?.full_name || item.profiles?.email || "@Creator",
+                creator_id: item.creator_id,
+                location: item.location || "Unknown",
+                price: Number(item.price) || 0,
+                average_rating: Number(item.average_rating) || 0,
+                review_count: item.review_count || 0,
+                image: item.image_url || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800&auto=format&fit=crop",
+                tags: item.tags || [],
+                duration_days: item.duration_days,
+                difficulty_level: item.difficulty_level
+            }));
+
+            setItineraries(formattedData);
+        } catch (error) {
+            console.error("Fetch error:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    function filterAndSortItineraries() {
+        let filtered = [...itineraries];
+
+        // Search filter
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter(item =>
+                item.title.toLowerCase().includes(query) ||
+                item.location.toLowerCase().includes(query) ||
+                item.creator.toLowerCase().includes(query)
+            );
+        }
+
+        // Tag filter
+        if (selectedTags.length > 0) {
+            filtered = filtered.filter(item =>
+                selectedTags.some(tag => item.tags.includes(tag))
+            );
+        }
+
+        // Price filter
+        filtered = filtered.filter(item =>
+            item.price >= priceRange[0] && item.price <= priceRange[1]
+        );
+
+        // Sort
+        filtered.sort((a, b) => {
+            switch (sortBy) {
+                case "newest":
+                    return 0; // Already sorted by created_at
+                case "price-low":
+                    return a.price - b.price;
+                case "price-high":
+                    return b.price - a.price;
+                case "rating":
+                    return b.average_rating - a.average_rating;
+                default:
+                    return 0;
+            }
+        });
+
+        setFilteredItineraries(filtered);
+    }
+
+    const allTags = Array.from(new Set(itineraries.flatMap(i => i.tags)));
+
+    const toggleTag = (tag: string) => {
+        setSelectedTags(prev =>
+            prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+        );
+    };
+
     return (
         <div className="container" style={{ padding: '60px 0' }}>
-            {!mounted ? null : (
-                <>
-                    <header style={{ marginBottom: '48px' }}>
-                        <h1 className="text-gradient" style={{ fontSize: '3rem', marginBottom: '16px' }}>Explore Itineraries</h1>
-                        <p style={{ color: 'var(--gray-400)', fontSize: '1.2rem', maxWidth: '600px' }}>
-                            Discover curated travel guides from the world&apos;s most influential travelers.
-                        </p>
-                    </header>
+            <header style={{ marginBottom: '48px' }}>
+                <h1 className="text-gradient" style={{ fontSize: '3rem', marginBottom: '16px' }}>
+                    Explore Itineraries
+                </h1>
+                <p style={{ color: 'var(--gray-400)', fontSize: '1.2rem', maxWidth: '600px' }}>
+                    Discover curated travel guides from verified creators around the world.
+                </p>
+            </header>
 
-                    {isLoading ? (
-                        <div style={{ textAlign: 'center', padding: '100px 0', color: 'var(--gray-400)' }}>
-                            Loading amazing adventures...
+            {/* Search and Filter Bar */}
+            <div style={{ marginBottom: '40px' }}>
+                <div style={{ display: 'flex', gap: '16px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                    {/* Search */}
+                    <div style={{ flex: 1, minWidth: '300px', position: 'relative' }}>
+                        <Search size={20} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray-400)' }} />
+                        <input
+                            type="text"
+                            placeholder="Search by title, location, or creator..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '14px 16px 14px 48px',
+                                borderRadius: '12px',
+                                background: 'var(--input-bg)',
+                                border: '1px solid var(--border)',
+                                color: 'white',
+                                fontSize: '0.95rem'
+                            }}
+                        />
+                    </div>
+
+                    {/* Sort */}
+                    <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as any)}
+                        style={{
+                            padding: '14px 16px',
+                            borderRadius: '12px',
+                            background: 'var(--input-bg)',
+                            border: '1px solid var(--border)',
+                            color: 'white',
+                            fontSize: '0.95rem',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <option value="rating">Highest Rated</option>
+                        <option value="newest">Newest First</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                    </select>
+
+                    {/* Filter Toggle */}
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className="btn btn-outline"
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                    >
+                        <Filter size={18} />
+                        Filters
+                        {(selectedTags.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000) && (
+                            <span style={{
+                                background: 'var(--primary)',
+                                color: 'white',
+                                borderRadius: '50%',
+                                width: '20px',
+                                height: '20px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.7rem',
+                                fontWeight: 700
+                            }}>
+                                {selectedTags.length + (priceRange[0] > 0 || priceRange[1] < 1000 ? 1 : 0)}
+                            </span>
+                        )}
+                    </button>
+                </div>
+
+                {/* Filter Panel */}
+                {showFilters && (
+                    <div className="glass card" style={{ padding: '24px', marginTop: '16px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '32px' }}>
+                            {/* Tags */}
+                            {allTags.length > 0 && (
+                                <div>
+                                    <h4 style={{ marginBottom: '12px', fontSize: '0.9rem', color: 'var(--gray-400)' }}>Categories</h4>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                        {allTags.map(tag => (
+                                            <button
+                                                key={tag}
+                                                onClick={() => toggleTag(tag)}
+                                                className="badge"
+                                                style={{
+                                                    background: selectedTags.includes(tag) ? 'var(--primary)' : 'var(--surface)',
+                                                    border: selectedTags.includes(tag) ? '1px solid var(--primary)' : '1px solid var(--border)',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.2s'
+                                                }}
+                                            >
+                                                {tag}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Price Range */}
+                            <div>
+                                <h4 style={{ marginBottom: '12px', fontSize: '0.9rem', color: 'var(--gray-400)' }}>
+                                    Price Range: ₹{priceRange[0]} - ₹{priceRange[1]}
+                                </h4>
+                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="1000"
+                                        value={priceRange[0]}
+                                        onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                                        style={{ flex: 1 }}
+                                    />
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="1000"
+                                        value={priceRange[1]}
+                                        onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                                        style={{ flex: 1 }}
+                                    />
+                                </div>
+                            </div>
                         </div>
-                    ) : (
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-                            gap: '32px'
-                        }}>
-                            {itineraries.map((item) => (
-                                <Link href={`/itinerary/${item.id}`} key={item.id} className="glass card card-hover" style={{ padding: '0', overflow: 'hidden', display: 'block' }}>
+
+                        {/* Clear Filters */}
+                        {(selectedTags.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000) && (
+                            <button
+                                onClick={() => {
+                                    setSelectedTags([]);
+                                    setPriceRange([0, 1000]);
+                                }}
+                                className="btn btn-outline"
+                                style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}
+                            >
+                                <X size={16} /> Clear All Filters
+                            </button>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {/* Results Count */}
+            <div style={{ marginBottom: '24px', color: 'var(--gray-400)', fontSize: '0.9rem' }}>
+                Showing {filteredItineraries.length} of {itineraries.length} itineraries
+            </div>
+
+            {/* Itineraries Grid */}
+            {isLoading ? (
+                <div style={{ textAlign: 'center', padding: '100px 0', color: 'var(--gray-400)' }}>
+                    Loading amazing adventures...
+                </div>
+            ) : filteredItineraries.length === 0 ? (
+                <div className="glass card" style={{ padding: '60px', textAlign: 'center' }}>
+                    <h3 style={{ fontSize: '1.5rem', marginBottom: '12px' }}>No itineraries found</h3>
+                    <p style={{ color: 'var(--gray-400)', marginBottom: '24px' }}>
+                        Try adjusting your search or filters
+                    </p>
+                    <button
+                        onClick={() => {
+                            setSearchQuery("");
+                            setSelectedTags([]);
+                            setPriceRange([0, 1000]);
+                        }}
+                        className="btn btn-primary"
+                    >
+                        Clear All Filters
+                    </button>
+                </div>
+            ) : (
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+                    gap: '32px'
+                }}>
+                    {filteredItineraries.map((item) => (
+                        <Link
+                            href={`/itinerary/${item.id}`}
+                            key={item.id}
+                            className="glass card card-hover"
+                            style={{ padding: '0', overflow: 'hidden', display: 'block' }}
+                        >
+                            <div style={{
+                                position: 'relative',
+                                height: '240px',
+                                backgroundImage: `url(${item.image})`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center'
+                            }}>
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '16px',
+                                    right: '16px',
+                                    background: 'rgba(15, 23, 42, 0.8)',
+                                    backdropFilter: 'blur(4px)',
+                                    padding: '6px 14px',
+                                    borderRadius: '99px',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 700,
+                                    color: 'var(--white)'
+                                }}>
+                                    ₹{item.price.toFixed(2)}
+                                </div>
+                                {item.duration_days && (
                                     <div style={{
-                                        position: 'relative',
-                                        height: '240px',
-                                        backgroundImage: `url(${item.image})`,
-                                        backgroundSize: 'cover',
-                                        backgroundPosition: 'center'
+                                        position: 'absolute',
+                                        bottom: '16px',
+                                        left: '16px',
+                                        background: 'rgba(15, 23, 42, 0.8)',
+                                        backdropFilter: 'blur(4px)',
+                                        padding: '4px 12px',
+                                        borderRadius: '99px',
+                                        fontSize: '0.75rem',
+                                        color: 'var(--white)'
                                     }}>
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: '16px',
-                                            right: '16px',
-                                            background: 'rgba(15, 23, 42, 0.8)',
-                                            backdropFilter: 'blur(4px)',
-                                            padding: '4px 12px',
-                                            borderRadius: '99px',
-                                            fontSize: '0.8rem',
-                                            fontWeight: 700,
-                                            color: 'var(--white)'
-                                        }}>
-                                            ${item.price.toFixed(2)}
-                                        </div>
+                                        {item.duration_days} Days
                                     </div>
-                                    <div style={{ padding: '24px' }}>
-                                        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                                            {item.tags?.map((tag: any) => (
-                                                <span key={tag} className="badge" style={{ background: 'var(--surface)', border: '1px solid var(--border)', fontSize: '0.65rem' }}>
-                                                    {tag}
-                                                </span>
-                                            ))}
-                                        </div>
-                                        <h3 style={{ fontSize: '1.4rem', marginBottom: '8px', color: 'var(--white)' }}>{item.title}</h3>
-                                        <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem', marginBottom: '20px' }}>
-                                            by {item.creator} • {item.location}
-                                        </p>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                <span style={{ color: '#fbbf24' }}>★</span>
-                                                <span style={{ fontWeight: 600 }}>{item.rating?.toFixed(1)}</span>
-                                                <span style={{ color: 'var(--gray-400)', fontSize: '0.85rem' }}>({item.reviews} reviews)</span>
-                                            </div>
-                                            <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem' }}>View Details →</span>
-                                        </div>
+                                )}
+                            </div>
+                            <div style={{ padding: '24px' }}>
+                                <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                                    {item.tags?.slice(0, 3).map((tag: string) => (
+                                        <span
+                                            key={tag}
+                                            className="badge"
+                                            style={{
+                                                background: 'var(--surface)',
+                                                border: '1px solid var(--border)',
+                                                fontSize: '0.65rem'
+                                            }}
+                                        >
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                                <h3 style={{ fontSize: '1.4rem', marginBottom: '8px', color: 'var(--white)' }}>
+                                    {item.title}
+                                </h3>
+                                <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <MapPin size={14} />
+                                    {item.location}
+                                </p>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <Star size={16} style={{ color: '#fbbf24', fill: '#fbbf24' }} />
+                                        <span style={{ fontWeight: 600 }}>
+                                            {item.average_rating > 0 ? item.average_rating.toFixed(1) : 'New'}
+                                        </span>
+                                        {item.review_count > 0 && (
+                                            <span style={{ color: 'var(--gray-400)', fontSize: '0.85rem' }}>
+                                                ({item.review_count})
+                                            </span>
+                                        )}
                                     </div>
-                                </Link>
-                            ))}
-                        </div>
-                    )}
-                </>
+                                    <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem' }}>
+                                        View Details →
+                                    </span>
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
             )}
         </div>
     );

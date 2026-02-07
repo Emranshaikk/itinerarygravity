@@ -4,6 +4,10 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle, MapPin, Star, ShieldCheck, Calendar, Clock, Info, Shield, Truck, Hotel, Coffee } from "@/components/Icons";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import ReviewSection from "@/components/reviews/ReviewSection";
+import ReviewForm from "@/components/reviews/ReviewForm";
+import PDFGenerator from "@/components/pdf/PDFGenerator";
 
 export default function ItineraryDetailsPage() {
     const params = useParams();
@@ -12,6 +16,10 @@ export default function ItineraryDetailsPage() {
     const [mounted, setMounted] = useState(false);
     const [liveData, setLiveData] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState<any>(null);
+    const [isPurchased, setIsPurchased] = useState(false);
+    const [userReview, setUserReview] = useState<any>(null);
+    const supabase = createClient();
 
     const id = params?.id as string || "";
     const isKyoto = id === "kyoto-traditional";
@@ -20,28 +28,69 @@ export default function ItineraryDetailsPage() {
     useEffect(() => {
         setMounted(true);
 
-        async function fetchItinerary() {
-            if (isKyoto || isBali) {
-                setIsLoading(false);
-                return;
-            }
-
+        async function fetchData() {
             try {
-                // Simplified UUID check or just try fetch
-                const res = await fetch(`/api/itineraries`);
-                const all = await res.json();
-                const found = all.find((it: any) => it.id === id);
-                if (found) {
-                    setLiveData(found);
+                // Get current user
+                const { data: { user: authUser } } = await supabase.auth.getUser();
+                setUser(authUser);
+
+                if (authUser) {
+                    // Check if purchased
+                    const { data: purchase } = await supabase
+                        .from('purchases')
+                        .select('id')
+                        .eq('user_id', authUser.id)
+                        .eq('itinerary_id', id)
+                        .single();
+
+                    if (purchase) setIsPurchased(true);
+
+                    // Check if already reviewed
+                    const { data: review } = await supabase
+                        .from('reviews')
+                        .select('*')
+                        .eq('user_id', authUser.id)
+                        .eq('itinerary_id', id)
+                        .single();
+
+                    if (review) setUserReview(review);
+                }
+
+                // Fetch itinerary data
+                if (isKyoto || isBali) {
+                    setIsLoading(false);
+                    return;
+                }
+
+                const { data: itineraryData, error } = await supabase
+                    .from('itineraries')
+                    .select(`
+                        *,
+                        profiles:creator_id (
+                            full_name,
+                            avatar_url
+                        )
+                    `)
+                    .eq('id', id)
+                    .single();
+
+                if (itineraryData) {
+                    setLiveData(itineraryData);
+
+                    // Track view (asynchronously)
+                    fetch('/api/analytics', {
+                        method: 'POST',
+                        body: JSON.stringify({ itinerary_id: id })
+                    }).catch(console.error);
                 }
             } catch (err) {
-                console.error("Error fetching itinerary:", err);
+                console.error("Error fetching data:", err);
             } finally {
                 setIsLoading(false);
             }
         }
 
-        fetchItinerary();
+        fetchData();
     }, [id, isKyoto, isBali]);
 
     // Comprehensive mock data matching the new creator fields
@@ -55,6 +104,8 @@ export default function ItineraryDetailsPage() {
         priceType: "Per Person",
         rating: isKyoto ? 4.9 : 4.8,
         reviews: isKyoto ? 124 : 89,
+        average_rating: isKyoto ? 4.9 : 4.8,
+        review_count: isKyoto ? 124 : 89,
         description: "Experience the magic of Kyoto with this carefully curated 7-day itinerary.",
         startingLocation: "Kansai International Airport (KIX)",
         endingLocation: "Kyoto Central Station",
@@ -69,6 +120,7 @@ export default function ItineraryDetailsPage() {
         advanceBooking: "None required",
         refundPolicy: "100% refund within 24 hours.",
         cancellationPolicy: "Digital product. Final sale once accessed.",
+        content: { days: [] },
         days: [
             {
                 number: 1,
@@ -98,18 +150,21 @@ export default function ItineraryDetailsPage() {
             currency: liveData.currency,
             description: liveData.description,
             creator: liveData.profiles?.full_name || "@Influencer",
+            average_rating: Number(liveData.average_rating) || 0,
+            review_count: liveData.review_count || 0,
+            content: liveData.content || { days: [] },
             // Map JSONB content back to expected fields
             ...liveData.content,
-            days: liveData.content?.days?.map((d: any) => ({
+            days: liveData.content?.days?.map((d: any, idx: number) => ({
                 ...d,
-                number: d.dayNumber,
-                title: d.dayTitle,
-                morning: d.morningPlan,
-                afternoon: d.afternoonPlan,
-                evening: d.eveningPlan,
-                hotel: d.hotelName,
-                transport: d.transportMode,
-                meals: Object.keys(d.meals).filter(k => d.meals[k])
+                number: d.dayNumber || idx + 1,
+                title: d.dayTitle || d.title || `Day ${idx + 1}`,
+                morning: d.morningPlan || d.morning || "",
+                afternoon: d.afternoonPlan || d.afternoon || "",
+                evening: d.eveningPlan || d.evening || "",
+                hotel: d.hotelName || d.hotel || "",
+                transport: d.transportMode || d.transport || "",
+                meals: d.meals ? (Array.isArray(d.meals) ? d.meals : Object.keys(d.meals).filter(k => d.meals[k])) : []
             })) || itinerary.days
         };
     }
@@ -118,7 +173,39 @@ export default function ItineraryDetailsPage() {
         router.push(`/checkout/${id}`);
     };
 
+    const handleReviewSubmitted = async () => {
+        // Refresh review status and itinerary stats
+        const { data: review } = await supabase
+            .from('reviews')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('itinerary_id', id)
+            .single();
+
+        if (review) setUserReview(review);
+
+        const { data: updatedItinerary } = await supabase
+            .from('itineraries')
+            .select('average_rating, review_count')
+            .eq('id', id)
+            .single();
+
+        if (updatedItinerary) {
+            setLiveData({ ...liveData, ...updatedItinerary });
+        }
+    };
+
     if (!mounted || isLoading) return <div style={{ minHeight: '100vh', background: 'var(--background)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gray-400)' }}>Loading adventure...</div>;
+
+    const pdfData = {
+        title: itinerary.title,
+        location: itinerary.location,
+        description: itinerary.description,
+        price: itinerary.price,
+        creator: itinerary.creator,
+        duration_days: liveData?.duration_days,
+        content: liveData?.content || itinerary.content
+    };
 
     return (
         <div style={{ paddingBottom: '100px' }}>
@@ -126,7 +213,7 @@ export default function ItineraryDetailsPage() {
             <div style={{ background: '#000000', borderBottom: '1px solid var(--border)', padding: '60px 0' }}>
                 <div className="container">
                     <button className="no-print" onClick={() => router.back()} style={{ background: 'none', border: 'none', color: 'var(--gray-400)', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '32px' }}>
-                        <ArrowLeft size={16} /> Back to Search
+                        <ArrowLeft size={16} /> Back to Explore
                     </button>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '48px', alignItems: 'flex-start' }}>
@@ -138,15 +225,25 @@ export default function ItineraryDetailsPage() {
                             <h1 className="text-gradient" style={{ fontSize: '3.5rem', fontWeight: 800, marginBottom: '20px', lineHeight: 1.1 }}>{itinerary.title}</h1>
                             <div style={{ display: 'flex', gap: '32px', color: 'var(--gray-400)', fontSize: '1.1rem' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={20} color="var(--primary)" /> {itinerary.location}</div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Star size={20} color="#fbbf24" fill="#fbbf24" /> <strong style={{ color: 'white' }}>{itinerary.rating}</strong> ({itinerary.reviews} reviews)</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Star size={20} color="#fbbf24" fill="#fbbf24" /> <strong style={{ color: 'white' }}>{itinerary.average_rating > 0 ? itinerary.average_rating.toFixed(1) : itinerary.rating}</strong> ({itinerary.review_count > 0 ? itinerary.review_count : itinerary.reviews} reviews)</div>
                             </div>
                         </div>
                         <div className="glass card" style={{ padding: '24px' }}>
                             <div className="no-print">
                                 <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem', marginBottom: '4px' }}>Price {itinerary.priceType}</p>
-                                <h2 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>{itinerary.price} <span style={{ fontSize: '1rem', color: 'var(--gray-400)' }}>{itinerary.currency}</span></h2>
-                                <button className="btn btn-primary" style={{ width: '100%', padding: '14px', marginBottom: '12px' }} onClick={handlePurchase}>Buy Full Itinerary</button>
-                                <button className="btn btn-outline" style={{ width: '100%', padding: '10px' }} onClick={() => window.print()}>Save as PDF</button>
+                                <h2 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>₹{itinerary.price} <span style={{ fontSize: '1rem', color: 'var(--gray-400)' }}>{itinerary.currency}</span></h2>
+
+                                {!isPurchased ? (
+                                    <button className="btn btn-primary" style={{ width: '100%', padding: '14px', marginBottom: '12px' }} onClick={handlePurchase}>Buy Full Itinerary</button>
+                                ) : (
+                                    <div style={{ padding: '12px', border: '1px solid #10b981', background: 'rgba(16,185,129,0.1)', color: '#10b981', borderRadius: '8px', marginBottom: '16px', textAlign: 'center', fontWeight: 600 }}>
+                                        ✅ You own this itinerary
+                                    </div>
+                                )}
+
+                                <div style={{ marginTop: '16px' }}>
+                                    <PDFGenerator itineraryData={pdfData} isPurchased={isPurchased} />
+                                </div>
                             </div>
                             {/* Visual marker for print, only visible during print due to globals.css logic */}
                             <div className="print-only">
@@ -222,49 +319,55 @@ export default function ItineraryDetailsPage() {
 
                             {/* Standard Interactive View (No Print) */}
                             <div className="no-print">
-                                {itinerary.days.filter(d => d.number === activeDay).map(day => (
-                                    <div key={day.number} className="glass card" style={{ padding: '40px' }}>
-                                        {/* Day Header */}
-                                        <div style={{ display: 'flex', gap: '20px', marginBottom: '32px', alignItems: 'flex-start' }}>
-                                            <div style={{ fontSize: '3rem', fontWeight: 800, opacity: 0.1 }}>0{day.number}</div>
-                                            <div>
-                                                <h3 style={{ fontSize: '1.5rem', marginBottom: '8px' }}>{day.title}</h3>
-                                                <div style={{ display: 'flex', gap: '16px', fontSize: '0.9rem', color: 'var(--gray-400)' }}>
-                                                    <span><Hotel size={14} /> {day.hotel}</span>
-                                                    <span><Truck size={14} /> {day.transport}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div style={{ display: 'grid', gap: '32px' }}>
-                                            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '24px' }}>
-                                                <span style={{ fontWeight: 700, color: 'var(--primary)' }}>Morning</span>
-                                                <p style={{ color: 'var(--gray-400)' }}>{day.morning}</p>
-                                            </div>
-                                            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '24px' }}>
-                                                <span style={{ fontWeight: 700, color: 'var(--primary)' }}>Afternoon</span>
-                                                <p style={{ color: 'var(--gray-400)' }}>{day.afternoon}</p>
-                                            </div>
-                                            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '24px' }}>
-                                                <span style={{ fontWeight: 700, color: 'var(--primary)' }}>Evening</span>
-                                                <p style={{ color: 'var(--gray-400)' }}>{day.evening}</p>
-                                            </div>
-                                        </div>
-
-                                        <div style={{ marginTop: '40px', paddingTop: '40px', borderTop: '1px solid var(--border)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-                                            <div>
-                                                <h4 style={{ marginBottom: '16px', fontSize: '1rem' }}><Coffee size={16} /> Meals & Activity</h4>
-                                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                                                    {day.meals.map(m => <span key={m} className="badge" style={{ padding: '4px 12px', borderRadius: '99px', fontSize: '0.75rem', fontWeight: 600, background: 'rgba(255,133,162,0.1)', color: 'var(--primary)' }}>{m} Included</span>)}
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <h4 style={{ marginBottom: '16px', fontSize: '1rem' }}><Shield size={16} /> Pro-Tips</h4>
-                                                <p style={{ fontSize: '0.9rem', color: 'var(--gray-400)' }}>{day.notes}</p>
-                                            </div>
-                                        </div>
+                                {itinerary.days.length === 0 ? (
+                                    <div className="glass card" style={{ padding: '40px', textAlign: 'center', color: 'var(--gray-400)' }}>
+                                        Full schedule available after purchase.
                                     </div>
-                                ))}
+                                ) : (
+                                    itinerary.days.filter(d => d.number === activeDay).map(day => (
+                                        <div key={day.number} className="glass card" style={{ padding: '40px' }}>
+                                            {/* Day Header */}
+                                            <div style={{ display: 'flex', gap: '20px', marginBottom: '32px', alignItems: 'flex-start' }}>
+                                                <div style={{ fontSize: '3rem', fontWeight: 800, opacity: 0.1 }}>0{day.number}</div>
+                                                <div>
+                                                    <h3 style={{ fontSize: '1.5rem', marginBottom: '8px' }}>{day.title}</h3>
+                                                    <div style={{ display: 'flex', gap: '16px', fontSize: '0.9rem', color: 'var(--gray-400)' }}>
+                                                        <span><Hotel size={14} /> {day.hotel}</span>
+                                                        <span><Truck size={14} /> {day.transport}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div style={{ display: 'grid', gap: '32px' }}>
+                                                <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '24px' }}>
+                                                    <span style={{ fontWeight: 700, color: 'var(--primary)' }}>Morning</span>
+                                                    <p style={{ color: 'var(--gray-400)' }}>{day.morning}</p>
+                                                </div>
+                                                <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '24px' }}>
+                                                    <span style={{ fontWeight: 700, color: 'var(--primary)' }}>Afternoon</span>
+                                                    <p style={{ color: 'var(--gray-400)' }}>{day.afternoon}</p>
+                                                </div>
+                                                <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '24px' }}>
+                                                    <span style={{ fontWeight: 700, color: 'var(--primary)' }}>Evening</span>
+                                                    <p style={{ color: 'var(--gray-400)' }}>{day.evening}</p>
+                                                </div>
+                                            </div>
+
+                                            <div style={{ marginTop: '40px', paddingTop: '40px', borderTop: '1px solid var(--border)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+                                                <div>
+                                                    <h4 style={{ marginBottom: '16px', fontSize: '1rem' }}><Coffee size={16} /> Meals & Activity</h4>
+                                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                                        {day.meals.map(m => <span key={m} className="badge" style={{ padding: '4px 12px', borderRadius: '99px', fontSize: '0.75rem', fontWeight: 600, background: 'rgba(255,133,162,0.1)', color: 'var(--primary)' }}>{m} Included</span>)}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h4 style={{ marginBottom: '16px', fontSize: '1rem' }}><Shield size={16} /> Pro-Tips</h4>
+                                                    <p style={{ fontSize: '0.9rem', color: 'var(--gray-400)' }}>{day.notes}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </div>
 
                             {/* Print-Only Sequential View */}
@@ -280,6 +383,34 @@ export default function ItineraryDetailsPage() {
                                 ))}
                             </div>
                         </section>
+
+                        {/* Review System Section */}
+                        <section style={{ marginBottom: '60px' }}>
+                            <div style={{ display: 'grid', gap: '40px' }}>
+                                <ReviewSection
+                                    itineraryId={id}
+                                    averageRating={itinerary.average_rating}
+                                    reviewCount={itinerary.review_count}
+                                />
+
+                                {isPurchased && (
+                                    <ReviewForm
+                                        itineraryId={id}
+                                        onReviewSubmitted={handleReviewSubmitted}
+                                        existingReview={userReview}
+                                    />
+                                )}
+
+                                {!isPurchased && user && (
+                                    <div className="glass card" style={{ padding: '32px', textAlign: 'center', border: '1px dashed var(--border)' }}>
+                                        <p style={{ color: 'var(--gray-400)' }}>
+                                            You must purchase this itinerary to leave a review.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+
                         {/* Pricing Policies & Fine Print */}
                         <section style={{ marginBottom: '60px' }}>
                             <h2 style={{ fontSize: '1.8rem', marginBottom: '32px' }}>Fine Print</h2>

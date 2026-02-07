@@ -6,22 +6,22 @@ export async function updateSession(request: NextRequest) {
         request,
     })
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim().replace(/\/$/, '')
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     if (!supabaseUrl || !supabaseAnonKey) {
-        console.error('Supabase URL or Anon Key is missing in middleware!')
+        return supabaseResponse
     }
 
     const supabase = createServerClient(
-        supabaseUrl || '',
-        supabaseAnonKey || '',
+        supabaseUrl,
+        supabaseAnonKey,
         {
             cookies: {
                 getAll() {
                     return request.cookies.getAll()
                 },
-                setAll(cookiesToSet) {
+                setAll(cookiesToSet: { name: string; value: string; options: any }[]) {
                     cookiesToSet.forEach(({ name, value, options }) => request.cookies.set({ name, value, ...options }))
                     supabaseResponse = NextResponse.next({
                         request,
@@ -37,30 +37,21 @@ export async function updateSession(request: NextRequest) {
     // IMPORTANT: Avoid writing any logic between createServerClient and
     // getUser. A simple mistake could make it very hard to debug
     // issues with users being randomly logged out.
-
     const {
         data: { user },
     } = await supabase.auth.getUser()
 
-    if (
-        !user &&
-        (request.nextUrl.pathname.startsWith('/dashboard') ||
-            request.nextUrl.pathname.startsWith('/checkout'))
-    ) {
-        // no user, potentially respond by redirecting the user to the login page
+    // Redirect to login if accessing protected routes without being logged in
+    const isProtectedRoute =
+        request.nextUrl.pathname.startsWith('/dashboard') ||
+        request.nextUrl.pathname.startsWith('/checkout')
+
+    if (!user && isProtectedRoute) {
         const url = request.nextUrl.clone()
         url.pathname = '/login'
+        url.searchParams.set('redirect', request.nextUrl.pathname)
         return NextResponse.redirect(url)
     }
-
-    // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
-    // creating a new response object with NextResponse.next() make sure to:
-    // 1. Pass the request in it, like so:
-    //    const myNewResponse = NextResponse.next({ request })
-    // 2. Copy over the cookies, like so:
-    //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-    // 3. Change the myNewResponse object to fit your needs, but remember that it needs to return a Response!
-    // 4. Otherwise, you can just return `supabaseResponse`.
 
     return supabaseResponse
 }
