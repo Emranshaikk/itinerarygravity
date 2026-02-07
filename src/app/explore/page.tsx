@@ -158,7 +158,7 @@ export default function ExplorePage() {
                                 borderRadius: '12px',
                                 background: 'var(--input-bg)',
                                 border: '1px solid var(--border)',
-                                color: 'white',
+                                color: 'var(--foreground)',
                                 fontSize: '0.95rem'
                             }}
                         />
@@ -173,7 +173,7 @@ export default function ExplorePage() {
                             borderRadius: '12px',
                             background: 'var(--input-bg)',
                             border: '1px solid var(--border)',
-                            color: 'white',
+                            color: 'var(--foreground)',
                             fontSize: '0.95rem',
                             cursor: 'pointer'
                         }}
@@ -195,7 +195,7 @@ export default function ExplorePage() {
                         {(selectedTags.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000) && (
                             <span style={{
                                 background: 'var(--primary)',
-                                color: 'white',
+                                color: 'var(--background)',
                                 borderRadius: '50%',
                                 width: '20px',
                                 height: '20px',
@@ -339,7 +339,7 @@ export default function ExplorePage() {
                                     borderRadius: '99px',
                                     fontSize: '0.9rem',
                                     fontWeight: 700,
-                                    color: 'var(--white)'
+                                    color: 'white'
                                 }}>
                                     ₹{item.price.toFixed(2)}
                                 </div>
@@ -353,7 +353,7 @@ export default function ExplorePage() {
                                         padding: '4px 12px',
                                         borderRadius: '99px',
                                         fontSize: '0.75rem',
-                                        color: 'var(--white)'
+                                        color: 'white'
                                     }}>
                                         {item.duration_days} Days
                                     </div>
@@ -375,7 +375,7 @@ export default function ExplorePage() {
                                         </span>
                                     ))}
                                 </div>
-                                <h3 style={{ fontSize: '1.4rem', marginBottom: '8px', color: 'var(--white)' }}>
+                                <h3 style={{ fontSize: '1.4rem', marginBottom: '8px', color: 'var(--foreground)' }}>
                                     {item.title}
                                 </h3>
                                 <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>

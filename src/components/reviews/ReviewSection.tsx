@@ -111,7 +111,7 @@ export default function ReviewSection({ itineraryId, averageRating, reviewCount 
                                     key={review.id}
                                     style={{
                                         padding: '24px',
-                                        background: 'rgba(255,255,255,0.02)',
+                                        background: 'var(--surface)',
                                         borderRadius: '12px',
                                         border: '1px solid var(--border)'
                                     }}
@@ -128,7 +128,8 @@ export default function ReviewSection({ itineraryId, averageRating, reviewCount 
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
                                                 fontWeight: 700,
-                                                fontSize: '1.1rem'
+                                                fontSize: '1.1rem',
+                                                color: 'var(--background)'
                                             }}
                                         >
                                             {(review.profiles.full_name || review.profiles.email).charAt(0).toUpperCase()}
@@ -154,7 +155,7 @@ export default function ReviewSection({ itineraryId, averageRating, reviewCount 
 
                                     {/* Review Comment */}
                                     {review.comment && (
-                                        <p style={{ color: 'var(--gray-300)', lineHeight: '1.6' }}>
+                                        <p style={{ color: 'var(--foreground)', opacity: 0.9, lineHeight: '1.6' }}>
                                             {review.comment}
                                         </p>
                                     )}

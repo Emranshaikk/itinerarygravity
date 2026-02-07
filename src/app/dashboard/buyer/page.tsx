@@ -216,7 +216,7 @@ export default function BuyerDashboard() {
                                         {item.location}
                                     </span>
                                 </div>
-                                <h3 style={{ fontSize: '1.25rem', marginBottom: '8px', color: 'white' }}>{item.title}</h3>
+                                <h3 style={{ fontSize: '1.25rem', marginBottom: '8px', color: 'var(--foreground)' }}>{item.title}</h3>
                                 <p style={{ fontSize: '0.9rem', color: 'var(--gray-400)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     by {item.profiles?.full_name || "@Influencer"}
                                 </p>

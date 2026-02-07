@@ -74,10 +74,10 @@ export default function BackgroundAnimation() {
                         left: `${Math.random() * 100}%`,
                         top: `${Math.random() * 100}%`,
                         opacity: 0.1,
-                        color: 'white'
+                        color: 'var(--foreground)'
                     }}
                     animate={{
-                        opacity: [0.05, 0.2, 0.05],
+                        opacity: [0.05, 0.15, 0.05],
                         scale: [1, 1.2, 1]
                     }}
                     transition={{

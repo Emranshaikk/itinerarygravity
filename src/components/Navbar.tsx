@@ -69,7 +69,7 @@ export default function Navbar() {
                                     style={{
                                         background: 'transparent',
                                         border: '1px solid var(--border)',
-                                        color: 'white',
+                                        color: 'var(--foreground)',
                                         padding: '6px 14px',
                                         borderRadius: '8px',
                                         fontSize: '0.85rem',
@@ -113,7 +113,7 @@ export default function Navbar() {
                     {user ? (
                         <>
                             <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 600 }}>Dashboard</Link>
-                            <button onClick={() => { handleSignOut(); setIsMenuOpen(false); }} style={{ background: 'transparent', border: '1px solid var(--border)', color: 'white', padding: '10px', borderRadius: '8px', cursor: 'pointer' }}>Sign Out</button>
+                            <button onClick={() => { handleSignOut(); setIsMenuOpen(false); }} style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--foreground)', padding: '10px', borderRadius: '8px', cursor: 'pointer' }}>Sign Out</button>
                         </>
                     ) : (
                         <>

@@ -210,7 +210,7 @@ export default function ItineraryDetailsPage() {
     return (
         <div style={{ paddingBottom: '100px' }}>
             {/* Header Section */}
-            <div style={{ background: '#000000', borderBottom: '1px solid var(--border)', padding: '60px 0' }}>
+            <div style={{ background: 'var(--background)', borderBottom: '1px solid var(--border)', padding: '60px 0' }}>
                 <div className="container">
                     <button className="no-print" onClick={() => router.back()} style={{ background: 'none', border: 'none', color: 'var(--gray-400)', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '32px' }}>
                         <ArrowLeft size={16} /> Back to Explore
@@ -220,12 +220,12 @@ export default function ItineraryDetailsPage() {
                         <div>
                             <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
                                 <span className="badge" style={{ background: 'rgba(255,133,162,0.2)', color: 'var(--primary)', border: '1px solid var(--primary)' }}>{itinerary.tripTheme}</span>
-                                <span className="badge" style={{ background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--border)' }}>{itinerary.duration}</span>
+                                <span className="badge" style={{ background: 'var(--surface)', color: 'var(--foreground)', border: '1px solid var(--border)' }}>{itinerary.duration}</span>
                             </div>
                             <h1 className="text-gradient" style={{ fontSize: '3.5rem', fontWeight: 800, marginBottom: '20px', lineHeight: 1.1 }}>{itinerary.title}</h1>
                             <div style={{ display: 'flex', gap: '32px', color: 'var(--gray-400)', fontSize: '1.1rem' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={20} color="var(--primary)" /> {itinerary.location}</div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Star size={20} color="#fbbf24" fill="#fbbf24" /> <strong style={{ color: 'white' }}>{itinerary.average_rating > 0 ? itinerary.average_rating.toFixed(1) : itinerary.rating}</strong> ({itinerary.review_count > 0 ? itinerary.review_count : itinerary.reviews} reviews)</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Star size={20} color="#fbbf24" fill="#fbbf24" /> <strong style={{ color: 'var(--foreground)' }}>{itinerary.average_rating > 0 ? itinerary.average_rating.toFixed(1) : itinerary.rating}</strong> ({itinerary.review_count > 0 ? itinerary.review_count : itinerary.reviews} reviews)</div>
                             </div>
                         </div>
                         <div className="glass card" style={{ padding: '24px' }}>

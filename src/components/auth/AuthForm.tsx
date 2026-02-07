@@ -92,9 +92,9 @@ export default function AuthForm({ mode }: AuthFormProps) {
                             width: '100%',
                             padding: '12px 16px',
                             borderRadius: '12px',
-                            background: 'rgba(255,255,255,0.05)',
+                            background: 'var(--input-bg)',
                             border: '1px solid var(--border)',
-                            color: 'white',
+                            color: 'var(--foreground)',
                             outline: 'none'
                         }}
                     />
@@ -111,9 +111,9 @@ export default function AuthForm({ mode }: AuthFormProps) {
                                     flex: 1,
                                     padding: '16px',
                                     borderRadius: '12px',
-                                    background: selectedRole === "buyer" ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
+                                    background: selectedRole === "buyer" ? 'var(--primary)' : 'var(--input-bg)',
                                     border: selectedRole === "buyer" ? '2px solid var(--primary)' : '1px solid var(--border)',
-                                    color: 'white',
+                                    color: selectedRole === "buyer" ? 'var(--background)' : 'var(--foreground)',
                                     cursor: 'pointer',
                                     transition: 'all 0.2s',
                                     fontWeight: selectedRole === "buyer" ? 600 : 400
@@ -130,9 +130,9 @@ export default function AuthForm({ mode }: AuthFormProps) {
                                     flex: 1,
                                     padding: '16px',
                                     borderRadius: '12px',
-                                    background: selectedRole === "influencer" ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
+                                    background: selectedRole === "influencer" ? 'var(--primary)' : 'var(--input-bg)',
                                     border: selectedRole === "influencer" ? '2px solid var(--primary)' : '1px solid var(--border)',
-                                    color: 'white',
+                                    color: selectedRole === "influencer" ? 'var(--background)' : 'var(--foreground)',
                                     cursor: 'pointer',
                                     transition: 'all 0.2s',
                                     fontWeight: selectedRole === "influencer" ? 600 : 400
@@ -159,9 +159,9 @@ export default function AuthForm({ mode }: AuthFormProps) {
                             width: '100%',
                             padding: '12px 16px',
                             borderRadius: '12px',
-                            background: 'rgba(255,255,255,0.05)',
+                            background: 'var(--input-bg)',
                             border: '1px solid var(--border)',
-                            color: 'white',
+                            color: 'var(--foreground)',
                             outline: 'none'
                         }}
                     />

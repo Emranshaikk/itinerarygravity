@@ -139,7 +139,7 @@ export default function ReviewForm({ itineraryId, onReviewSubmitted, existingRev
                             borderRadius: '12px',
                             background: 'var(--input-bg)',
                             border: '1px solid var(--border)',
-                            color: 'white',
+                            color: 'var(--foreground)',
                             fontSize: '0.95rem',
                             resize: 'vertical',
                             fontFamily: 'inherit'
