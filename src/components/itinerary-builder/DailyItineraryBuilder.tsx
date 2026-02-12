@@ -95,24 +95,24 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             <div style={{ paddingBottom: '1rem' }}>
-                <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--foreground)', marginBottom: '0.5rem' }}>
                     <Calendar style={{ color: '#9333ea' }} size={32} />
                     Day-by-Day Itinerary
                 </h2>
-                <p style={{ color: '#78716c' }}>
+                <p style={{ color: 'var(--gray-400)' }}>
                     Design a time-optimized, stress-free flow. Detail is the difference between a good trip and a great one.
                 </p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
                 {data.map((day, index) => (
-                    <div key={index} style={{ border: '1px solid #f5f5f4', borderRadius: '2rem', backgroundColor: 'white', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)' }}>
+                    <div key={index} style={{ border: '1px solid var(--border)', borderRadius: '2rem', backgroundColor: 'var(--surface)', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)' }}>
                         {/* Day Header */}
-                        <div style={{ padding: '2rem', borderBottom: '1px solid #f5f5f4', backgroundColor: '#fdfbf7', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ padding: '2rem', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--input-bg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1 }}>
-                                <div style={{ fontSize: '3rem', fontWeight: 900, color: '#e7e5e4', lineHeight: 1 }}>{day.dayNumber < 10 ? `0${day.dayNumber}` : day.dayNumber}</div>
+                                <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--border)', lineHeight: 1 }}>{day.dayNumber < 10 ? `0${day.dayNumber}` : day.dayNumber}</div>
                                 <input
-                                    style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', fontWeight: 'bold', color: '#1c1917', width: '100%', outline: 'none' }}
+                                    style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--foreground)', width: '100%', outline: 'none' }}
                                     placeholder={`Day ${day.dayNumber} Title`}
                                     value={day.title}
                                     onChange={(e) => updateDay(index, 'title', e.target.value)}
@@ -122,7 +122,7 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                                 <button
                                     onClick={() => autoFillDay(index)}
                                     disabled={generatingDay === index}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '0.75rem', border: '1px solid #e7e5e4', backgroundColor: 'white', color: '#78716c', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '0.75rem', border: '1px solid var(--border)', backgroundColor: 'var(--surface)', color: 'var(--gray-400)', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}
                                 >
                                     <Wand2 size={14} /> {generatingDay === index ? "Generating..." : "Auto-Fill Day"}
                                 </button>
@@ -135,38 +135,38 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                         </div>
 
                         {/* Top Logistics Bar */}
-                        <div style={{ backgroundColor: '#fafaf9', padding: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', borderBottom: '1px solid #f5f5f4' }}>
+                        <div style={{ backgroundColor: 'var(--input-bg)', padding: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', borderBottom: '1px solid var(--border)' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ color: '#78716c', fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <label style={{ color: 'var(--gray-400)', fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                     <Clock size={14} /> Wake Up
                                 </label>
                                 <input
                                     type="time"
                                     className="form-input"
-                                    style={{ backgroundColor: 'white' }}
+                                    style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}
                                     value={day.wakeUpTime || "08:00"}
                                     onChange={(e) => updateDay(index, 'wakeUpTime', e.target.value)}
                                 />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ color: '#78716c', fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <label style={{ color: 'var(--gray-400)', fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                     <Info size={14} /> Insider Tip
                                 </label>
                                 <input
                                     className="form-input"
-                                    style={{ backgroundColor: 'white' }}
+                                    style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}
                                     placeholder="e.g. Arrive before 8am..."
                                     value={day.crowdTips || ""}
                                     onChange={(e) => updateDay(index, 'crowdTips', e.target.value)}
                                 />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ color: '#78716c', fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <label style={{ color: 'var(--gray-400)', fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                     <MapPin size={14} /> Transit Plan
                                 </label>
                                 <input
                                     className="form-input"
-                                    style={{ backgroundColor: 'white' }}
+                                    style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}
                                     placeholder="e.g. Metro + Walking"
                                     value={day.logistics.transport}
                                     onChange={(e) => updateDay(index, 'logistics.transport', e.target.value)}
@@ -183,14 +183,14 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                                     </h4>
                                     <input
                                         type="time"
-                                        style={{ background: 'transparent', border: 'none', fontSize: '0.875rem', color: '#78716c', textAlign: 'right', fontWeight: '600' }}
+                                        style={{ background: 'transparent', border: 'none', fontSize: '0.875rem', color: 'var(--gray-400)', textAlign: 'right', fontWeight: '600' }}
                                         value={day.morning.time}
                                         onChange={(e) => updateDay(index, 'morning.time', e.target.value)}
                                     />
                                 </div>
                                 <textarea
                                     className="form-input"
-                                    style={{ backgroundColor: '#fdfbf7', border: '1px solid #f5f5f4', fontSize: '0.875rem', minHeight: '140px' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--border)', fontSize: '0.875rem', minHeight: '140px', color: 'var(--foreground)' }}
                                     placeholder="Morning activity details..."
                                     value={day.morning.activity}
                                     onChange={(e) => updateDay(index, 'morning.activity', e.target.value)}
@@ -205,14 +205,14 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                                     </h4>
                                     <input
                                         type="time"
-                                        style={{ background: 'transparent', border: 'none', fontSize: '0.875rem', color: '#78716c', textAlign: 'right', fontWeight: '600' }}
+                                        style={{ background: 'transparent', border: 'none', fontSize: '0.875rem', color: 'var(--gray-400)', textAlign: 'right', fontWeight: '600' }}
                                         value={day.afternoon.time}
                                         onChange={(e) => updateDay(index, 'afternoon.time', e.target.value)}
                                     />
                                 </div>
                                 <textarea
                                     className="form-input"
-                                    style={{ backgroundColor: '#fdfbf7', border: '1px solid #f5f5f4', fontSize: '0.875rem', minHeight: '140px' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--border)', fontSize: '0.875rem', minHeight: '140px', color: 'var(--foreground)' }}
                                     placeholder="Afternoon activity details..."
                                     value={day.afternoon.activity}
                                     onChange={(e) => updateDay(index, 'afternoon.activity', e.target.value)}
@@ -227,14 +227,14 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                                     </h4>
                                     <input
                                         type="time"
-                                        style={{ background: 'transparent', border: 'none', fontSize: '0.875rem', color: '#78716c', textAlign: 'right', fontWeight: '600' }}
+                                        style={{ background: 'transparent', border: 'none', fontSize: '0.875rem', color: 'var(--gray-400)', textAlign: 'right', fontWeight: '600' }}
                                         value={day.evening.time}
                                         onChange={(e) => updateDay(index, 'evening.time', e.target.value)}
                                     />
                                 </div>
                                 <textarea
                                     className="form-input"
-                                    style={{ backgroundColor: '#fdfbf7', border: '1px solid #f5f5f4', fontSize: '0.875rem', minHeight: '140px' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--border)', fontSize: '0.875rem', minHeight: '140px', color: 'var(--foreground)' }}
                                     placeholder="Evening activity details..."
                                     value={day.evening.activity}
                                     onChange={(e) => updateDay(index, 'evening.activity', e.target.value)}
@@ -247,9 +247,9 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                 <button
                     onClick={addDay}
                     className="btn"
-                    style={{ width: '100%', padding: '2.5rem', borderRadius: '2rem', border: '2px dashed #e7e5e4', color: '#78716c', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', backgroundColor: 'white', cursor: 'pointer', fontSize: '1.25rem', transition: 'all 0.2s ease' }}
+                    style={{ width: '100%', padding: '2.5rem', borderRadius: '2rem', border: '2px dashed var(--border)', color: 'var(--gray-400)', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', backgroundColor: 'var(--surface)', cursor: 'pointer', fontSize: '1.25rem', transition: 'all 0.2s ease' }}
                 >
-                    <div style={{ backgroundColor: '#f5f5f4', padding: '0.5rem', borderRadius: '50%' }}>
+                    <div style={{ backgroundColor: 'var(--input-bg)', padding: '0.5rem', borderRadius: '50%' }}>
                         <Plus size={24} />
                     </div>
                     Add Day {data.length + 1}

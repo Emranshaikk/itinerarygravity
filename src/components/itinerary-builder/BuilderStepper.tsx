@@ -55,9 +55,9 @@ export default function BuilderStepper({ activeStep, onStepChange, completedStep
                                     padding: '1rem 1.5rem',
                                     borderRadius: '1.25rem',
                                     border: '2px solid',
-                                    borderColor: isActive ? '#a5f3fc' : '#f5f5f4',
-                                    backgroundColor: isActive ? '#cffafe' : 'white',
-                                    color: isActive ? '#164e63' : '#a8a29e',
+                                    borderColor: isActive ? '#a5f3fc' : 'var(--border)',
+                                    backgroundColor: isActive ? '#cffafe' : 'var(--surface)',
+                                    color: isActive ? '#164e63' : 'var(--gray-400)',
                                     fontWeight: '600',
                                     fontSize: '1rem',
                                     letterSpacing: '-0.025em',
@@ -70,7 +70,7 @@ export default function BuilderStepper({ activeStep, onStepChange, completedStep
                                 {section.label}
                             </button>
                             {idx < visibleSections.length - 1 && (
-                                <span style={{ color: '#d6d3d1', fontSize: '1.5rem', fontWeight: 'bold' }}>·</span>
+                                <span style={{ color: 'var(--border)', fontSize: '1.5rem', fontWeight: 'bold' }}>·</span>
                             )}
                         </div>
                     );

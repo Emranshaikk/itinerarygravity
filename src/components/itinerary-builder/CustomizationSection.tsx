@@ -34,11 +34,11 @@ export default function CustomizationSection({ data, onChange }: CustomizationSe
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1.5rem' }}>
                 <div>
-                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--foreground)', marginBottom: '0.5rem' }}>
                         <Sliders style={{ color: '#9333ea' }} size={32} />
                         Customization Options
                     </h2>
-                    <p style={{ color: '#78716c' }}>
+                    <p style={{ color: 'var(--gray-400)' }}>
                         A great itinerary works for everyone. Add specific advice for different traveler profiles and budget levels.
                     </p>
                 </div>
@@ -55,19 +55,19 @@ export default function CustomizationSection({ data, onChange }: CustomizationSe
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
 
                 {/* Profile Specific Tips */}
-                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '2rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '2rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ec4899', margin: 0 }}>
                         <Users size={20} /> Traveler Profiles
                     </h3>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                 <Heart size={14} style={{ color: '#ec4899' }} /> FOR COUPLES
                             </label>
                             <textarea
                                 className="form-input"
-                                style={{ backgroundColor: '#fdfbf7', minHeight: '100px' }}
+                                style={{ backgroundColor: 'var(--input-bg)', minHeight: '100px', color: 'var(--foreground)' }}
                                 placeholder="Romantic spots, private dinners..."
                                 value={data.coupleTips || ""}
                                 onChange={(e) => updateField("coupleTips", e.target.value)}
@@ -75,12 +75,12 @@ export default function CustomizationSection({ data, onChange }: CustomizationSe
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                 <Users size={14} style={{ color: '#3b82f6' }} /> FOR FAMILIES
                             </label>
                             <textarea
                                 className="form-input"
-                                style={{ backgroundColor: '#fdfbf7', minHeight: '100px' }}
+                                style={{ backgroundColor: 'var(--input-bg)', minHeight: '100px', color: 'var(--foreground)' }}
                                 placeholder="Kid-friendly activities, stroller info..."
                                 value={data.familyTips || ""}
                                 onChange={(e) => updateField("familyTips", e.target.value)}
@@ -88,12 +88,12 @@ export default function CustomizationSection({ data, onChange }: CustomizationSe
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                 <User size={14} style={{ color: '#10b981' }} /> FOR SOLO TRAVELERS
                             </label>
                             <textarea
                                 className="form-input"
-                                style={{ backgroundColor: '#fdfbf7', minHeight: '100px' }}
+                                style={{ backgroundColor: 'var(--input-bg)', minHeight: '100px', color: 'var(--foreground)' }}
                                 placeholder="Safety for solos, social spots..."
                                 value={data.soloTips || ""}
                                 onChange={(e) => updateField("soloTips", e.target.value)}
@@ -103,19 +103,19 @@ export default function CustomizationSection({ data, onChange }: CustomizationSe
                 </div>
 
                 {/* Tier Specific Advice */}
-                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '2rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '2rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#eab308', margin: 0 }}>
                         <ArrowUpCircle size={20} /> Budget & Luxury Tweaks
                     </h3>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                 <ArrowUpCircle size={14} style={{ color: '#f59e0b' }} /> LUXURY UPGRADES
                             </label>
                             <textarea
                                 className="form-input"
-                                style={{ backgroundColor: '#fdfbf7', minHeight: '160px' }}
+                                style={{ backgroundColor: 'var(--input-bg)', minHeight: '160px', color: 'var(--foreground)' }}
                                 placeholder="How to make this trip 'First Class'..."
                                 value={data.luxuryUpgrade || ""}
                                 onChange={(e) => updateField("luxuryUpgrade", e.target.value)}
@@ -123,12 +123,12 @@ export default function CustomizationSection({ data, onChange }: CustomizationSe
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={{ fontSize: '0.75rem', color: '#78716c', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                 <Wallet size={14} style={{ color: '#10b981' }} /> BUDGET SAVING HACKS
                             </label>
                             <textarea
                                 className="form-input"
-                                style={{ backgroundColor: '#fdfbf7', minHeight: '160px' }}
+                                style={{ backgroundColor: 'var(--input-bg)', minHeight: '160px', color: 'var(--foreground)' }}
                                 placeholder="How to do this trip on a dime..."
                                 value={data.budgetSaver || ""}
                                 onChange={(e) => updateField("budgetSaver", e.target.value)}

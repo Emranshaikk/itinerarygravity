@@ -65,14 +65,14 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
                 {/* Main Identity */}
-                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '2rem', backgroundColor: '#fdfbf7' }}>
+                <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '2rem', backgroundColor: 'var(--surface)' }}>
                     <div style={{ marginBottom: '1.5rem' }}>
-                        <label className="form-label" style={{ fontWeight: 'bold', color: '#a8a29e', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Itinerary Title</label>
+                        <label className="form-label" style={{ fontWeight: 'bold', color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Itinerary Title</label>
                         <input
                             name="title"
                             value={data.title}
                             onChange={handleChange}
-                            style={{ background: 'transparent', border: 'none', fontSize: '2.5rem', fontWeight: 900, color: '#1c1917', width: '100%', padding: 0 }}
+                            style={{ background: 'transparent', border: 'none', fontSize: '2.5rem', fontWeight: 900, color: 'var(--foreground)', width: '100%', padding: 0 }}
                             placeholder="e.g. The Ultimate Bali Escape"
                         />
                         <div style={{ height: '4px', width: '80px', backgroundColor: '#22d3ee', borderRadius: '9999px', marginTop: '1rem' }} />
@@ -80,24 +80,24 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', paddingTop: '1rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label className="form-label" style={{ fontWeight: '600', color: '#78716c' }}>Destination</label>
+                            <label className="form-label" style={{ fontWeight: '600', color: 'var(--gray-400)' }}>Destination</label>
                             <input
                                 name="destination"
                                 value={data.destination}
                                 onChange={handleChange}
                                 className="form-input"
-                                style={{ backgroundColor: 'white' }}
+                                style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                 placeholder="e.g. Kyoto, Japan"
                             />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label className="form-label" style={{ fontWeight: '600', color: '#78716c' }}>Duration</label>
+                            <label className="form-label" style={{ fontWeight: '600', color: 'var(--gray-400)' }}>Duration</label>
                             <input
                                 name="duration"
                                 value={data.duration}
                                 onChange={handleChange}
                                 className="form-input"
-                                style={{ backgroundColor: 'white' }}
+                                style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                 placeholder="e.g. 7 Days / 6 Nights"
                             />
                         </div>
@@ -106,17 +106,17 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
 
                 {/* Classification */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-                    <div style={{ padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1rem', backgroundColor: '#fdfbf7' }}>
-                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#1c1917', marginBottom: '1rem' }}>Trip Details</h3>
+                    <div style={{ padding: '1.5rem', border: '1px solid var(--border)', borderRadius: '1rem', backgroundColor: 'var(--surface)' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: 'var(--foreground)', marginBottom: '1rem' }}>Trip Details</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label className="form-label" style={{ fontSize: '0.75rem', color: '#a8a29e', textTransform: 'uppercase', fontWeight: 'bold' }}>Trip Type</label>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', fontWeight: 'bold' }}>Trip Type</label>
                                 <select
                                     name="tripType"
                                     value={data.tripType}
                                     onChange={handleChange}
                                     className="form-input"
-                                    style={{ backgroundColor: 'white' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                 >
                                     <option value="Luxury">Luxury</option>
                                     <option value="Budget">Budget</option>
@@ -128,30 +128,30 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                                 </select>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label className="form-label" style={{ fontSize: '0.75rem', color: '#a8a29e', textTransform: 'uppercase', fontWeight: 'bold' }}>Perfect For</label>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', fontWeight: 'bold' }}>Perfect For</label>
                                 <input
                                     name="targetAudience"
                                     value={data.targetAudience}
                                     onChange={handleChange}
                                     className="form-input"
-                                    style={{ backgroundColor: 'white' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                     placeholder="e.g. Foodies, Couples, Solo ladies"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div style={{ padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1rem', backgroundColor: '#fdfbf7' }}>
-                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#1c1917', marginBottom: '1rem' }}>Seasonal Info</h3>
+                    <div style={{ padding: '1.5rem', border: '1px solid var(--border)', borderRadius: '1rem', backgroundColor: 'var(--surface)' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: 'var(--foreground)', marginBottom: '1rem' }}>Seasonal Info</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label className="form-label" style={{ fontSize: '0.75rem', color: '#a8a29e', textTransform: 'uppercase', fontWeight: 'bold' }}>Best Time to Visit</label>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', fontWeight: 'bold' }}>Best Time to Visit</label>
                                 <input
                                     name="bestTimeToVisit"
                                     value={data.bestTimeToVisit}
                                     onChange={handleChange}
                                     className="form-input"
-                                    style={{ backgroundColor: 'white' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                     placeholder="e.g. March - May (Sakura Season)"
                                 />
                             </div>
@@ -162,28 +162,28 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                 {/* Branding & Pricing */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                     {/* Branding */}
-                    <div style={{ gridColumn: 'span 2', padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1rem', backgroundColor: '#fdfbf7' }}>
-                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#1c1917', marginBottom: '1.5rem' }}>Creator Branding</h3>
+                    <div style={{ gridColumn: 'span 2', padding: '1.5rem', border: '1px solid var(--border)', borderRadius: '1rem', backgroundColor: 'var(--surface)' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: 'var(--foreground)', marginBottom: '1.5rem' }}>Creator Branding</h3>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label className="form-label" style={{ fontSize: '0.75rem', color: '#a8a29e', textTransform: 'uppercase', fontWeight: 'bold' }}>Brand Name</label>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', fontWeight: 'bold' }}>Brand Name</label>
                                 <input
                                     name="brandName"
                                     value={data.brandName || ""}
                                     onChange={handleChange}
                                     className="form-input"
-                                    style={{ backgroundColor: 'white' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                     placeholder="Your Name or Brand"
                                 />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label className="form-label" style={{ fontSize: '0.75rem', color: '#a8a29e', textTransform: 'uppercase', fontWeight: 'bold' }}>Tagline</label>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', fontWeight: 'bold' }}>Tagline</label>
                                 <input
                                     name="tagline"
                                     value={data.tagline || ""}
                                     onChange={handleChange}
                                     className="form-input"
-                                    style={{ backgroundColor: 'white' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                     placeholder="Something catchy..."
                                 />
                             </div>
@@ -191,29 +191,29 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                     </div>
 
                     {/* Pricing */}
-                    <div style={{ padding: '1.5rem', border: '2px solid #cffafe', borderRadius: '1rem', backgroundColor: '#ecfeff' }}>
-                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#164e63', marginBottom: '1rem' }}>Pricing</h3>
+                    <div style={{ padding: '1.5rem', border: '2px solid var(--border)', borderRadius: '1rem', backgroundColor: 'var(--surface)' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: 'var(--foreground)', marginBottom: '1rem' }}>Pricing</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label className="form-label" style={{ fontSize: '0.75rem', color: '#0891b2', textTransform: 'uppercase', fontWeight: 'bold' }}>Listing Price</label>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', fontWeight: 'bold' }}>Listing Price</label>
                                 <input
                                     name="price"
                                     type="number"
                                     value={data.price}
                                     onChange={handlePriceChange}
                                     className="form-input"
-                                    style={{ backgroundColor: 'white', fontSize: '1.5rem', fontWeight: 900, color: '#164e63', padding: '1rem' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', fontSize: '1.5rem', fontWeight: 900, color: 'var(--foreground)', padding: '1rem' }}
                                     placeholder="0"
                                 />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label className="form-label" style={{ fontSize: '0.75rem', color: '#0891b2', textTransform: 'uppercase', fontWeight: 'bold' }}>Currency</label>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', fontWeight: 'bold' }}>Currency</label>
                                 <select
                                     name="currency"
                                     value={data.currency || "USD"}
                                     onChange={handleChange}
                                     className="form-input"
-                                    style={{ backgroundColor: 'white', color: '#164e63' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                 >
                                     <option value="USD">USD ($)</option>
                                     <option value="EUR">EUR (€)</option>

@@ -61,11 +61,11 @@ export default function PreTripSection({ data, onChange }: PreTripSectionProps) 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1.5rem' }}>
                 <div>
-                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--foreground)', marginBottom: '0.5rem' }}>
                         <Plane style={{ color: '#2563eb' }} size={32} />
                         Before You Travel
                     </h2>
-                    <p style={{ color: '#78716c' }}>
+                    <p style={{ color: 'var(--gray-400)' }}>
                         A stress-free checklist from 7 days out until boarding. Cover flights, packing, and quick prep.
                     </p>
                 </div>
@@ -80,36 +80,36 @@ export default function PreTripSection({ data, onChange }: PreTripSectionProps) 
             </div>
 
             {/* Flight Guide */}
-            <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+            <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--foreground)', margin: 0 }}>
                     <Plane style={{ color: '#2563eb' }} size={20} /> Flight Strategy
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Best Airports</label>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--gray-400)' }}>Best Airports</label>
                         <input
                             className="form-input"
-                            style={{ backgroundColor: '#fdfbf7' }}
+                            style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                             placeholder="e.g. NRT or KIX"
                             value={data.flightGuide.bestAirports.join(", ")}
                             onChange={e => handleFlightChange("bestAirports", handleArrayInput(e.target.value))}
                         />
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Arrival Strategy</label>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--gray-400)' }}>Arrival Strategy</label>
                         <input
                             className="form-input"
-                            style={{ backgroundColor: '#fdfbf7' }}
+                            style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                             placeholder="e.g. Arrive before noon..."
                             value={data.flightGuide.arrivalDepartureStats}
                             onChange={e => handleFlightChange("arrivalDepartureStats", e.target.value)}
                         />
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Seat Selection Secret</label>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--gray-400)' }}>Seat Selection Secret</label>
                         <textarea
                             className="form-input"
-                            style={{ backgroundColor: '#fdfbf7', minHeight: '100px' }}
+                            style={{ backgroundColor: 'var(--input-bg)', minHeight: '100px', color: 'var(--foreground)' }}
                             placeholder="e.g. Sit on the left for views..."
                             value={data.flightGuide.seatTips || ""}
                             onChange={e => handleFlightChange("seatTips", e.target.value)}
@@ -117,20 +117,20 @@ export default function PreTripSection({ data, onChange }: PreTripSectionProps) 
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Baggage Tips</label>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--gray-400)' }}>Baggage Tips</label>
                             <input
                                 className="form-input"
-                                style={{ backgroundColor: '#fdfbf7' }}
+                                style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                 placeholder="e.g. Pack light..."
                                 value={data.flightGuide.baggageTips || ""}
                                 onChange={e => handleFlightChange("baggageTips", e.target.value)}
                             />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Jet Lag Hack</label>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--gray-400)' }}>Jet Lag Hack</label>
                             <input
                                 className="form-input"
-                                style={{ backgroundColor: '#fdfbf7' }}
+                                style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                 placeholder="e.g. Stay awake until 9PM..."
                                 value={data.flightGuide.jetLagTips || ""}
                                 onChange={e => handleFlightChange("jetLagTips", e.target.value)}
@@ -142,31 +142,31 @@ export default function PreTripSection({ data, onChange }: PreTripSectionProps) 
 
             {/* Quick Prep: Connectivity & Money */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderLeft: '4px solid #9333ea', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.25rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                <div style={{ padding: '2rem', border: '1px solid var(--border)', borderLeft: '4px solid #9333ea', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1.25rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--foreground)', margin: 0 }}>
                         <Smartphone style={{ color: '#9333ea' }} size={20} /> Tech & Connectivity Prep
                     </h3>
-                    <p style={{ fontSize: '0.875rem', color: '#78716c', margin: 0 }}>Quick checklist ensuring they are online immediately.</p>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--gray-400)', margin: 0 }}>Quick checklist ensuring they are online immediately.</p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {["Download eSIM App (e.g. Airalo/Ubigi)", "Download Offline Maps", "Pack Universal Adapter"].map((item, idx) => (
-                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem', borderRadius: '0.75rem', backgroundColor: '#fdfbf7', border: '1px solid #f5f5f4' }}>
+                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem', borderRadius: '0.75rem', backgroundColor: 'var(--input-bg)', border: '1px solid var(--border)' }}>
                                 <input type="checkbox" style={{ width: '1.25rem', height: '1.25rem', cursor: 'pointer' }} defaultChecked />
-                                <span style={{ fontSize: '0.875rem', color: '#1c1917' }}>{item}</span>
+                                <span style={{ fontSize: '0.875rem', color: 'var(--foreground)' }}>{item}</span>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderLeft: '4px solid #16a34a', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.25rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                <div style={{ padding: '2rem', border: '1px solid var(--border)', borderLeft: '4px solid #16a34a', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1.25rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--foreground)', margin: 0 }}>
                         <CreditCard style={{ color: '#16a34a' }} size={20} /> Money Prep
                     </h3>
-                    <p style={{ fontSize: '0.875rem', color: '#78716c', margin: 0 }}>Avoid frozen cards and high fees.</p>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--gray-400)', margin: 0 }}>Avoid frozen cards and high fees.</p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {["Notify Bank of Travel Dates", "Carry roughly $200 in USD/EUR as backup", "Check Exchange Rates"].map((item, idx) => (
-                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem', borderRadius: '0.75rem', backgroundColor: '#fdfbf7', border: '1px solid #f5f5f4' }}>
+                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem', borderRadius: '0.75rem', backgroundColor: 'var(--input-bg)', border: '1px solid var(--border)' }}>
                                 <input type="checkbox" style={{ width: '1.25rem', height: '1.25rem', cursor: 'pointer' }} defaultChecked />
-                                <span style={{ fontSize: '0.875rem', color: '#1c1917' }}>{item}</span>
+                                <span style={{ fontSize: '0.875rem', color: 'var(--foreground)' }}>{item}</span>
                             </div>
                         ))}
                     </div>
@@ -174,16 +174,16 @@ export default function PreTripSection({ data, onChange }: PreTripSectionProps) 
             </div>
 
             {/* Essentials */}
-            <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+            <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--foreground)', margin: 0 }}>
                     <AlertTriangle style={{ color: '#ca8a04' }} size={20} /> Documents & Verification
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Required Documents Checklist</label>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--gray-400)' }}>Required Documents Checklist</label>
                         <textarea
                             className="form-input"
-                            style={{ backgroundColor: '#fdfbf7' }}
+                            style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                             placeholder="e.g. Passport, Visa, Hotel Booking (Comma separated)"
                             value={data.essentials.documents.join(", ")}
                             onChange={e => handleEssentialsChange("documents", handleArrayInput(e.target.value))}
@@ -192,20 +192,20 @@ export default function PreTripSection({ data, onChange }: PreTripSectionProps) 
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Health & Vaccines</label>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--gray-400)' }}>Health & Vaccines</label>
                             <input
                                 className="form-input"
-                                style={{ backgroundColor: '#fdfbf7' }}
+                                style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                 placeholder="e.g. Covid Vax"
                                 value={data.essentials.health.join(", ")}
                                 onChange={e => handleEssentialsChange("health", handleArrayInput(e.target.value))}
                             />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78716c' }}>Travel Insurance Advice</label>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--gray-400)' }}>Travel Insurance Advice</label>
                             <input
                                 className="form-input"
-                                style={{ backgroundColor: '#fdfbf7' }}
+                                style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                 placeholder="e.g. Essential. Ensure coverage."
                                 value={data.essentials.insurance}
                                 onChange={e => handleEssentialsChange("insurance", e.target.value)}
@@ -216,12 +216,12 @@ export default function PreTripSection({ data, onChange }: PreTripSectionProps) 
             </div>
 
             {/* Packing List */}
-            <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+            <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1c1917', margin: 0 }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--foreground)', margin: 0 }}>
                         <Briefcase style={{ color: '#ea580c' }} size={20} /> Ultimate Packing List
                     </h3>
-                    <span style={{ padding: '0.25rem 0.75rem', backgroundColor: '#fdfbf7', color: '#0891b2', fontSize: '0.75rem', borderRadius: '1rem', border: '1px solid #f5f5f4', fontWeight: 'bold' }}>
+                    <span style={{ padding: '0.25rem 0.75rem', backgroundColor: 'var(--input-bg)', color: '#0891b2', fontSize: '0.75rem', borderRadius: '1rem', border: '1px solid var(--border)', fontWeight: 'bold' }}>
                         Zero Stress
                     </span>
                 </div>
@@ -231,15 +231,15 @@ export default function PreTripSection({ data, onChange }: PreTripSectionProps) 
                         { title: "Clothes & Wearables", icon: Shirt, color: '#ec4899', category: "Clothes" },
                         { title: "Tech & Gadgets", icon: Zap, color: '#eab308', category: "Tech" },
                         { title: "Toiletries & Meds", icon: CheckSquare, color: '#06b6d4', category: "Toiletries" },
-                        { title: "Miscellaneous", icon: CheckSquare, color: '#78716c', category: "Misc" }
+                        { title: "Miscellaneous", icon: CheckSquare, color: 'var(--gray-400)', category: "Misc" }
                     ].map((sec, idx) => (
                         <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            <label style={{ fontSize: '0.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#44403c' }}>
+                            <label style={{ fontSize: '0.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--gray-400)' }}>
                                 <sec.icon size={16} style={{ color: sec.color }} /> {sec.title}
                             </label>
                             <textarea
                                 className="form-input"
-                                style={{ minHeight: '120px', backgroundColor: '#fdfbf7', fontSize: '0.875rem' }}
+                                style={{ minHeight: '120px', backgroundColor: 'var(--input-bg)', fontSize: '0.875rem', color: 'var(--foreground)' }}
                                 placeholder="One item per line..."
                                 value={data.packingList.find(p => p.category === sec.category)?.items.join("\n") || ""}
                                 onChange={(e) => {

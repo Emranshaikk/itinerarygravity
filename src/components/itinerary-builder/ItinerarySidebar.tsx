@@ -36,16 +36,16 @@ export default function ItinerarySidebar({ activeStep, onStepChange, completedSt
     return (
         <div className="glass rounded-2xl h-fit sticky top-24 overflow-hidden border border-white/10 shadow-2xl flex flex-col max-h-[85vh]">
             {/* Header */}
-            <div className="p-6 border-b border-white/10 bg-black/20 backdrop-blur-md">
-                <h3 className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            <div className="p-6 border-b border-border bg-card/30 backdrop-blur-md">
+                <h3 className="text-xl font-bold text-foreground">
                     Itinerary Builder
                 </h3>
                 <div className="mt-4">
-                    <div className="flex justify-between text-xs text-gray-400 mb-1">
+                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
                         <span>Completion</span>
-                        <span className="text-white font-medium">{progress}%</span>
+                        <span className="text-foreground font-medium">{progress}%</span>
                     </div>
-                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-1.5 w-full bg-secondary/50 rounded-full overflow-hidden">
                         <div
                             className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-500 ease-out"
                             style={{ width: `${progress}%` }}
@@ -69,8 +69,8 @@ export default function ItinerarySidebar({ activeStep, onStepChange, completedSt
                             className={`
                                 group w-full flex items-center gap-4 px-4 py-3 text-left transition-all duration-200 relative
                                 ${isActive
-                                    ? "bg-white/10"
-                                    : "hover:bg-white/5"
+                                    ? "bg-accent"
+                                    : "hover:bg-accent/50"
                                 }
                             `}
                         >
@@ -83,10 +83,10 @@ export default function ItinerarySidebar({ activeStep, onStepChange, completedSt
                             <div className={`
                                 relative z-10 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 border
                                 ${isActive
-                                    ? "bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-blue-400/30 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                                    ? "bg-primary/10 border-primary text-primary shadow-[0_0_15px_rgba(59,130,246,0.3)]"
                                     : isCompleted
                                         ? "bg-green-500/10 border-green-500/30 text-green-400"
-                                        : "bg-white/5 border-white/5 text-gray-500 group-hover:text-gray-300 group-hover:border-white/10"
+                                        : "bg-secondary/50 border-border text-muted-foreground group-hover:text-foreground group-hover:border-border"
                                 }
                             `}>
                                 {isCompleted && !isActive ? (
@@ -98,17 +98,17 @@ export default function ItinerarySidebar({ activeStep, onStepChange, completedSt
 
                             {/* Text Content */}
                             <div className="flex-1 min-w-0">
-                                <p className={`text-sm font-semibold truncate transition-colors ${isActive ? "text-white" : isCompleted ? "text-green-100/80" : "text-gray-400 group-hover:text-gray-200"}`}>
+                                <p className={`text-sm font-semibold truncate transition-colors ${isActive ? "text-foreground" : isCompleted ? "text-green-600 dark:text-green-400" : "text-muted-foreground group-hover:text-foreground"}`}>
                                     {section.label}
                                 </p>
-                                <p className={`text-[10px] truncate ${isActive ? "text-blue-200/70" : "text-gray-600 group-hover:text-gray-500"}`}>
+                                <p className={`text-[10px] truncate ${isActive ? "text-primary/70" : "text-muted-foreground/70 group-hover:text-muted-foreground"}`}>
                                     {section.desc}
                                 </p>
                             </div>
 
                             {/* Active Chevron */}
                             {isActive && (
-                                <ChevronRight size={14} className="text-white/50 animate-pulse" />
+                                <ChevronRight size={14} className="text-foreground/50 animate-pulse" />
                             )}
                         </button>
                     );

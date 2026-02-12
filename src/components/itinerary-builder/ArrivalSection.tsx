@@ -34,11 +34,11 @@ export default function ArrivalSection({ data, onChange }: ArrivalSectionProps) 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1.5rem' }}>
                 <div>
-                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--foreground)', marginBottom: '0.5rem' }}>
                         <PlaneLanding style={{ color: '#2563eb' }} size={32} />
                         Arrival Day Experience
                     </h2>
-                    <p style={{ color: '#78716c' }}>
+                    <p style={{ color: 'var(--gray-400)' }}>
                         The first 4 hours are the most stressful. Guide them from the airport to their first "I'm finally here" moment.
                     </p>
                 </div>
@@ -54,13 +54,13 @@ export default function ArrivalSection({ data, onChange }: ArrivalSectionProps) 
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                 {/* Getting from Airport */}
-                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', position: 'relative' }}>
+                <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', position: 'relative' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1d4ed8', margin: 0 }}>
                         <Train size={20} /> Airport to City Transfer
                     </h3>
                     <textarea
                         className="form-input"
-                        style={{ minHeight: '120px', backgroundColor: '#fdfbf7' }}
+                        style={{ minHeight: '120px', backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                         placeholder="Step-by-step instructions. Which train? Which exit?"
                         value={data.airportToCity}
                         onChange={(e) => updateField("airportToCity", e.target.value)}
@@ -68,13 +68,13 @@ export default function ArrivalSection({ data, onChange }: ArrivalSectionProps) 
                 </div>
 
                 {/* Check-in & Luggage */}
-                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', position: 'relative' }}>
+                <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', position: 'relative' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#9333ea', margin: 0 }}>
                         <Key size={20} /> Check-in & Luggage Info
                     </h3>
                     <textarea
                         className="form-input"
-                        style={{ minHeight: '120px', backgroundColor: '#fdfbf7' }}
+                        style={{ minHeight: '120px', backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                         placeholder="Can they drop bags early? Any quirks about hotels here?"
                         value={data.checkInProcess}
                         onChange={(e) => updateField("checkInProcess", e.target.value)}
@@ -82,13 +82,13 @@ export default function ArrivalSection({ data, onChange }: ArrivalSectionProps) 
                 </div>
 
                 {/* First Meal */}
-                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', position: 'relative' }}>
+                <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', position: 'relative' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ea580c', margin: 0 }}>
                         <Coffee size={20} /> First "Welcome" Meal
                     </h3>
                     <textarea
                         className="form-input"
-                        style={{ minHeight: '120px', backgroundColor: '#fdfbf7' }}
+                        style={{ minHeight: '120px', backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                         placeholder="Suggest somewhere easy and iconic near the main hub."
                         value={data.firstMealSuggestion}
                         onChange={(e) => updateField("firstMealSuggestion", e.target.value)}
@@ -96,13 +96,13 @@ export default function ArrivalSection({ data, onChange }: ArrivalSectionProps) 
                 </div>
 
                 {/* Orientation */}
-                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', position: 'relative' }}>
+                <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', position: 'relative' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#059669', margin: 0 }}>
                         <MapPin size={20} /> Quick Orientation Tips
                     </h3>
                     <textarea
                         className="form-input"
-                        style={{ minHeight: '120px', backgroundColor: '#fdfbf7' }}
+                        style={{ minHeight: '120px', backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                         placeholder="How to find their bearings? Landmark suggestions?"
                         value={data.orientationTips}
                         onChange={(e) => updateField("orientationTips", e.target.value)}
@@ -110,13 +110,13 @@ export default function ArrivalSection({ data, onChange }: ArrivalSectionProps) 
                 </div>
 
                 {/* Last-Minute Tech */}
-                <div style={{ gridColumn: '1 / -1', padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <div style={{ gridColumn: '1 / -1', padding: '2rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#b45309', margin: 0 }}>
                         <Clock size={20} /> Last-Minute Essentials (SIM/Cash)
                     </h3>
                     <input
                         className="form-input"
-                        style={{ backgroundColor: '#fdfbf7' }}
+                        style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                         placeholder="e.g. Best place to pick up a physical SIM or withdraw cash at arrival."
                         value={data.simCardPickUp || ""}
                         onChange={(e) => updateField("simCardPickUp", e.target.value)}

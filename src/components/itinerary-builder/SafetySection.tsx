@@ -62,11 +62,11 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1.5rem' }}>
                 <div>
-                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--foreground)', marginBottom: '0.5rem' }}>
                         <Shield style={{ color: '#eab308' }} size={32} />
                         Safety, Scams & Culture
                     </h2>
-                    <p style={{ color: '#78716c' }}>
+                    <p style={{ color: 'var(--gray-400)' }}>
                         Empower your travelers with confidence. Knowing what NOT to do is as important as knowing what to do.
                     </p>
                 </div>
@@ -83,7 +83,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
 
                 {/* Common Scams */}
-                <div style={{ padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <div style={{ padding: '1.5rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ef4444', margin: 0 }}>
                             <UserX size={20} /> Common Scams & Traps
@@ -97,7 +97,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                             <div key={i} style={{ display: 'flex', gap: '0.5rem' }}>
                                 <textarea
                                     className="form-input"
-                                    style={{ backgroundColor: '#fdfbf7', fontSize: '0.875rem', flex: 1, minHeight: '60px' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', fontSize: '0.875rem', flex: 1, minHeight: '60px', color: 'var(--foreground)' }}
                                     placeholder="e.g. 'Broken' taxi meters..."
                                     value={scam}
                                     onChange={(e) => {
@@ -106,7 +106,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                                         updateField("commonScams", newScams);
                                     }}
                                 />
-                                <button onClick={() => removeScam(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>
+                                <button onClick={() => removeScam(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: 'var(--gray-400)', cursor: 'pointer' }}>
                                     <Trash2 size={16} />
                                 </button>
                             </div>
@@ -115,7 +115,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                 </div>
 
                 {/* Culture Dos & Don'ts */}
-                <div style={{ padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <div style={{ padding: '1.5rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#3b82f6', margin: 0 }}>
                             <Scale size={20} /> Cultural Dos & Don'ts
@@ -129,7 +129,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                             <div key={i} style={{ display: 'flex', gap: '0.5rem' }}>
                                 <textarea
                                     className="form-input"
-                                    style={{ backgroundColor: '#fdfbf7', fontSize: '0.875rem', flex: 1, minHeight: '60px' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', fontSize: '0.875rem', flex: 1, minHeight: '60px', color: 'var(--foreground)' }}
                                     placeholder="e.g. DO: Bow slightly..."
                                     value={item}
                                     onChange={(e) => {
@@ -138,7 +138,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                                         updateField("culturalDosAndDonts", newItems);
                                     }}
                                 />
-                                <button onClick={() => removeDoDont(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>
+                                <button onClick={() => removeDoDont(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: 'var(--gray-400)', cursor: 'pointer' }}>
                                     <Trash2 size={16} />
                                 </button>
                             </div>
@@ -147,7 +147,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                 </div>
 
                 {/* Safety Tips */}
-                <div style={{ padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <div style={{ padding: '1.5rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#eab308', margin: 0 }}>
                             <AlertTriangle size={20} /> General Safety Tips
@@ -161,7 +161,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                             <div key={i} style={{ display: 'flex', gap: '0.5rem' }}>
                                 <input
                                     className="form-input"
-                                    style={{ backgroundColor: '#fdfbf7', fontSize: '0.875rem', flex: 1 }}
+                                    style={{ backgroundColor: 'var(--input-bg)', fontSize: '0.875rem', flex: 1, color: 'var(--foreground)' }}
                                     placeholder="e.g. Keep a copy of your passport..."
                                     value={tip}
                                     onChange={(e) => {
@@ -170,7 +170,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                                         updateField("safetyTips", newTips);
                                     }}
                                 />
-                                <button onClick={() => removeTip(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>
+                                <button onClick={() => removeTip(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: 'var(--gray-400)', cursor: 'pointer' }}>
                                     <Trash2 size={16} />
                                 </button>
                             </div>
@@ -179,7 +179,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                 </div>
 
                 {/* Emergency Numbers */}
-                <div style={{ padding: '1.5rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <div style={{ padding: '1.5rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981', margin: 0 }}>
                             <Phone size={20} /> Emergency Numbers
@@ -193,7 +193,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                             <div key={i} style={{ display: 'flex', gap: '1rem' }}>
                                 <input
                                     className="form-input"
-                                    style={{ backgroundColor: '#fdfbf7', fontSize: '0.875rem', flex: 1 }}
+                                    style={{ backgroundColor: 'var(--input-bg)', fontSize: '0.875rem', flex: 1, color: 'var(--foreground)' }}
                                     placeholder="Agency Name"
                                     value={entry.name}
                                     onChange={(e) => {
@@ -204,7 +204,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                                 />
                                 <input
                                     className="form-input"
-                                    style={{ backgroundColor: '#fdfbf7', fontSize: '0.875rem', width: '120px' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', fontSize: '0.875rem', width: '120px', color: 'var(--foreground)' }}
                                     placeholder="Number"
                                     value={entry.number}
                                     onChange={(e) => {
@@ -213,7 +213,7 @@ export default function SafetySection({ data, onChange }: SafetySectionProps) {
                                         updateField("emergencyNumbers", newNums);
                                     }}
                                 />
-                                <button onClick={() => removeEmergency(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#a8a29e', cursor: 'pointer' }}>
+                                <button onClick={() => removeEmergency(i)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: 'var(--gray-400)', cursor: 'pointer' }}>
                                     <Trash2 size={16} />
                                 </button>
                             </div>

@@ -36,11 +36,11 @@ export default function PostTripSection({ data, onChange }: PostTripSectionProps
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1.5rem' }}>
                 <div>
-                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1c1917', marginBottom: '0.5rem' }}>
+                    <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--foreground)', marginBottom: '0.5rem' }}>
                         <ImageIcon style={{ color: '#9333ea' }} size={32} />
                         Post-Trip & Reflection
                     </h2>
-                    <p style={{ color: '#78716c' }}>
+                    <p style={{ color: 'var(--gray-400)' }}>
                         Keep the adventure alive. Help them process their photos, recover from jet lag, and plan their next dream destination.
                     </p>
                 </div>
@@ -57,13 +57,13 @@ export default function PostTripSection({ data, onChange }: PostTripSectionProps
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
 
                 {/* Jet Lag & Health */}
-                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#6366f1', margin: 0 }}>
                         <Sparkles size={20} /> Jet Lag & Recovery Hacks
                     </h3>
                     <textarea
                         className="form-input"
-                        style={{ backgroundColor: '#fdfbf7', minHeight: '120px' }}
+                        style={{ backgroundColor: 'var(--input-bg)', minHeight: '120px', color: 'var(--foreground)' }}
                         placeholder="How to adapt back to their home timezone smoothly..."
                         value={data.jetLagRecovery || ""}
                         onChange={(e) => updateField("jetLagRecovery", e.target.value)}
@@ -71,13 +71,13 @@ export default function PostTripSection({ data, onChange }: PostTripSectionProps
                 </div>
 
                 {/* Content & Photography */}
-                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ec4899', margin: 0 }}>
                         <Camera size={20} /> Photo Editing & Sharing Tips
                     </h3>
                     <textarea
                         className="form-input"
-                        style={{ backgroundColor: '#fdfbf7', minHeight: '120px' }}
+                        style={{ backgroundColor: 'var(--input-bg)', minHeight: '120px', color: 'var(--foreground)' }}
                         placeholder="Presets to use, best way to organize 1000+ photos..."
                         value={data.photoTips || ""}
                         onChange={(e) => updateField("photoTips", e.target.value)}
@@ -85,21 +85,21 @@ export default function PostTripSection({ data, onChange }: PostTripSectionProps
                 </div>
 
                 {/* Where Next? */}
-                <div style={{ padding: '2rem', border: '1px solid #f5f5f4', borderRadius: '1.5rem', backgroundColor: 'white', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1.5rem', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981', margin: 0 }}>
                         <Map size={20} /> "Where to Next?" Ideas
                     </h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <input
                             className="form-input"
-                            style={{ backgroundColor: '#fdfbf7' }}
+                            style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                             placeholder="e.g. Hokkaido, Osaka, Nara (separated by commas)"
                             value={data.nextDestinationIdeas?.join(", ") || ""}
                             onChange={(e) => handleNextDestinations(e.target.value)}
                         />
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                             {data.nextDestinationIdeas?.map((dest, i) => (
-                                <span key={i} style={{ padding: '0.25rem 0.75rem', backgroundColor: '#fdfbf7', color: '#0891b2', fontSize: '0.75rem', borderRadius: '1rem', border: '1px solid #f5f5f4', fontWeight: 'bold' }}>
+                                <span key={i} style={{ padding: '0.25rem 0.75rem', backgroundColor: 'var(--input-bg)', color: '#0891b2', fontSize: '0.75rem', borderRadius: '1rem', border: '1px solid var(--border)', fontWeight: 'bold' }}>
                                     {dest}
                                 </span>
                             ))}
@@ -108,10 +108,10 @@ export default function PostTripSection({ data, onChange }: PostTripSectionProps
                 </div>
 
                 {/* Community & Reviews */}
-                <div style={{ padding: '2rem', border: '2px dashed #e7e5e4', borderRadius: '1.5rem', backgroundColor: '#fafaf9', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', gap: '1rem' }}>
-                    <Share2 size={40} style={{ color: '#a8a29e' }} />
-                    <h4 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#1c1917', margin: 0 }}>Feedback Is A Gift</h4>
-                    <p style={{ fontSize: '0.75rem', color: '#78716c', fontStyle: 'italic', margin: 0, maxWidth: '240px' }}>
+                <div style={{ padding: '2rem', border: '2px dashed var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--input-bg)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', gap: '1rem' }}>
+                    <Share2 size={40} style={{ color: 'var(--gray-400)' }} />
+                    <h4 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: 'var(--foreground)', margin: 0 }}>Feedback Is A Gift</h4>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--gray-400)', fontStyle: 'italic', margin: 0, maxWidth: '240px' }}>
                         Encourage your travelers to tag you in their photos! This builds your brand and shows others that your itineraries work.
                     </p>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
