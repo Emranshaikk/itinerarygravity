@@ -29,6 +29,11 @@ export default async function DashboardPage() {
             redirect("/dashboard/buyer");
         }
     } catch (e) {
+        // Next.js Redirects throw an error, we must re-throw it
+        if ((e as Error).message === 'NEXT_REDIRECT') {
+            throw e;
+        }
+
         // Even if DB check fails, trust metadata as fallback during initial signup
         const metaRole = user.user_metadata?.role;
         if (metaRole === 'influencer') redirect("/dashboard/influencer");

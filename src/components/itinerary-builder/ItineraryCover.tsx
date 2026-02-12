@@ -118,13 +118,13 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                                     className="form-input"
                                     style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                 >
-                                    <option value="Luxury">Luxury</option>
-                                    <option value="Budget">Budget</option>
-                                    <option value="Adventure">Adventure</option>
-                                    <option value="Honeymoon">Honeymoon</option>
-                                    <option value="Family">Family</option>
-                                    <option value="Solo">Solo</option>
-                                    <option value="Cultural">Cultural</option>
+                                    <option value="Luxury" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>Luxury</option>
+                                    <option value="Budget" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>Budget</option>
+                                    <option value="Adventure" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>Adventure</option>
+                                    <option value="Honeymoon" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>Honeymoon</option>
+                                    <option value="Family" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>Family</option>
+                                    <option value="Solo" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>Solo</option>
+                                    <option value="Cultural" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>Cultural</option>
                                 </select>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -226,10 +226,10 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                                     className="form-input"
                                     style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                 >
-                                    <option value="USD">USD ($)</option>
-                                    <option value="EUR">EUR (€)</option>
-                                    <option value="GBP">GBP (£)</option>
-                                    <option value="INR">INR (₹)</option>
+                                    <option value="USD" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>USD ($)</option>
+                                    <option value="EUR" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>EUR (€)</option>
+                                    <option value="GBP" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>GBP (£)</option>
+                                    <option value="INR" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>INR (₹)</option>
                                 </select>
                             </div>
                         </div>

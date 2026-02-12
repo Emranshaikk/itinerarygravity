@@ -73,6 +73,12 @@ export default function ExplorePage() {
             setItineraries(formattedData);
         } catch (error) {
             console.error("Fetch error:", error);
+            if (error instanceof Error) {
+                console.error("Error message:", error.message);
+                console.error("Error stack:", error.stack);
+            } else {
+                console.error("Unknown error object:", JSON.stringify(error, null, 2));
+            }
         } finally {
             setIsLoading(false);
         }

@@ -183,10 +183,10 @@ export default function FoodSection({ data, onChange }: FoodSectionProps) {
                                                     updateField("restaurantRecommendations", newRests);
                                                 }}
                                             >
-                                                <option value="$">$ (Economy)</option>
-                                                <option value="$$">$$ (Standard)</option>
-                                                <option value="$$$">$$$ (Premium)</option>
-                                                <option value="$$$$">$$$$ (Luxury)</option>
+                                                <option value="$" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>$ (Economy)</option>
+                                                <option value="$$" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>$$ (Standard)</option>
+                                                <option value="$$$" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>$$$ (Premium)</option>
+                                                <option value="$$$$" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>$$$$ (Luxury)</option>
                                             </select>
                                         </td>
                                         <td style={{ padding: '0.75rem' }}>
