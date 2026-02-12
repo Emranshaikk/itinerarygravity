@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import jsPDF from "jspdf";
-import { Download } from "@/components/Icons";
+import { Download, Printer } from "@/components/Icons";
 
 interface ItineraryData {
     title: string;
@@ -196,6 +196,19 @@ export default function PDFGenerator({ itineraryData, isPurchased }: PDFGenerato
                     💡 Purchase this itinerary to download the complete PDF
                 </div>
             )}
+
+            <button
+                onClick={() => window.print()}
+                className="btn btn-outline"
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    cursor: 'pointer'
+                }}
+            >
+                <Printer size={18} /> Print / Save as PDF
+            </button>
         </div>
     );
 }

@@ -138,6 +138,17 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                                     placeholder="e.g. Foodies, Couples, Solo ladies"
                                 />
                             </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', fontWeight: 'bold' }}>Vibe Tags (Comma separated)</label>
+                                <input
+                                    name="tags"
+                                    value={data.tags?.join(", ") || ""}
+                                    onChange={(e) => onChange({ ...data, tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean) })}
+                                    className="form-input"
+                                    style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
+                                    placeholder="e.g. Chill, Nightlife, Foodie"
+                                />
+                            </div>
                         </div>
                     </div>
 

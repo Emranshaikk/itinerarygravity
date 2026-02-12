@@ -294,9 +294,9 @@ export default function ExplorePage() {
                 </div>
             ) : filteredItineraries.length === 0 ? (
                 <div className="glass card" style={{ padding: '60px', textAlign: 'center' }}>
-                    <h3 style={{ fontSize: '1.5rem', marginBottom: '12px' }}>No itineraries found</h3>
+                    <h3 style={{ fontSize: '1.5rem', marginBottom: '12px' }}>No guides here yet</h3>
                     <p style={{ color: 'var(--gray-400)', marginBottom: '24px' }}>
-                        Try adjusting your search or filters
+                        Request a guide for this location!
                     </p>
                     <button
                         onClick={() => {

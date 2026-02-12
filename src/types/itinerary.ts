@@ -12,6 +12,7 @@ export interface ItineraryContent {
         version?: string;
         lastUpdated?: string;
         tagline?: string;
+        tags?: string[]; // Vibe tags e.g. "Chill", "Foodie", "Nightlife"
         // Listing Details (Used for platform)
         price?: number;
         currency?: string;
@@ -200,6 +201,7 @@ export const initialItineraryContent: ItineraryContent = {
         targetAudience: "",
         price: 0,
         currency: "USD",
+        tags: [],
     },
     preTrip: {
         flightGuide: { bestAirports: [], arrivalDepartureStats: "" },

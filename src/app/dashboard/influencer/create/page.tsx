@@ -138,19 +138,19 @@ export default function CreateItineraryPage() {
     }
 
     return (
-        <div suppressHydrationWarning style={{ minHeight: '100vh', backgroundColor: '#fafaf9', color: '#1c1917', paddingBottom: '6rem', paddingLeft: '1rem', paddingRight: '1rem', fontFamily: 'sans-serif' }}>
+        <div suppressHydrationWarning style={{ minHeight: '100vh', backgroundColor: 'var(--background)', color: 'var(--foreground)', paddingBottom: '6rem', paddingLeft: '1rem', paddingRight: '1rem', fontFamily: 'sans-serif' }}>
             <header className="container" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingTop: '2rem', paddingBottom: '2rem', maxWidth: '1100px', margin: '0 auto' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                         <button
                             onClick={() => router.back()}
-                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#78716c', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '0.5rem', fontSize: '0.875rem' }}
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--gray-400)', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '0.5rem', fontSize: '0.875rem' }}
                         >
                             <ArrowLeft size={16} /> Back
                         </button>
-                        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.025em', fontStyle: 'italic', margin: 0 }}>Plan Your Trip</h1>
+                        <h1 className="text-gradient" style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.025em', fontStyle: 'italic', margin: 0 }}>Plan Your Trip</h1>
                     </div>
-                    <button className="btn btn-outline" style={{ borderRadius: '0.75rem', backgroundColor: 'white', padding: '0.5rem 1.5rem', fontSize: '0.875rem' }}>
+                    <button className="btn btn-outline" style={{ borderRadius: '0.75rem', padding: '0.5rem 1.5rem', fontSize: '0.875rem' }}>
                         <Eye size={16} style={{ marginRight: '0.5rem' }} /> Preview
                     </button>
                 </div>
@@ -163,15 +163,15 @@ export default function CreateItineraryPage() {
                     completedSteps={getCompletedSteps()}
                 />
 
-                <div className="card" style={{ minHeight: '60vh', backgroundColor: 'white', borderRadius: '2rem', padding: '2rem', border: '2px solid #f5f5f4', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', marginTop: '2rem' }}>
+                <div className="card glass" style={{ minHeight: '60vh', marginTop: '2rem' }}>
                     {renderSection()}
                 </div>
 
                 <div style={{ marginTop: '3rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
                     {activeStep > 1 && (
                         <button
-                            className="btn"
-                            style={{ minWidth: '140px', padding: '1rem 2rem', borderRadius: '1.5rem', border: '2px solid #e7e5e4', backgroundColor: 'white', color: '#1c1917', fontWeight: 'bold', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', cursor: 'pointer' }}
+                            className="btn btn-outline"
+                            style={{ minWidth: '140px', padding: '1rem 2rem', borderRadius: '1.5rem', fontWeight: 'bold', cursor: 'pointer' }}
                             onClick={() => setActiveStep(prev => Math.max(1, prev - 1))}
                         >
                             <ChevronRight size={20} style={{ marginRight: '0.5rem', transform: 'rotate(180deg)' }} />
@@ -182,16 +182,16 @@ export default function CreateItineraryPage() {
                     <button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="btn"
-                        style={{ minWidth: '140px', padding: '1rem 2rem', borderRadius: '1.5rem', border: '2px solid #86efac', backgroundColor: '#f0fdf4', color: '#166534', fontWeight: 'bold', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', cursor: 'pointer' }}
+                        className="btn btn-outline"
+                        style={{ minWidth: '140px', padding: '1rem 2rem', borderRadius: '1.5rem', borderColor: 'var(--primary)', color: 'var(--primary)', fontWeight: 'bold', cursor: 'pointer' }}
                     >
                         <Save size={20} style={{ marginRight: '0.5rem' }} />
                         {isSaving ? "Saving..." : "Save"}
                     </button>
 
                     <button
-                        className="btn"
-                        style={{ minWidth: '140px', padding: '1rem 2rem', borderRadius: '1.5rem', border: '2px solid #86efac', backgroundColor: '#f0fdf4', color: '#166534', fontWeight: 'bold', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', cursor: 'pointer' }}
+                        className="btn btn-primary"
+                        style={{ minWidth: '140px', padding: '1rem 2rem', borderRadius: '1.5rem', fontWeight: 'bold', cursor: 'pointer' }}
                         onClick={() => {
                             if (activeStep < 15) {
                                 setActiveStep(prev => prev + 1);

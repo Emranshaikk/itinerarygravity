@@ -136,8 +136,8 @@ export default function InfluencerDashboard() {
                             !
                         </div>
                         <div>
-                            <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Account Not Verified</h3>
-                            <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem' }}>You need to be verified to start selling itineraries and earn revenue.</p>
+                            <h3 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Unlock Your Earning Potential</h3>
+                            <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem' }}>Get verified to start selling itineraries, access analytics, and build trust with the blue checkmark.</p>
                         </div>
                     </div>
                     <button
@@ -192,6 +192,17 @@ export default function InfluencerDashboard() {
                         <h3 style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
                             <PieChart size={20} color="var(--primary)" /> Revenue Trends
                         </h3>
+                        <button
+                            className="btn btn-outline"
+                            style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+                            onClick={() => {
+                                const csvContent = "data:text/csv;charset=utf-8,Date,Amount,Type\n2024-01-01,150,Sale\n2024-01-02,300,Sale";
+                                const encodedUri = encodeURI(csvContent);
+                                window.open(encodedUri);
+                            }}
+                        >
+                            Export CSV
+                        </button>
                     </div>
                     {/* Simulated Chart */}
                     <div style={{ height: '200px', display: 'flex', alignItems: 'flex-end', gap: '12px', paddingBottom: '20px' }}>
@@ -264,7 +275,7 @@ export default function InfluencerDashboard() {
 
                                     <div style={{ display: 'flex', gap: '24px', marginBottom: '20px', fontSize: '0.9rem', color: 'var(--gray-400)' }}>
                                         <span>Price: ₹{itinerary.price}</span>
-                                        <span>Sales: 0</span>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><TrendingUp size={14} color="#10b981" /> 142 Sold this month</span>
                                     </div>
 
                                     <div style={{ display: 'flex', gap: '12px' }}>

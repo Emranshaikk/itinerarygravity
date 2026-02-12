@@ -41,15 +41,7 @@ export default function Footer() {
                             <Link href="/terms" style={{ color: 'var(--gray-400)', fontSize: '0.9rem' }}>Terms of Service</Link>
                         </div>
                     </div>
-                    <div>
-                        <h4 style={{ marginBottom: '20px', fontSize: '1.1rem' }}>Admin</h4>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <Link href="/login" style={{ color: 'var(--gray-400)', fontSize: '0.9rem' }}>Admin Login</Link>
-                            <p style={{ color: 'var(--gray-400)', fontSize: '0.8rem', fontStyle: 'italic' }}>
-                                Use admin@test.com to access the panel.
-                            </p>
-                        </div>
-                    </div>
+
                 </div>
                 <div style={{
                     paddingTop: '32px',

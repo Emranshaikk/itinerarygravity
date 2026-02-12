@@ -1,42 +1,99 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { ArrowLeft, Save, Shield, Star, Info, ShieldCheck, Camera } from "@/components/Icons";
 
 export default function InfluencerSettingsPage() {
     const router = useRouter();
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [status, setStatus] = useState<'idle' | 'saving'>('idle');
+    const [user, setUser] = useState<any>(null);
+    const [status, setStatus] = useState<'idle' | 'saving' | 'loading'>('loading');
     const [profileImg, setProfileImg] = useState<string | null>(null);
+    const supabase = createClient();
 
     const [profile, setProfile] = useState({
-        name: "Sarah Travels",
-        handle: "sarah_travels",
-        bio: "Full-time traveler and photographer. I've been to 45 countries and counting.",
-        email: "influencer@test.com",
-        instagram: "sarah_travels",
-        tiktok: "sarah_daily"
+        name: "",
+        handle: "",
+        bio: "",
+        email: "",
+        instagram: "",
+        tiktok: ""
     });
 
     const [payment, setPayment] = useState({
-        stripeConnected: true,
-        paypalEmail: "sarah.pay@example.com",
+        stripeConnected: false,
+        paypalEmail: "",
         payoutFrequency: "Weekly",
         currency: "USD"
     });
 
-    const handleSave = () => {
-        setStatus('saving');
-        setTimeout(() => {
+    useEffect(() => {
+        const fetchProfile = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                setUser(user);
+                const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+                if (data) {
+                    setProfile({
+                        name: data.full_name || "",
+                        handle: data.username || "",
+                        bio: data.bio || "",
+                        email: user.email || "",
+                        instagram: data.social_links?.instagram || "",
+                        tiktok: data.social_links?.tiktok || ""
+                    });
+                    setProfileImg(data.avatar_url);
+                    if (data.payment_info) {
+                        setPayment(prev => ({ ...prev, ...data.payment_info }));
+                    }
+                }
+            }
             setStatus('idle');
-            alert("Settings saved successfully!");
-        }, 1500);
+        };
+        fetchProfile();
+    }, []);
+
+    const handleSave = async () => {
+        if (!user) return;
+        setStatus('saving');
+
+        try {
+            const updates = {
+                id: user.id,
+                full_name: profile.name,
+                username: profile.handle,
+                bio: profile.bio,
+                avatar_url: profileImg,
+                social_links: {
+                    instagram: profile.instagram,
+                    tiktok: profile.tiktok
+                },
+                payment_info: payment,
+                updated_at: new Date().toISOString(),
+            };
+
+            const { error } = await supabase.from('profiles').upsert(updates);
+
+            if (error) {
+                console.error("Error saving settings:", error);
+                alert("Error saving settings: " + error.message);
+            } else {
+                alert("Settings saved successfully!");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("An unexpected error occurred.");
+        } finally {
+            setStatus('idle');
+        }
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            // In a real app, upload to Supabase Storage here
             const reader = new FileReader();
             reader.onloadend = () => {
                 setProfileImg(reader.result as string);

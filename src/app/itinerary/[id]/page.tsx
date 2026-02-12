@@ -137,7 +137,8 @@ export default function ItineraryDetailsPage() {
         pickup: "Airport Terminal 1 Arrival Hall",
         drop: "Kyoto Station Main Entrance",
         insurance: "Strongly Recommended",
-        advanceBookingText: "None required"
+        advanceBookingText: "None required",
+        tags: isKyoto ? ["Culture", "History", "Nature"] : ["Adventure", "Nature", "Relaxation"]
     };
 
     // If we have live data, override the defaults
@@ -149,6 +150,7 @@ export default function ItineraryDetailsPage() {
             price: Number(liveData.price),
             currency: liveData.currency,
             description: liveData.description,
+            tags: liveData.content?.cover?.tags || [],
             creator: liveData.profiles?.full_name || "@Influencer",
             average_rating: Number(liveData.average_rating) || 0,
             review_count: liveData.review_count || 0,
@@ -207,6 +209,33 @@ export default function ItineraryDetailsPage() {
         content: liveData?.content || itinerary.content
     };
 
+    const renderActivity = (activityData: any, timeOfDay: string) => {
+        if (!activityData) return null;
+        const isRich = typeof activityData === 'object';
+        const text = isRich ? activityData.activity : activityData;
+        const location = isRich ? activityData.location : null;
+
+        return (
+            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '24px' }}>
+                <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{timeOfDay}</span>
+                <div>
+                    <p style={{ color: 'var(--gray-400)' }}>{text}</p>
+                    {location && (
+                        <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gradient"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', marginTop: '8px', fontWeight: 600 }}
+                        >
+                            <MapPin size={14} /> Open in Maps
+                        </a>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div style={{ paddingBottom: '100px' }}>
             {/* Header Section */}
@@ -221,6 +250,9 @@ export default function ItineraryDetailsPage() {
                             <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
                                 <span className="badge" style={{ background: 'rgba(255,133,162,0.2)', color: 'var(--primary)', border: '1px solid var(--primary)' }}>{itinerary.tripTheme}</span>
                                 <span className="badge" style={{ background: 'var(--surface)', color: 'var(--foreground)', border: '1px solid var(--border)' }}>{itinerary.duration}</span>
+                                {itinerary.tags && itinerary.tags.map((tag: string, i: number) => (
+                                    <span key={i} className="badge" style={{ background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6', border: '1px solid rgba(139, 92, 246, 0.3)' }}>#{tag}</span>
+                                ))}
                             </div>
                             <h1 className="text-gradient" style={{ fontSize: '3.5rem', fontWeight: 800, marginBottom: '20px', lineHeight: 1.1 }}>{itinerary.title}</h1>
                             <div style={{ display: 'flex', gap: '32px', color: 'var(--gray-400)', fontSize: '1.1rem' }}>
@@ -292,9 +324,20 @@ export default function ItineraryDetailsPage() {
 
                         {/* Daily Itinerary Tabs */}
                         <section style={{ marginBottom: '60px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-                                <h2 style={{ fontSize: '1.8rem' }}>Daily Schedule</h2>
-                                <div className="no-print" style={{ display: 'flex', gap: '8px' }}>
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                marginBottom: '32px',
+                                position: 'sticky',
+                                top: '0',
+                                zIndex: 50,
+                                background: 'var(--background)',
+                                padding: '16px 0',
+                                borderBottom: '1px solid var(--border)'
+                            }}>
+                                <h2 style={{ fontSize: '1.8rem', margin: 0 }}>Daily Schedule</h2>
+                                <div className="no-print" style={{ display: 'flex', gap: '8px', overflowX: 'auto', maxWidth: '100%', paddingBottom: '4px' }}>
                                     {itinerary.days.map(day => (
                                         <button
                                             key={day.number}
@@ -303,12 +346,16 @@ export default function ItineraryDetailsPage() {
                                                 width: '40px',
                                                 height: '40px',
                                                 borderRadius: '50%',
+                                                flexShrink: 0,
                                                 border: '1px solid var(--border)',
-                                                background: activeDay === day.number ? 'var(--primary)' : 'transparent',
-                                                color: activeDay === day.number ? 'black' : 'var(--gray-400)',
+                                                background: activeDay === day.number ? 'var(--primary)' : 'var(--surface)',
+                                                color: activeDay === day.number ? 'var(--background)' : 'var(--gray-400)',
                                                 fontWeight: 700,
                                                 cursor: 'pointer',
-                                                transition: 'all 0.2s'
+                                                transition: 'all 0.2s',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
                                             }}
                                         >
                                             {day.number}
@@ -325,46 +372,101 @@ export default function ItineraryDetailsPage() {
                                     </div>
                                 ) : (
                                     itinerary.days.filter(d => d.number === activeDay).map(day => (
-                                        <div key={day.number} className="glass card" style={{ padding: '40px' }}>
+                                        <div key={day.number} className="glass card" style={{ padding: '40px', position: 'relative', overflow: 'hidden' }}>
+                                            {/* Lock Overlay for Days > 1 or Unpurchased Day 1 parts */
+                                                (!isPurchased && (activeDay > 1)) && (
+                                                    <div style={{
+                                                        position: 'absolute',
+                                                        inset: 0,
+                                                        background: 'rgba(0,0,0,0.6)',
+                                                        backdropFilter: 'blur(8px)',
+                                                        zIndex: 10,
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        color: 'white',
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        <ShieldCheck size={48} style={{ marginBottom: '16px', color: '#fbbf24' }} />
+                                                        <h3 style={{ fontSize: '1.8rem', marginBottom: '8px' }}>Unlock Day {day.number}</h3>
+                                                        <p style={{ maxWidth: '400px', marginBottom: '24px', color: '#e5e7eb' }}>Purchase the full itinerary to access detailed plans, maps, and local secrets for this day.</p>
+                                                        <button className="btn btn-primary" onClick={handlePurchase}>Buy Full Access</button>
+                                                    </div>
+                                                )}
+
                                             {/* Day Header */}
                                             <div style={{ display: 'flex', gap: '20px', marginBottom: '32px', alignItems: 'flex-start' }}>
                                                 <div style={{ fontSize: '3rem', fontWeight: 800, opacity: 0.1 }}>0{day.number}</div>
                                                 <div>
                                                     <h3 style={{ fontSize: '1.5rem', marginBottom: '8px' }}>{day.title}</h3>
                                                     <div style={{ display: 'flex', gap: '16px', fontSize: '0.9rem', color: 'var(--gray-400)' }}>
-                                                        <span><Hotel size={14} /> {day.hotel}</span>
+                                                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                            <Hotel size={14} />
+                                                            {day.hotel}
+                                                        </span>
                                                         <span><Truck size={14} /> {day.transport}</span>
                                                     </div>
+
+                                                    {/* Affiliate Hook */}
+                                                    {day.hotel && (
+                                                        <div style={{ marginTop: '12px' }}>
+                                                            <a
+                                                                href="#"
+                                                                className="btn btn-outline"
+                                                                style={{ padding: '6px 12px', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '6px', borderRadius: '8px' }}
+                                                                onClick={(e) => { e.preventDefault(); alert("This would link to Booking.com or similar affiliate."); }}
+                                                            >
+                                                                Make a Reservation
+                                                            </a>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
 
                                             <div style={{ display: 'grid', gap: '32px' }}>
-                                                <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '24px' }}>
-                                                    <span style={{ fontWeight: 700, color: 'var(--primary)' }}>Morning</span>
-                                                    <p style={{ color: 'var(--gray-400)' }}>{day.morning}</p>
-                                                </div>
-                                                <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '24px' }}>
-                                                    <span style={{ fontWeight: 700, color: 'var(--primary)' }}>Afternoon</span>
-                                                    <p style={{ color: 'var(--gray-400)' }}>{day.afternoon}</p>
-                                                </div>
-                                                <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '24px' }}>
-                                                    <span style={{ fontWeight: 700, color: 'var(--primary)' }}>Evening</span>
-                                                    <p style={{ color: 'var(--gray-400)' }}>{day.evening}</p>
+                                                {renderActivity(day.morning, "Morning")}
+
+                                                {/* Partial Blur for Day 1 if not purchased */}
+                                                <div style={{ position: 'relative' }}>
+                                                    {(!isPurchased && activeDay === 1) && (
+                                                        <div style={{
+                                                            position: 'absolute',
+                                                            inset: '-20px -20px -20px -20px',
+                                                            background: 'linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.8) 40%, rgba(0,0,0,0.95))',
+                                                            zIndex: 10,
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'flex-end',
+                                                            paddingBottom: '40px'
+                                                        }}>
+                                                            <p style={{ color: 'white', fontWeight: 600, marginBottom: '16px' }}>Curious about the rest of the day?</p>
+                                                            <button className="btn btn-primary" onClick={handlePurchase}>Unlock Full Itinerary</button>
+                                                        </div>
+                                                    )}
+                                                    <div style={{ filter: (!isPurchased && activeDay === 1) ? 'blur(4px)' : 'none', opacity: (!isPurchased && activeDay === 1) ? 0.5 : 1, userSelect: (!isPurchased && activeDay === 1) ? 'none' : 'auto' }}>
+                                                        {renderActivity(day.afternoon, "Afternoon")}
+                                                        {renderActivity(day.evening, "Evening")}
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                            <div style={{ marginTop: '40px', paddingTop: '40px', borderTop: '1px solid var(--border)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-                                                <div>
-                                                    <h4 style={{ marginBottom: '16px', fontSize: '1rem' }}><Coffee size={16} /> Meals & Activity</h4>
-                                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                                                        {day.meals.map(m => <span key={m} className="badge" style={{ padding: '4px 12px', borderRadius: '99px', fontSize: '0.75rem', fontWeight: 600, background: 'rgba(255,133,162,0.1)', color: 'var(--primary)' }}>{m} Included</span>)}
+                                            {/* Footer Info (Locked if not purchased) */}
+                                            {(isPurchased || activeDay === 1) && (
+                                                <div style={{ marginTop: '40px', paddingTop: '40px', borderTop: '1px solid var(--border)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', filter: (!isPurchased && activeDay === 1) ? 'blur(4px)' : 'none' }}>
+                                                    <div>
+                                                        <h4 style={{ marginBottom: '16px', fontSize: '1rem' }}><Coffee size={16} /> Meals & Activity</h4>
+                                                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                                            {day.meals.map(m => <span key={m} className="badge" style={{ padding: '4px 12px', borderRadius: '99px', fontSize: '0.75rem', fontWeight: 600, background: 'rgba(255,133,162,0.1)', color: 'var(--primary)' }}>{m} Included</span>)}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <h4 style={{ marginBottom: '16px', fontSize: '1rem' }}><Shield size={16} /> Pro-Tips</h4>
+                                                        <p style={{ fontSize: '0.9rem', color: 'var(--gray-400)' }}>{day.notes}</p>
                                                     </div>
                                                 </div>
-                                                <div>
-                                                    <h4 style={{ marginBottom: '16px', fontSize: '1rem' }}><Shield size={16} /> Pro-Tips</h4>
-                                                    <p style={{ fontSize: '0.9rem', color: 'var(--gray-400)' }}>{day.notes}</p>
-                                                </div>
-                                            </div>
+                                            )}
                                         </div>
                                     ))
                                 )}

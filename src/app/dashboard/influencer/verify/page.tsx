@@ -140,18 +140,31 @@ export default function VerificationPage() {
                         A verified badge builds trust with your followers. To maintain the highest quality, we manually review every creator application.
                     </p>
 
-                    <div style={{ display: 'grid', gap: '20px', marginBottom: '40px' }}>
-                        {[
-                            "Publish and sell unlimited itineraries",
-                            "Get the blue verification checkmark",
-                            "Manual admin review for authenticity",
-                            "Access to advanced sales analytics"
-                        ].map((feature, i) => (
-                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                <ShieldCheck size={24} color="var(--primary)" />
-                                <span style={{ fontSize: '1.1rem' }}>{feature}</span>
-                            </div>
-                        ))}
+                    <div className="glass card" style={{ padding: '0', overflow: 'hidden', marginBottom: '40px', border: '1px solid var(--border)' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid var(--border)', background: 'rgba(255,255,255,0.02)' }}>
+                                    <th style={{ textAlign: 'left', padding: '20px', color: 'var(--gray-400)', fontWeight: 500 }}>Feature</th>
+                                    <th style={{ textAlign: 'center', padding: '20px', color: 'var(--gray-400)', fontWeight: 500 }}>Free Creator</th>
+                                    <th style={{ textAlign: 'center', padding: '20px', color: 'var(--primary)', fontWeight: 700 }}>Verified Creator</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {[
+                                    { name: "Itinerary Publishing", free: "Limited (1)", verified: "Unlimited" },
+                                    { name: "Blue Verification Badge", free: <span style={{ opacity: 0.3 }}>✕</span>, verified: <CheckCircle2 size={18} color="var(--primary)" /> },
+                                    { name: "Sales Analytics", free: "Basic", verified: "Advanced" },
+                                    { name: "Trust Factor & Reach", free: "Standard", verified: "High Priority" },
+                                    { name: "Platform Fee", free: "30%", verified: "30%" }
+                                ].map((row, i) => (
+                                    <tr key={i} style={{ borderBottom: i < 4 ? '1px solid var(--border)' : 'none' }}>
+                                        <td style={{ padding: '20px', fontWeight: 500 }}>{row.name}</td>
+                                        <td style={{ padding: '20px', textAlign: 'center', color: 'var(--gray-400)' }}>{row.free}</td>
+                                        <td style={{ padding: '20px', textAlign: 'center', fontWeight: 600, color: 'var(--foreground)' }}>{row.verified}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
 
                     <div className="glass card" style={{ padding: '32px' }}>
