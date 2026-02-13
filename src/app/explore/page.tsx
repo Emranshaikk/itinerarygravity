@@ -173,10 +173,10 @@ function ExploreContent() {
         <div className="container" style={{ padding: '60px 0' }}>
             <header style={{ marginBottom: '48px' }}>
                 <h1 className="text-gradient" style={{ fontSize: '3rem', marginBottom: '16px' }}>
-                    Explore Itineraries
+                    Your Next Masterpiece Adventure Starts Here.
                 </h1>
                 <p style={{ color: 'var(--gray-400)', fontSize: '1.2rem', maxWidth: '600px' }}>
-                    Discover curated travel guides from verified creators around the world.
+                    Browse premium guides from creators who live and breathe travel.
                 </p>
             </header>
 

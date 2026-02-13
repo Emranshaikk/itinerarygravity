@@ -134,10 +134,11 @@ export default function VerificationPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '80px', alignItems: 'flex-start' }}>
                 <div>
                     <h1 style={{ fontSize: '3.5rem', fontWeight: 800, marginBottom: '24px' }}>
-                        Get the <span className="text-gradient">Verified Badge</span>
+                        Join the Elite 1%. <br />
+                        <span className="text-gradient">Get Verified.</span>
                     </h1>
                     <p style={{ fontSize: '1.2rem', color: 'var(--gray-400)', marginBottom: '40px', lineHeight: '1.8' }}>
-                        A verified badge builds trust with your followers. To maintain the highest quality, we manually review every creator application.
+                        Followers buy from creators they trust. A verified badge increases your conversion by up to 40% and shows the world you're the real deal.
                     </p>
 
                     <div className="glass card" style={{ padding: '0', overflow: 'hidden', marginBottom: '40px', border: '1px solid var(--border)' }}>

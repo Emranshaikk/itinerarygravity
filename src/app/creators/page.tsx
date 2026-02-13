@@ -29,8 +29,8 @@ export default function CreatorsPage() {
                         marginBottom: '24px',
                         lineHeight: 1.1
                     }}>
-                        Turn Your Travels into <br />
-                        <span className="text-gradient">Passive Income</span>
+                        Your Travel Intelligence is <br />
+                        <span className="text-gradient">Your Greatest Asset</span>
                     </h1>
                     <p style={{
                         fontSize: 'clamp(1rem, 3vw, 1.25rem)',
@@ -40,7 +40,7 @@ export default function CreatorsPage() {
                         lineHeight: '1.8',
                         padding: '0 20px'
                     }}>
-                        Your followers want to know how you travel. Stop sending free recommendations and start selling verified, high-quality itineraries.
+                        Stop answering the same 'Which hotel?' DMs for free. Build your legacy, monetize your expertise, and help your community travel deeper—all while earning 70% of every sale.
                     </p>
                     <div style={{
                         display: 'flex',
@@ -76,13 +76,13 @@ export default function CreatorsPage() {
                         {[
                             {
                                 icon: <Plus color="var(--primary)" />,
-                                title: "Easy Creation",
-                                desc: "Our intuitive builder lets you create detailed PDF-ready itineraries in minutes."
+                                title: "Monetize Your Influence",
+                                desc: "Turn your hard-earned travel knowledge into a professional product in minutes."
                             },
                             {
                                 icon: <ShieldCheck color="var(--primary)" />,
-                                title: "Verification Badge",
-                                desc: "Get verified to build trust. Followers know your itineraries are the real deal."
+                                title: "Build Radical Trust",
+                                desc: "The 'Verified' badge isn't just a checkmark—it's a signal to your fans that your advice is gold."
                             },
                             {
                                 icon: <Star color="var(--primary)" />,

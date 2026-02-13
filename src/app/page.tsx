@@ -68,8 +68,8 @@ export default async function Home() {
             lineHeight: 1.1,
             display: 'block'
           }}>
-            Travel Like Your <br />
-            Favorite Creator
+            Stop Guessing. <br />
+            Start Experiencing.
           </h1>
           <p style={{
             fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
@@ -80,8 +80,8 @@ export default async function Home() {
             marginRight: 'auto',
             lineHeight: '1.8'
           }}>
-            Access detailed, verified itineraries from top travel influencers.
-            Experience the world through their eyes, with curated tips for hotels, food, and hidden gems.
+            Access field-tested itineraries from the world’s most trusted travel creators.
+            No tourist traps. Just authentic, verified adventures.
           </p>
 
           <HeroSearch />
@@ -107,9 +107,9 @@ export default async function Home() {
         <div className="container">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
             {[
-              { title: "Verified Itineraries", desc: "Every itinerary is verified with proof of visit. No more fake reviews." },
-              { title: "Hidden Gems", desc: "Discover spots that aren't on the usual tourist map, curated by locals and experts." },
-              { title: "Instant Access", desc: "Download PDF guides instantly or view them interactively on our app." }
+              { title: "Field-Tested Truth", desc: "Every guide is backed by \"Proof of Visit\" photos. If they haven't been there, they can't sell it here." },
+              { title: "The Local Edge", desc: "Skip the \"Top 10\" lists. Get the coffee shop only locals know and the sunset spot that isn't on Instagram yet." },
+              { title: "Travel with Confidence", desc: "Downloadable offline guides and interactive maps that work even when your signal doesn't." }
             ].map((feature, i) => (
               <div key={i} className="glass" style={{ padding: '32px', borderRadius: '16px' }}>
                 <h3 style={{ fontSize: '1.5rem', marginBottom: '16px', color: 'var(--foreground)' }}>{feature.title}</h3>
