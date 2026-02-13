@@ -11,6 +11,7 @@ export default function InfluencerDashboard() {
     const [user, setUser] = useState<any>(null);
     const [profile, setProfile] = useState<any>(null);
     const [itineraries, setItineraries] = useState<any[]>([]);
+    const [totalEarnings, setTotalEarnings] = useState(0);
     const [loading, setLoading] = useState(true);
     const supabase = createClient();
 
@@ -43,11 +44,18 @@ export default function InfluencerDashboard() {
             // 2. Fetch Itineraries
             const { data: itineraryData } = await supabase
                 .from('itineraries')
-                .select('*')
+                .select('*, purchases(creator_earnings)')
                 .eq('creator_id', userId)
                 .order('created_at', { ascending: false });
 
-            if (itineraryData) setItineraries(itineraryData);
+            if (itineraryData) {
+                setItineraries(itineraryData);
+                const total = itineraryData.reduce((acc, it) => {
+                    const itTotal = it.purchases?.reduce((pAcc: number, p: any) => pAcc + (Number(p.creator_earnings) || 0), 0) || 0;
+                    return acc + itTotal;
+                }, 0);
+                setTotalEarnings(total);
+            }
 
         } catch (error) {
             console.error("Error fetching dashboard data:", error);
@@ -234,7 +242,7 @@ export default function InfluencerDashboard() {
                             </div>
                             <span style={{ color: 'var(--gray-400)', fontSize: '0.9rem' }}>Estimated Balance</span>
                         </div>
-                        <p style={{ fontSize: '1.8rem', fontWeight: 700 }}>₹0.00</p>
+                        <p style={{ fontSize: '1.8rem', fontWeight: 700 }}>₹{totalEarnings.toFixed(2)}</p>
                         <p style={{ fontSize: '0.75rem', color: '#10b981', marginTop: '4px' }}>↑ 0% from last month</p>
                     </div>
 

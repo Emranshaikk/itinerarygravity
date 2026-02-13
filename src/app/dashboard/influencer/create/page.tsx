@@ -22,6 +22,7 @@ import EmergencySection from "@/components/itinerary-builder/EmergencySection";
 import DepartureSection from "@/components/itinerary-builder/DepartureSection";
 import PostTripSection from "@/components/itinerary-builder/PostTripSection";
 import ProofSection from "@/components/itinerary-builder/ProofSection";
+import AffiliateSection from "@/components/itinerary-builder/AffiliateSection";
 
 // To make percentage more alive, we check more fields
 const checkSectionCompletion = (step: number, content: ItineraryContent) => {
@@ -42,6 +43,7 @@ const checkSectionCompletion = (step: number, content: ItineraryContent) => {
         case 14: return !!content.postTrip.jetLagRecovery || (content.postTrip.nextDestinationIdeas?.length ?? 0) > 0;
         case 15: return !!content.bonus.googleMapsLink || content.bonus.externalLinks.length > 0;
         case 16: return content.proofOfVisit.images.length > 0;
+        case 17: return (content.affiliateProducts?.length ?? 0) > 0;
         default: return false;
     }
 };
@@ -59,7 +61,7 @@ export default function CreateItineraryPage() {
 
     const getCompletedSteps = () => {
         const steps: number[] = [];
-        for (let i = 1; i <= 16; i++) {
+        for (let i = 1; i <= 17; i++) {
             if (checkSectionCompletion(i, content)) steps.push(i);
         }
         return steps;
@@ -132,6 +134,8 @@ export default function CreateItineraryPage() {
                 return <BonusSection data={content.bonus} onChange={(d) => setContent({ ...content, bonus: d })} />;
             case 16:
                 return <ProofSection data={content.proofOfVisit} onChange={(d) => setContent({ ...content, proofOfVisit: d })} />;
+            case 17:
+                return <AffiliateSection data={content.affiliateProducts || []} onChange={(d: any[]) => setContent({ ...content, affiliateProducts: d })} />;
             default:
                 return <ItineraryCover data={content.cover} onChange={(d) => setContent({ ...content, cover: d })} />;
         }
@@ -197,14 +201,14 @@ export default function CreateItineraryPage() {
                         className="btn btn-primary"
                         style={{ minWidth: '140px', padding: '1rem 2rem', borderRadius: '1.5rem', fontWeight: 'bold', cursor: 'pointer' }}
                         onClick={() => {
-                            if (activeStep < 16) {
+                            if (activeStep < 17) {
                                 setActiveStep(prev => prev + 1);
                             }
                             else handleSave();
                         }}
                     >
-                        {activeStep === 16 ? "Finish" : "Next"}
-                        {activeStep !== 16 && <ChevronRight size={20} style={{ marginLeft: '0.5rem' }} />}
+                        {activeStep === 17 ? "Finish" : "Next"}
+                        {activeStep !== 17 && <ChevronRight size={20} style={{ marginLeft: '0.5rem' }} />}
                     </button>
                 </div>
             </div>

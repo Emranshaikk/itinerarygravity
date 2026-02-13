@@ -44,10 +44,29 @@ export default function CheckoutPage() {
                     name: "ItineraryGravity",
                     description: `Purchase ${item.title}`,
                     order_id: data.id,
-                    handler: function (response: any) {
-                        // In a real app, you would verify the payment on the backend here
-                        // For now we'll just redirect to success
-                        router.push(`/dashboard/buyer?success=true&payment_id=${response.razorpay_payment_id}`);
+                    handler: async function (rzpResponse: any) {
+                        try {
+                            const verifyResponse = await fetch('/api/checkout/verify', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    razorpay_order_id: rzpResponse.razorpay_order_id,
+                                    razorpay_payment_id: rzpResponse.razorpay_payment_id,
+                                    razorpay_signature: rzpResponse.razorpay_signature,
+                                    itineraryId: id,
+                                    amount: data.amount
+                                })
+                            });
+
+                            if (verifyResponse.ok) {
+                                router.push(`/dashboard/buyer?success=true&payment_id=${rzpResponse.razorpay_payment_id}`);
+                            } else {
+                                alert("Failed to verify payment. Please contact support.");
+                            }
+                        } catch (error) {
+                            console.error("Verification error:", error);
+                            alert("Payment verification failed.");
+                        }
                     },
                     prefill: {
                         name: "",

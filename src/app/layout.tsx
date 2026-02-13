@@ -9,6 +9,8 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "ItineraryGravity | Influencer Itinerary Marketplace",
   description: "Buy and sell travel itineraries from your favorite creators.",
+  manifest: "/manifest.json",
+  themeColor: "#ff85a2",
 };
 
 export default function RootLayout({

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { MapPin, Star, Search, Filter, X } from "@/components/Icons";
+import VerifiedBadge from "@/components/VerifiedBadge";
 
 interface Itinerary {
     id: string;
@@ -16,6 +17,7 @@ interface Itinerary {
     review_count: number;
     image: string;
     tags: string[];
+    is_verified?: boolean;
     duration_days?: number;
     difficulty_level?: string;
 }
@@ -47,10 +49,12 @@ export default function ExplorePage() {
                     *,
                     profiles:creator_id (
                         full_name,
-                        email
+                        email,
+                        is_verified
                     )
                 `)
                 .eq('is_published', true)
+                .eq('is_approved', true)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -66,6 +70,7 @@ export default function ExplorePage() {
                 review_count: item.review_count || 0,
                 image: item.image_url || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800&auto=format&fit=crop",
                 tags: item.tags || [],
+                is_verified: item.profiles?.is_verified || false,
                 duration_days: item.duration_days,
                 difficulty_level: item.difficulty_level
             }));
@@ -387,6 +392,10 @@ export default function ExplorePage() {
                                 <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <MapPin size={14} />
                                     {item.location}
+                                </p>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--gray-400)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    by {item.creator}
+                                    {item.is_verified && <VerifiedBadge size={14} />}
                                 </p>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

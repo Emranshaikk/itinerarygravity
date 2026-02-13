@@ -192,6 +192,14 @@ export interface ItineraryContent {
         images: { url: string; caption: string }[];
         notes?: string;
     };
+    affiliateProducts?: {
+        id?: string;
+        title: string;
+        productUrl: string;
+        imageUrl?: string;
+        priceDisplay?: string;
+        category?: string;
+    }[];
 }
 
 export const initialItineraryContent: ItineraryContent = {
@@ -248,5 +256,6 @@ export const initialItineraryContent: ItineraryContent = {
     proofOfVisit: {
         images: [],
         notes: ""
-    }
+    },
+    affiliateProducts: []
 };
