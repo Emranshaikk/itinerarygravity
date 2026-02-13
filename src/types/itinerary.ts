@@ -16,6 +16,8 @@ export interface ItineraryContent {
         // Listing Details (Used for platform)
         price?: number;
         currency?: string;
+        seoTitle?: string;
+        seoDescription?: string;
     };
 
     // 2. Before You Travel

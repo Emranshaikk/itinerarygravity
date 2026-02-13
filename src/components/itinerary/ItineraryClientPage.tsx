@@ -12,6 +12,8 @@ import VerifiedBadge from "@/components/VerifiedBadge";
 import TravelerGallery from "@/components/itinerary/TravelerGallery";
 import BudgetTracker from "@/components/itinerary/BudgetTracker";
 import AffiliateShowcase from "@/components/itinerary/AffiliateShowcase";
+import Breadcrumbs from "@/components/itinerary/Breadcrumbs";
+import RelatedItineraries from "@/components/itinerary/RelatedItineraries";
 
 interface Props {
     id: string;
@@ -292,6 +294,12 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
             {/* Header Section */}
             <div style={{ background: 'var(--background)', borderBottom: '1px solid var(--border)', padding: '60px 0' }}>
                 <div className="container">
+                    <Breadcrumbs
+                        items={[
+                            { label: 'Explore', href: '/explore' },
+                            { label: itinerary.title }
+                        ]}
+                    />
                     <button className="no-print" onClick={() => router.back()} style={{ background: 'none', border: 'none', color: 'var(--gray-400)', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '32px' }}>
                         <ArrowLeft size={16} /> Back to Explore
                     </button>
@@ -329,6 +337,19 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                 ) : (
                                     <div style={{ padding: '12px', border: '1px solid #10b981', background: 'rgba(16,185,129,0.1)', color: '#10b981', borderRadius: '8px', marginBottom: '16px', textAlign: 'center', fontWeight: 600 }}>
                                         ✅ You own this itinerary
+                                    </div>
+                                )}
+
+                                {isPurchased && !userReview && (
+                                    <div style={{ marginTop: '16px', padding: '16px', background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.3)', borderRadius: '12px' }}>
+                                        <p style={{ fontSize: '0.85rem', color: 'var(--foreground)', marginBottom: '8px', fontWeight: 600 }}>Love the trip?</p>
+                                        <p style={{ fontSize: '0.8rem', color: 'var(--gray-400)', marginBottom: '12px' }}>Help others by leaving a quick review! It helps the creator immensely.</p>
+                                        <button
+                                            onClick={() => document.getElementById('review-form')?.scrollIntoView({ behavior: 'smooth' })}
+                                            style={{ width: '100%', padding: '8px', fontSize: '0.8rem', borderRadius: '8px', border: 'none', background: '#fbbf24', color: '#000', fontWeight: 700, cursor: 'pointer' }}
+                                        >
+                                            Write a Review
+                                        </button>
                                     </div>
                                 )}
 
@@ -579,7 +600,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                         )}
 
                         <section style={{ marginBottom: '60px' }}>
-                            <div style={{ display: 'grid', gap: '40px' }}>
+                            <div id="review-form" style={{ display: 'grid', gap: '40px' }}>
                                 <ReviewSection
                                     itineraryId={id}
                                     averageRating={itinerary.average_rating}
@@ -596,7 +617,13 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                             </div>
                         </section>
 
-                        <section style={{ marginBottom: '60px' }}>
+                        <RelatedItineraries
+                            itineraryId={id}
+                            location={itinerary.location}
+                            creatorId={liveData?.creator_id || ""}
+                        />
+
+                        <section style={{ marginBottom: '60px', marginTop: '80px' }}>
                             <h2 style={{ fontSize: '1.8rem', marginBottom: '32px' }}>Fine Print</h2>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
                                 <div className="glass card" style={{ padding: '32px' }}>

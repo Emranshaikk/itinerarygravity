@@ -21,6 +21,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="preconnect" href="https://**.supabase.co" />
+        <link rel="dns-prefetch" href="https://**.supabase.co" />
         <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
       </head>
       <body suppressHydrationWarning>

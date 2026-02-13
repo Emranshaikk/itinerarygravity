@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { MapPin, Star, Search, Filter, X } from "@/components/Icons";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import ItineraryCard from "@/components/ItineraryCard";
 
 interface Itinerary {
     id: string;
@@ -327,94 +328,13 @@ export default function ExplorePage() {
                     gap: '32px'
                 }}>
                     {filteredItineraries.map((item) => (
-                        <Link
-                            href={`/itinerary/${item.id}`}
+                        <ItineraryCard
                             key={item.id}
-                            className="glass card card-hover"
-                            style={{ padding: '0', overflow: 'hidden', display: 'block' }}
-                        >
-                            <div style={{
-                                position: 'relative',
-                                height: '240px',
-                                backgroundImage: `url(${item.image})`,
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center'
-                            }}>
-                                <div style={{
-                                    position: 'absolute',
-                                    top: '16px',
-                                    right: '16px',
-                                    background: 'rgba(15, 23, 42, 0.8)',
-                                    backdropFilter: 'blur(4px)',
-                                    padding: '6px 14px',
-                                    borderRadius: '99px',
-                                    fontSize: '0.9rem',
-                                    fontWeight: 700,
-                                    color: 'white'
-                                }}>
-                                    ₹{item.price.toFixed(2)}
-                                </div>
-                                {item.duration_days && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        bottom: '16px',
-                                        left: '16px',
-                                        background: 'rgba(15, 23, 42, 0.8)',
-                                        backdropFilter: 'blur(4px)',
-                                        padding: '4px 12px',
-                                        borderRadius: '99px',
-                                        fontSize: '0.75rem',
-                                        color: 'white'
-                                    }}>
-                                        {item.duration_days} Days
-                                    </div>
-                                )}
-                            </div>
-                            <div style={{ padding: '24px' }}>
-                                <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
-                                    {item.tags?.slice(0, 3).map((tag: string) => (
-                                        <span
-                                            key={tag}
-                                            className="badge"
-                                            style={{
-                                                background: 'var(--surface)',
-                                                border: '1px solid var(--border)',
-                                                fontSize: '0.65rem'
-                                            }}
-                                        >
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                                <h3 style={{ fontSize: '1.4rem', marginBottom: '8px', color: 'var(--foreground)' }}>
-                                    {item.title}
-                                </h3>
-                                <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <MapPin size={14} />
-                                    {item.location}
-                                </p>
-                                <p style={{ fontSize: '0.85rem', color: 'var(--gray-400)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    by {item.creator}
-                                    {item.is_verified && <VerifiedBadge size={14} />}
-                                </p>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <Star size={16} style={{ color: '#fbbf24', fill: '#fbbf24' }} />
-                                        <span style={{ fontWeight: 600 }}>
-                                            {item.average_rating > 0 ? item.average_rating.toFixed(1) : 'New'}
-                                        </span>
-                                        {item.review_count > 0 && (
-                                            <span style={{ color: 'var(--gray-400)', fontSize: '0.85rem' }}>
-                                                ({item.review_count})
-                                            </span>
-                                        )}
-                                    </div>
-                                    <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem' }}>
-                                        View Details →
-                                    </span>
-                                </div>
-                            </div>
-                        </Link>
+                            itinerary={{
+                                ...item,
+                                image: item.image, // mapping image to image for the component if name differs
+                            }}
+                        />
                     ))}
                 </div>
             )}

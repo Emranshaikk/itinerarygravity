@@ -77,6 +77,8 @@ export default function CreateItineraryPage() {
                 currency: content.cover.currency || "USD",
                 description: `A ${content.cover.tripType} trip to ${content.cover.destination} for ${content.cover.duration}.`,
                 duration: content.cover.duration,
+                seo_title: content.cover.seoTitle,
+                seo_description: content.cover.seoDescription,
                 content: content,
             };
 

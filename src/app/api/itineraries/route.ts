@@ -36,16 +36,25 @@ export async function POST(req: Request) {
             console.error("[PROFILE_UPSERT_ERROR]", profileError);
         }
 
+        // Generate slug from title
+        const slug = title
+            .toLowerCase()
+            .replace(/[^\w ]+/g, '')
+            .replace(/ +/g, '-') + '-' + Math.random().toString(36).substring(2, 6);
+
         // 2. Insert Itinerary
         const { data, error } = await supabase
             .from('itineraries')
             .insert({
                 creator_id: userId,
                 title,
+                slug,
                 location: finalLocation,
                 price,
                 currency: currency || "USD",
                 description: body.description || `A trip to ${finalLocation}`,
+                seo_title: body.seo_title || body.content?.cover?.seoTitle,
+                seo_description: body.seo_description || body.content?.cover?.seoDescription,
                 content: body.content,
                 is_published: true
             })

@@ -235,6 +235,43 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                         </div>
                     </div>
                 </div>
+
+                {/* Advanced SEO */}
+                <div style={{ padding: '1.5rem', border: '1px solid var(--border)', borderRadius: '1rem', backgroundColor: 'var(--surface)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
+                        <Tag className="text-purple-400" size={24} />
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: 'var(--foreground)' }}>Advanced SEO Controls (Optional)</h3>
+                    </div>
+                    <p style={{ color: 'var(--gray-400)', fontSize: '0.85rem', marginBottom: '20px' }}>
+                        Customize how your itinerary appears in Google Search. If left blank, we'll generate optimized tags for you automatically.
+                    </p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', fontWeight: 'bold' }}>Custom SEO Title</label>
+                            <input
+                                name="seoTitle"
+                                value={data.seoTitle || ""}
+                                onChange={handleChange}
+                                className="form-input"
+                                style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
+                                placeholder="e.g. 7 Days in Kyoto: The Ultimate Photography Guide"
+                            />
+                            <p style={{ fontSize: '0.7rem', color: 'var(--gray-500)' }}>Recommended: Under 60 characters.</p>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', fontWeight: 'bold' }}>Custom SEO Description</label>
+                            <textarea
+                                name="seoDescription"
+                                value={data.seoDescription || ""}
+                                onChange={handleChange}
+                                className="form-input"
+                                style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)', minHeight: '100px', paddingTop: '12px' }}
+                                placeholder="e.g. Discover hidden temples, best ramen spots, and secret photography locations in this comprehensive 7-day Kyoto itinerary."
+                            />
+                            <p style={{ fontSize: '0.7rem', color: 'var(--gray-500)' }}>Recommended: Under 160 characters.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
