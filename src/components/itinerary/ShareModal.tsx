@@ -90,7 +90,7 @@ export default function ShareModal({ itinerary, isOpen, onClose }: ShareModalPro
                                 color: 'white',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyCenter: 'center',
+                                justifyContent: 'center',
                                 padding: '16px'
                             }}>
                                 {target.icon}
