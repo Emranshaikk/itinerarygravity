@@ -25,7 +25,31 @@ async function getItinerariesByDestination(destination: string) {
         .order('average_rating', { ascending: false });
 
     if (error) return [];
-    return data;
+
+    // Multi-level ranking logic:
+    // 1. Verified creators first
+    // 2. Higher average rating
+    // 3. Higher review count as tie-breaker
+    // 4. Newer itineraries as final tie-breaker
+    return (data || []).sort((a: any, b: any) => {
+        // 1. Verified status
+        const aVerified = a.profiles?.is_verified ? 1 : 0;
+        const bVerified = b.profiles?.is_verified ? 1 : 0;
+        if (aVerified !== bVerified) return bVerified - aVerified;
+
+        // 2. Average Rating
+        if (Number(b.average_rating) !== Number(a.average_rating)) {
+            return Number(b.average_rating) - Number(a.average_rating);
+        }
+
+        // 3. Review Count
+        if (Number(b.review_count) !== Number(a.review_count)) {
+            return Number(b.review_count) - Number(a.review_count);
+        }
+
+        // 4. Recency (ID or created_at as proxy)
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

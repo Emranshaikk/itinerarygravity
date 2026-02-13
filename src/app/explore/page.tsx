@@ -125,7 +125,16 @@ export default function ExplorePage() {
                 case "price-high":
                     return b.price - a.price;
                 case "rating":
-                    return b.average_rating - a.average_rating;
+                    // Multi-level sort for "Rating": 
+                    // Verified > Rating > Review Count > Newest
+                    const aVerified = a.is_verified ? 1 : 0;
+                    const bVerified = b.is_verified ? 1 : 0;
+                    if (aVerified !== bVerified) return bVerified - aVerified;
+
+                    if (b.average_rating !== a.average_rating) {
+                        return b.average_rating - a.average_rating;
+                    }
+                    return b.review_count - a.review_count;
                 default:
                     return 0;
             }
