@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Star } from "@/components/Icons";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import WishlistButton from "@/components/itinerary/WishlistButton";
 
 interface ItineraryCardProps {
     itinerary: {
@@ -43,6 +44,14 @@ export default function ItineraryCard({ itinerary }: ItineraryCardProps) {
                     style={{ objectFit: 'cover' }}
                     sizes="(max-width: 768px) 100vw, 350px"
                 />
+                <div style={{
+                    position: 'absolute',
+                    top: '16px',
+                    left: '16px',
+                    zIndex: 10
+                }}>
+                    <WishlistButton itineraryId={itinerary.id} />
+                </div>
                 <div style={{
                     position: 'absolute',
                     top: '16px',

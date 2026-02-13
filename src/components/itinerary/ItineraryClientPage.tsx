@@ -14,6 +14,9 @@ import BudgetTracker from "@/components/itinerary/BudgetTracker";
 import AffiliateShowcase from "@/components/itinerary/AffiliateShowcase";
 import Breadcrumbs from "@/components/itinerary/Breadcrumbs";
 import RelatedItineraries from "@/components/itinerary/RelatedItineraries";
+import ShareModal from "@/components/itinerary/ShareModal";
+import JourneyMap from "@/components/itinerary/JourneyMap";
+import { Share2, Compass, Navigation } from "@/components/Icons";
 
 interface Props {
     id: string;
@@ -31,6 +34,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
     const [user, setUser] = useState<any>(initialUser);
     const [isPurchased, setIsPurchased] = useState(initialIsPurchased || false);
     const [userReview, setUserReview] = useState<any>(null);
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const supabase = createClient();
 
     const isKyoto = id === "kyoto-traditional";
@@ -361,12 +365,23 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                     >
                                         <MapPin size={18} /> Open in Google Maps
                                     </button>
+                                    <button
+                                        onClick={() => setIsShareModalOpen(true)}
+                                        className="btn btn-outline"
+                                        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                    >
+                                        <Share2 size={18} /> Share Itinerary
+                                    </button>
                                     <PDFGenerator itineraryData={pdfData} isPurchased={isPurchased} />
                                 </div>
                             </div>
                             <div className="print-only">
                                 <p>Verified Itinerary Guide</p>
                                 <p>Price: {itinerary.price} {itinerary.currency}</p>
+                            </div>
+
+                            <div style={{ marginTop: '24px' }}>
+                                <JourneyMap days={itinerary.days} location={itinerary.location} />
                             </div>
                         </div>
                     </div>
@@ -688,6 +703,16 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
 
                 </div>
             </div>
+
+            <ShareModal
+                itinerary={{
+                    id,
+                    title: itinerary.title,
+                    location: itinerary.location
+                }}
+                isOpen={isShareModalOpen}
+                onClose={() => setIsShareModalOpen(false)}
+            />
         </div>
     );
 }

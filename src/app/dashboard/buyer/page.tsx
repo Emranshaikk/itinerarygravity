@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 export default function BuyerDashboard() {
     const router = useRouter();
     const [purchases, setPurchases] = useState<any[]>([]);
+    const [wishlist, setWishlist] = useState<any[]>([]);
     const [marketplaceItems, setMarketplaceItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const supabase = createClient();
@@ -56,7 +57,21 @@ export default function BuyerDashboard() {
                     setPurchases(formatted);
                 }
 
-                // 2. Fetch Marketplace (Discovery)
+                // 2. Fetch Wishlist
+                const { data: wishlistData } = await supabase
+                    .from('wishlists')
+                    .select(`
+                        id,
+                        itinerary_id,
+                        itineraries (*)
+                    `)
+                    .eq('user_id', user.id);
+
+                if (wishlistData) {
+                    setWishlist(wishlistData.map((w: any) => w.itineraries));
+                }
+
+                // 3. Fetch Marketplace
                 const { data: marketData } = await supabase
                     .from('itineraries')
                     .select(`
@@ -141,6 +156,36 @@ export default function BuyerDashboard() {
                                     </div>
                                 </div>
                             </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {wishlist.length > 0 && (
+                <div style={{ marginBottom: '60px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                        <h2 style={{ fontSize: '1.5rem' }}>Saved for Later</h2>
+                        <Link href="/explore" style={{ color: 'var(--primary)', textDecoration: 'none', fontSize: '0.9rem' }}>Find more adventures →</Link>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '32px' }}>
+                        {wishlist.map((item) => (
+                            <Link
+                                href={`/itinerary/${item.id}`}
+                                key={item.id}
+                                className="glass card card-hover"
+                                style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', textDecoration: 'none' }}
+                            >
+                                <div style={{
+                                    height: '160px',
+                                    backgroundImage: `url(${item.image_url || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800"})`,
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center'
+                                }} />
+                                <div style={{ padding: '20px' }}>
+                                    <h3 style={{ fontSize: '1.1rem', marginBottom: '4px', color: 'var(--foreground)' }}>{item.title}</h3>
+                                    <p style={{ fontSize: '0.85rem', color: 'var(--gray-400)' }}>{item.location}</p>
+                                </div>
+                            </Link>
                         ))}
                     </div>
                 </div>

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { MapPin, Star, Search, Filter, X } from "@/components/Icons";
 import VerifiedBadge from "@/components/VerifiedBadge";
@@ -16,7 +17,8 @@ interface Itinerary {
     price: number;
     average_rating: number;
     review_count: number;
-    image: string;
+    image?: string;
+    image_url?: string;
     tags: string[];
     is_verified?: boolean;
     duration_days?: number;
@@ -24,6 +26,14 @@ interface Itinerary {
 }
 
 export default function ExplorePage() {
+    return (
+        <Suspense fallback={<div className="container" style={{ padding: '60px 0' }}>Loading...</div>}>
+            <ExploreContent />
+        </Suspense>
+    );
+}
+
+function ExploreContent() {
     const [itineraries, setItineraries] = useState<Itinerary[]>([]);
     const [filteredItineraries, setFilteredItineraries] = useState<Itinerary[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -33,10 +43,18 @@ export default function ExplorePage() {
     const [sortBy, setSortBy] = useState<"newest" | "price-low" | "price-high" | "rating">("rating");
     const [showFilters, setShowFilters] = useState(false);
     const supabase = createClient();
+    const searchParams = useSearchParams();
 
     useEffect(() => {
+        const urlSearch = searchParams.get('search');
+        if (urlSearch) {
+            setSearchQuery(urlSearch);
+            document.title = `Explore ${urlSearch} | ItineraryGravity`;
+        } else {
+            document.title = `Explore Adventures | ItineraryGravity`;
+        }
         fetchItineraries();
-    }, []);
+    }, [searchParams]);
 
     useEffect(() => {
         filterAndSortItineraries();
@@ -341,7 +359,7 @@ export default function ExplorePage() {
                             key={item.id}
                             itinerary={{
                                 ...item,
-                                image: item.image, // mapping image to image for the component if name differs
+                                image: item.image_url || item.image || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800",
                             }}
                         />
                     ))}

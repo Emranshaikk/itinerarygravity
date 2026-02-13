@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import HeroSearch from "@/components/itinerary/HeroSearch";
+import ItineraryCard from "@/components/ItineraryCard";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -81,6 +83,9 @@ export default async function Home() {
             Access detailed, verified itineraries from top travel influencers.
             Experience the world through their eyes, with curated tips for hotels, food, and hidden gems.
           </p>
+
+          <HeroSearch />
+
           <div style={{
             display: 'flex',
             gap: '16px',
@@ -164,27 +169,130 @@ export default async function Home() {
             <Link href="/explore" style={{ color: 'var(--foreground)', fontWeight: 600, borderBottom: '1px solid var(--foreground)', textDecoration: 'none', paddingBottom: '2px' }}>View all →</Link>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
+          <TrendingItineraries />
+        </div>
+      </section>
+
+      {/* Featured Destinations */}
+      <section style={{ padding: '100px 0', background: 'var(--surface)' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+            <h2 className="text-gradient" style={{ fontSize: '3rem', marginBottom: '16px' }}>Top Destinations</h2>
+            <p style={{ color: 'var(--gray-400)' }}>Explore the world's most sought-after locations through expert guides.</p>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '24px'
+          }}>
             {[
-              { title: "Kyoto: Traditional Japan", creator: "@SarahTravels", price: "$15", image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=600" },
-              { title: "Amalfi Coast Summer", creator: "@WanderlustJohn", price: "$25", image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=600" },
-              { title: "Bali: Hidden Gems", creator: "@BaliExplorer", price: "$12", image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=600" }
-            ].map((item, i) => (
-              <div key={i} className="glass card" style={{ padding: '0', overflow: 'hidden' }}>
-                <div style={{ height: '200px', backgroundImage: `url(${item.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-                <div style={{ padding: '24px' }}>
-                  <h3 style={{ fontSize: '1.2rem', marginBottom: '8px' }}>{item.title}</h3>
-                  <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem', marginBottom: '16px' }}>by {item.creator}</p>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 700, fontSize: '1.2rem' }}>{item.price}</span>
-                    <Link href={`/itinerary/${i === 0 ? 'kyoto-traditional' : 'bali-hidden'}`} className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '0.8rem' }}>View Details</Link>
-                  </div>
+              { name: "Kyoto", img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800", count: 12 },
+              { name: "Bali", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=800", count: 24 },
+              { name: "Paris", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800", count: 18 },
+              { name: "Tokyo", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=800", count: 31 }
+            ].map(dest => (
+              <Link
+                key={dest.name}
+                href={`/explore?search=${dest.name}`}
+                className="glass card-hover"
+                style={{
+                  position: 'relative',
+                  height: '350px',
+                  borderRadius: '24px',
+                  overflow: 'hidden',
+                  textDecoration: 'none'
+                }}
+              >
+                <img
+                  src={dest.img}
+                  alt={dest.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-end',
+                  padding: '32px'
+                }}>
+                  <h3 style={{ fontSize: '1.8rem', color: 'white', marginBottom: '4px' }}>{dest.name}</h3>
+                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem' }}>{dest.count} Guides</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Creators Section */}
+      <section style={{ padding: '100px 0' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+            <h2 className="text-gradient" style={{ fontSize: '3rem', marginBottom: '16px' }}>Meet Our Top Creators</h2>
+            <p style={{ color: 'var(--gray-400)' }}>Learn from the best travelers who live life on the edge.</p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '32px' }}>
+            {[
+              { name: "Sarah Travels", bio: "Culture explorer based in Kyoto. Sharing hidden shrines and tea houses.", handle: "@SarahTravels", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400", sales: "2.4k" },
+              { name: "WanderJohn", bio: "Adventure junkie & solo traveler. expert on the Amalfi Coast and Alps.", handle: "@WanderJohn", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400", sales: "1.8k" },
+              { name: "Bali Explorer", bio: "Living the dream in Ubud. Waterfalls, spiritual retreats, and surf spots.", handle: "@BaliExplorer", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400", sales: "3.2k" }
+            ].map((creator, i) => (
+              <div key={i} className="glass card card-hover" style={{ padding: '32px', textAlign: 'center', borderRadius: '32px' }}>
+                <div style={{ width: '120px', height: '120px', borderRadius: '50%', margin: '0 auto 24px auto', overflow: 'hidden', border: '4px solid var(--primary-light)', padding: '4px' }}>
+                  <img src={creator.img} alt={creator.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                </div>
+                <h3 style={{ fontSize: '1.4rem', marginBottom: '4px' }}>{creator.name}</h3>
+                <p style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.9rem', marginBottom: '16px' }}>{creator.handle}</p>
+                <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem', marginBottom: '24px', lineHeight: '1.6' }}>{creator.bio}</p>
+                <div style={{ background: 'var(--surface)', padding: '12px', borderRadius: '16px', display: 'flex', justifyContent: 'center', gap: '8px', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 800, fontSize: '1.1rem' }}>{creator.sales}</span>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)' }}>Sales</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </section>
+    </div>
+  );
+}
+
+async function TrendingItineraries() {
+  const supabase = await createClient();
+  const { data: itineraries } = await supabase
+    .from('itineraries')
+    .select(`
+      *,
+      profiles:creator_id (
+        full_name,
+        is_verified
+      )
+    `)
+    .eq('is_published', true)
+    .eq('is_approved', true)
+    .order('average_rating', { ascending: false })
+    .limit(3);
+
+  if (!itineraries || itineraries.length === 0) return null;
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
+      {itineraries.map((item: any) => (
+        <ItineraryCard
+          key={item.id}
+          itinerary={{
+            ...item,
+            creator: item.profiles?.full_name || "@Creator",
+            image: item.image_url || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800",
+            is_verified: item.profiles?.is_verified,
+            tags: item.tags || []
+          }}
+        />
+      ))}
     </div>
   );
 }
