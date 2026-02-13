@@ -4,7 +4,8 @@ import React, { useRef, useEffect } from "react";
 import {
     Book, Plane, CreditCard, MapPin, Calendar, Utensils,
     Bus, Star, Shield, Sliders, AlertTriangle, ShoppingBag,
-    LogOut, Image as ImageIcon, Gift, ChevronLeft, ChevronRight, CheckCircle2
+    LogOut, Image as ImageIcon, Gift, ChevronLeft, ChevronRight, CheckCircle2,
+    Camera
 } from "lucide-react";
 
 interface BuilderStepperProps {
@@ -29,6 +30,7 @@ const SECTIONS = [
     { id: 13, label: "Departure", icon: LogOut },
     { id: 14, label: "Post-Trip", icon: ImageIcon },
     { id: 15, label: "Bonus", icon: Gift },
+    { id: 16, label: "Proof of Visit", icon: Camera },
 ];
 
 export default function BuilderStepper({ activeStep, onStepChange, completedSteps }: BuilderStepperProps) {

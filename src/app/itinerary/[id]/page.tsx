@@ -120,7 +120,10 @@ export default function ItineraryDetailsPage() {
         advanceBooking: "None required",
         refundPolicy: "100% refund within 24 hours.",
         cancellationPolicy: "Digital product. Final sale once accessed.",
-        content: { days: [] },
+        content: {
+            days: [] as any[],
+            proofOfVisit: { images: [] as any[], notes: "" }
+        },
         days: [
             {
                 number: 1,
@@ -154,7 +157,7 @@ export default function ItineraryDetailsPage() {
             creator: liveData.profiles?.full_name || "@Influencer",
             average_rating: Number(liveData.average_rating) || 0,
             review_count: liveData.review_count || 0,
-            content: liveData.content || { days: [] },
+            content: liveData.content || { days: [], proofOfVisit: { images: [], notes: "" } },
             // Map JSONB content back to expected fields
             ...liveData.content,
             days: liveData.content?.days?.map((d: any, idx: number) => ({
@@ -485,6 +488,38 @@ export default function ItineraryDetailsPage() {
                                 ))}
                             </div>
                         </section>
+
+                        {/* Proof of Visit Section */}
+                        {itinerary.content?.proofOfVisit?.images?.length > 0 && (
+                            <section style={{ marginBottom: '60px' }}>
+                                <h2 style={{ fontSize: '1.8rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <ShieldCheck size={28} color="#10b981" />
+                                    Proof of Visit
+                                </h2>
+                                <p style={{ color: 'var(--gray-400)', marginBottom: '32px' }}>
+                                    {itinerary.content.proofOfVisit.notes || "I personally visited these locations to ensure this guide is accurate and high-quality."}
+                                </p>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+                                    {itinerary.content.proofOfVisit.images.map((img: any, i: number) => (
+                                        <div key={i} className="glass card" style={{ overflow: 'hidden', padding: 0 }}>
+                                            <div style={{ height: '250px', width: '100%' }}>
+                                                <img
+                                                    src={img.url}
+                                                    alt={`Proof ${i}`}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    onError={(e: any) => e.target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=800'}
+                                                />
+                                            </div>
+                                            <div style={{ padding: '20px' }}>
+                                                <p style={{ fontSize: '0.95rem', color: 'var(--gray-400)', lineHeight: '1.6', margin: 0, fontStyle: 'italic' }}>
+                                                    "{img.caption}"
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
 
                         {/* Review System Section */}
                         <section style={{ marginBottom: '60px' }}>

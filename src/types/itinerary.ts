@@ -178,16 +178,19 @@ export interface ItineraryContent {
         nextDestinationIdeas?: string[];
     };
 
-    // 13. Bonus
     // 13. Bonus & Value Adds
     bonus: {
-        googleMapsLink: string;
-        reservationTips: string;
-        commonMistakes: string;
-        tripUpgrades: string;
-        includePackingChecklist: boolean;
-        includeBudgetPlanner: boolean;
+        googleMapsLink?: string;
+        reservationTips?: string;
+        commonMistakes?: string;
+        tripUpgrades?: string;
+        includePackingChecklist?: boolean;
+        includeBudgetPlanner?: boolean;
         externalLinks: { label: string; url: string }[];
+    };
+    proofOfVisit: {
+        images: { url: string; caption: string }[];
+        notes?: string;
     };
 }
 
@@ -242,4 +245,8 @@ export const initialItineraryContent: ItineraryContent = {
         includeBudgetPlanner: true,
         externalLinks: []
     },
+    proofOfVisit: {
+        images: [],
+        notes: ""
+    }
 };
