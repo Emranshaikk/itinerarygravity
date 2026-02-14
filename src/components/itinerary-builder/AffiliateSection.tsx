@@ -136,13 +136,13 @@ export default function AffiliateSection({ data, onChange }: AffiliateSectionPro
                         <select
                             value={newItem.category}
                             onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
-                            style={{ width: '100%', padding: '10px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--foreground)' }}
+                            style={{ width: '100%', padding: '10px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--foreground)', outline: 'none' }}
                         >
-                            <option value="Gear">Travel Gear</option>
-                            <option value="Hotel">Accomodation</option>
-                            <option value="Insurance">Insurance</option>
-                            <option value="Activity">Tours & Activities</option>
-                            <option value="Other">Other</option>
+                            <option value="Gear" style={{ background: '#1a1a1a', color: '#ffffff' }}>Travel Gear</option>
+                            <option value="Hotel" style={{ background: '#1a1a1a', color: '#ffffff' }}>Accomodation</option>
+                            <option value="Insurance" style={{ background: '#1a1a1a', color: '#ffffff' }}>Insurance</option>
+                            <option value="Activity" style={{ background: '#1a1a1a', color: '#ffffff' }}>Tours & Activities</option>
+                            <option value="Other" style={{ background: '#1a1a1a', color: '#ffffff' }}>Other</option>
                         </select>
                     </div>
                 </div>

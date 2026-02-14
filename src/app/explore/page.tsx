@@ -214,13 +214,14 @@ function ExploreContent() {
                             border: '1px solid var(--border)',
                             color: 'var(--foreground)',
                             fontSize: '0.95rem',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            outline: 'none'
                         }}
                     >
-                        <option value="rating">Highest Rated</option>
-                        <option value="newest">Newest First</option>
-                        <option value="price-low">Price: Low to High</option>
-                        <option value="price-high">Price: High to Low</option>
+                        <option value="rating" style={{ background: '#1a1a1a', color: '#ffffff' }}>Highest Rated</option>
+                        <option value="newest" style={{ background: '#1a1a1a', color: '#ffffff' }}>Newest First</option>
+                        <option value="price-low" style={{ background: '#1a1a1a', color: '#ffffff' }}>Price: Low to High</option>
+                        <option value="price-high" style={{ background: '#1a1a1a', color: '#ffffff' }}>Price: High to Low</option>
                     </select>
 
                     {/* Filter Toggle */}

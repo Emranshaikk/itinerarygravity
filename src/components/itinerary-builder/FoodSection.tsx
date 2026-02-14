@@ -175,7 +175,7 @@ export default function FoodSection({ data, onChange }: FoodSectionProps) {
                                         <td style={{ padding: '0.75rem' }}>
                                             <select
                                                 className="form-input"
-                                                style={{ border: 'none', width: '100%', background: 'transparent', cursor: 'pointer', color: 'var(--foreground)' }}
+                                                style={{ border: 'none', width: '100%', background: 'transparent', cursor: 'pointer', color: 'var(--foreground)', outline: 'none' }}
                                                 value={rest.priceRange || "$$"}
                                                 onChange={(e) => {
                                                     const newRests = [...data.restaurantRecommendations];
@@ -183,10 +183,10 @@ export default function FoodSection({ data, onChange }: FoodSectionProps) {
                                                     updateField("restaurantRecommendations", newRests);
                                                 }}
                                             >
-                                                <option value="$" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>$ (Economy)</option>
-                                                <option value="$$" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>$$ (Standard)</option>
-                                                <option value="$$$" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>$$$ (Premium)</option>
-                                                <option value="$$$$" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>$$$$ (Luxury)</option>
+                                                <option value="$" style={{ background: '#1a1a1a', color: '#ffffff' }}>$ (Economy)</option>
+                                                <option value="$$" style={{ background: '#1a1a1a', color: '#ffffff' }}>$$ (Standard)</option>
+                                                <option value="$$$" style={{ background: '#1a1a1a', color: '#ffffff' }}>$$$ (Premium)</option>
+                                                <option value="$$$$" style={{ background: '#1a1a1a', color: '#ffffff' }}>$$$$ (Luxury)</option>
                                             </select>
                                         </td>
                                         <td style={{ padding: '0.75rem' }}>

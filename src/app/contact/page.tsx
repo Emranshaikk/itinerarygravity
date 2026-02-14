@@ -153,15 +153,16 @@ export default function ContactPage() {
                             value={formData.subject}
                             onChange={handleChange}
                             className="form-input"
+                            style={{ outline: 'none' }}
                             required
                         >
-                            <option value="">Select a subject</option>
-                            <option value="general">General Inquiry</option>
-                            <option value="support">Technical Support</option>
-                            <option value="creator">Creator Account</option>
-                            <option value="payment">Payment Issue</option>
-                            <option value="partnership">Partnership Opportunity</option>
-                            <option value="other">Other</option>
+                            <option value="" style={{ background: '#1a1a1a', color: '#ffffff' }}>Select a subject</option>
+                            <option value="general" style={{ background: '#1a1a1a', color: '#ffffff' }}>General Inquiry</option>
+                            <option value="support" style={{ background: '#1a1a1a', color: '#ffffff' }}>Technical Support</option>
+                            <option value="creator" style={{ background: '#1a1a1a', color: '#ffffff' }}>Creator Account</option>
+                            <option value="payment" style={{ background: '#1a1a1a', color: '#ffffff' }}>Payment Issue</option>
+                            <option value="partnership" style={{ background: '#1a1a1a', color: '#ffffff' }}>Partnership Opportunity</option>
+                            <option value="other" style={{ background: '#1a1a1a', color: '#ffffff' }}>Other</option>
                         </select>
                     </div>
 

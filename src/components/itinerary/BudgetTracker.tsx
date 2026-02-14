@@ -182,13 +182,13 @@ export default function BudgetTracker({ itineraryId, dailyBudgetEstimate, totalD
                         </div>
                         <div>
                             <label className="label">Category</label>
-                            <select className="form-input" value={category} onChange={(e) => setCategory(e.target.value)}>
-                                <option value="food">🍔 Food & Drink</option>
-                                <option value="transport">🚕 Transport</option>
-                                <option value="hotel">🏨 Accommodation</option>
-                                <option value="activities">🎟️ Activities</option>
-                                <option value="shopping">🛍️ Shopping</option>
-                                <option value="other">✨ Other</option>
+                            <select className="form-input" value={category} onChange={(e) => setCategory(e.target.value)} style={{ outline: 'none' }}>
+                                <option value="food" style={{ background: '#1a1a1a', color: '#ffffff' }}>🍔 Food & Drink</option>
+                                <option value="transport" style={{ background: '#1a1a1a', color: '#ffffff' }}>🚕 Transport</option>
+                                <option value="hotel" style={{ background: '#1a1a1a', color: '#ffffff' }}>🏨 Accommodation</option>
+                                <option value="activities" style={{ background: '#1a1a1a', color: '#ffffff' }}>🎟️ Activities</option>
+                                <option value="shopping" style={{ background: '#1a1a1a', color: '#ffffff' }}>🛍️ Shopping</option>
+                                <option value="other" style={{ background: '#1a1a1a', color: '#ffffff' }}>✨ Other</option>
                             </select>
                         </div>
                         <div style={{ gridColumn: '1 / -1' }}>

@@ -116,15 +116,15 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                                     value={data.tripType}
                                     onChange={handleChange}
                                     className="form-input"
-                                    style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)', outline: 'none' }}
                                 >
-                                    <option value="Luxury" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>Luxury</option>
-                                    <option value="Budget" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>Budget</option>
-                                    <option value="Adventure" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>Adventure</option>
-                                    <option value="Honeymoon" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>Honeymoon</option>
-                                    <option value="Family" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>Family</option>
-                                    <option value="Solo" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>Solo</option>
-                                    <option value="Cultural" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>Cultural</option>
+                                    <option value="Luxury" style={{ background: '#1a1a1a', color: '#ffffff' }}>Luxury</option>
+                                    <option value="Budget" style={{ background: '#1a1a1a', color: '#ffffff' }}>Budget</option>
+                                    <option value="Adventure" style={{ background: '#1a1a1a', color: '#ffffff' }}>Adventure</option>
+                                    <option value="Honeymoon" style={{ background: '#1a1a1a', color: '#ffffff' }}>Honeymoon</option>
+                                    <option value="Family" style={{ background: '#1a1a1a', color: '#ffffff' }}>Family</option>
+                                    <option value="Solo" style={{ background: '#1a1a1a', color: '#ffffff' }}>Solo</option>
+                                    <option value="Cultural" style={{ background: '#1a1a1a', color: '#ffffff' }}>Cultural</option>
                                 </select>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -224,12 +224,12 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                                     value={data.currency || "USD"}
                                     onChange={handleChange}
                                     className="form-input"
-                                    style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
+                                    style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)', outline: 'none' }}
                                 >
-                                    <option value="USD" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>USD ($)</option>
-                                    <option value="EUR" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>EUR (€)</option>
-                                    <option value="GBP" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>GBP (£)</option>
-                                    <option value="INR" style={{ backgroundColor: 'var(--surface)', color: 'var(--foreground)' }}>INR (₹)</option>
+                                    <option value="USD" style={{ background: '#1a1a1a', color: '#ffffff' }}>USD ($)</option>
+                                    <option value="EUR" style={{ background: '#1a1a1a', color: '#ffffff' }}>EUR (€)</option>
+                                    <option value="GBP" style={{ background: '#1a1a1a', color: '#ffffff' }}>GBP (£)</option>
+                                    <option value="INR" style={{ background: '#1a1a1a', color: '#ffffff' }}>INR (₹)</option>
                                 </select>
                             </div>
                         </div>

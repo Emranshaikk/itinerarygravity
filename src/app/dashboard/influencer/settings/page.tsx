@@ -240,17 +240,17 @@ export default function InfluencerSettingsPage() {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                             <div className="form-group">
                                 <label className="form-label">Payout Frequency</label>
-                                <select className="form-input" value={payment.payoutFrequency} onChange={(e) => setPayment({ ...payment, payoutFrequency: e.target.value })}>
-                                    <option>Daily</option>
-                                    <option>Weekly</option>
-                                    <option>Monthly</option>
+                                <select className="form-input" value={payment.payoutFrequency} onChange={(e) => setPayment({ ...payment, payoutFrequency: e.target.value })} style={{ outline: 'none' }}>
+                                    <option style={{ background: '#1a1a1a', color: '#ffffff' }}>Daily</option>
+                                    <option style={{ background: '#1a1a1a', color: '#ffffff' }}>Weekly</option>
+                                    <option style={{ background: '#1a1a1a', color: '#ffffff' }}>Monthly</option>
                                 </select>
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Primary Currency</label>
-                                <select className="form-input" value={payment.currency} onChange={(e) => setPayment({ ...payment, currency: e.target.value })}>
-                                    <option>INR</option>
-                                    <option>USD</option>
+                                <select className="form-input" value={payment.currency} onChange={(e) => setPayment({ ...payment, currency: e.target.value })} style={{ outline: 'none' }}>
+                                    <option style={{ background: '#1a1a1a', color: '#ffffff' }}>INR</option>
+                                    <option style={{ background: '#1a1a1a', color: '#ffffff' }}>USD</option>
                                 </select>
                             </div>
                         </div>
