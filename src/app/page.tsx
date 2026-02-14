@@ -263,7 +263,9 @@ export default async function Home() {
 
 async function TrendingItineraries() {
   const supabase = await createClient();
-  const { data: itineraries } = await supabase
+
+  // First, try to get approved itineraries
+  let { data: itineraries } = await supabase
     .from('itineraries')
     .select(`
       *,
@@ -276,6 +278,25 @@ async function TrendingItineraries() {
     .eq('is_approved', true)
     .order('average_rating', { ascending: false })
     .limit(3);
+
+  // If no approved itineraries found, fallback to any published itineraries
+  // This ensures the section isn't empty during initial development/testing
+  if (!itineraries || itineraries.length === 0) {
+    const { data: fallbackItineraries } = await supabase
+      .from('itineraries')
+      .select(`
+        *,
+        profiles:creator_id (
+          full_name,
+          is_verified
+        )
+      `)
+      .eq('is_published', true)
+      .order('created_at', { ascending: false })
+      .limit(3);
+
+    itineraries = fallbackItineraries;
+  }
 
   if (!itineraries || itineraries.length === 0) return null;
 

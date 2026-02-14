@@ -39,7 +39,7 @@ function ExploreContent() {
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+    const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
     const [sortBy, setSortBy] = useState<"newest" | "price-low" | "price-high" | "rating">("rating");
     const [showFilters, setShowFilters] = useState(false);
     const supabase = createClient();
@@ -231,7 +231,7 @@ function ExploreContent() {
                     >
                         <Filter size={18} />
                         Filters
-                        {(selectedTags.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000) && (
+                        {(selectedTags.length > 0 || priceRange[0] > 0 || priceRange[1] < 50000) && (
                             <span style={{
                                 background: 'var(--primary)',
                                 color: 'var(--background)',
@@ -287,7 +287,8 @@ function ExploreContent() {
                                     <input
                                         type="range"
                                         min="0"
-                                        max="1000"
+                                        max="50000"
+                                        step="500"
                                         value={priceRange[0]}
                                         onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
                                         style={{ flex: 1 }}
@@ -295,7 +296,8 @@ function ExploreContent() {
                                     <input
                                         type="range"
                                         min="0"
-                                        max="1000"
+                                        max="50000"
+                                        step="500"
                                         value={priceRange[1]}
                                         onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
                                         style={{ flex: 1 }}
@@ -309,7 +311,7 @@ function ExploreContent() {
                             <button
                                 onClick={() => {
                                     setSelectedTags([]);
-                                    setPriceRange([0, 1000]);
+                                    setPriceRange([0, 50000]);
                                 }}
                                 className="btn btn-outline"
                                 style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}
@@ -341,7 +343,7 @@ function ExploreContent() {
                         onClick={() => {
                             setSearchQuery("");
                             setSelectedTags([]);
-                            setPriceRange([0, 1000]);
+                            setPriceRange([0, 50000]);
                         }}
                         className="btn btn-primary"
                     >
