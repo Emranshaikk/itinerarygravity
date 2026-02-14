@@ -24,13 +24,22 @@ interface ItineraryCardProps {
 }
 
 export default function ItineraryCard({ itinerary }: ItineraryCardProps) {
-    const slug = itinerary.slug || itinerary.id;
+    const slug = itinerary.slug || itinerary.id || "";
 
     return (
         <Link
             href={`/itinerary/${slug}`}
+            prefetch={true}
             className="glass card card-hover"
-            style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', textDecoration: 'none' }}
+            style={{
+                padding: '0',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                textDecoration: 'none',
+                cursor: 'pointer'
+            }}
         >
             <div style={{
                 position: 'relative',

@@ -71,7 +71,15 @@ export default function RelatedItineraries({ itineraryId, location, creatorId }:
                         key={item.id}
                         href={`/itinerary/${item.slug || item.id}`}
                         className="glass card"
-                        style={{ padding: 0, overflow: 'hidden', textDecoration: 'none', transition: 'all 0.3s ease', display: 'flex', flexDirection: 'column' }}
+                        style={{
+                            padding: 0,
+                            overflow: 'hidden',
+                            textDecoration: 'none',
+                            transition: 'all 0.3s ease',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            cursor: 'pointer'
+                        }}
                     >
                         <div style={{ height: '220px', position: 'relative', width: '100%' }}>
                             <Image

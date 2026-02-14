@@ -10,8 +10,8 @@ interface Props {
 async function getItinerary(id: string) {
     const supabase = await createClient();
 
-    // Check if id is a UUID
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+    // Check if id is a UUID (more inclusive regex)
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 
     let query = supabase
         .from('itineraries')
@@ -25,14 +25,32 @@ async function getItinerary(id: string) {
         `);
 
     if (isUuid) {
-        query = query.eq('id', id);
+        query = query.or(`id.eq.${id},slug.eq.${id}`);
     } else {
         query = query.eq('slug', id);
     }
 
     const { data, error } = await query.single();
 
-    if (error || !data) return null;
+    // Fallback search if single() fails or no data found (in case slug looks like UUID or vice-versa)
+    if (error || !data) {
+        const { data: fallbackData } = await supabase
+            .from('itineraries')
+            .select(`
+                *,
+                profiles:creator_id (
+                    full_name,
+                    avatar_url,
+                    is_verified
+                )
+            `)
+            .or(`id.eq.${id},slug.eq.${id}`)
+            .limit(1)
+            .maybeSingle();
+
+        return fallbackData;
+    }
+
     return data;
 }
 
