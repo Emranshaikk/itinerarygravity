@@ -62,7 +62,8 @@ function ExploreContent() {
 
     async function fetchItineraries() {
         try {
-            const { data, error } = await supabase
+            // First, try to fetch with profiles join
+            let { data, error } = await supabase
                 .from('itineraries')
                 .select(`
                     *,
@@ -76,7 +77,30 @@ function ExploreContent() {
                 .eq('is_approved', true)
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
+            if (error) {
+                console.error("Supabase query error:", {
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint,
+                    code: error.code
+                });
+
+                // Fallback: try without the profiles join
+                console.log("Attempting fallback query without profiles join...");
+                const fallback = await supabase
+                    .from('itineraries')
+                    .select('*')
+                    .eq('is_published', true)
+                    .eq('is_approved', true)
+                    .order('created_at', { ascending: false });
+
+                if (fallback.error) {
+                    console.error("Fallback query also failed:", fallback.error);
+                    throw fallback.error;
+                }
+
+                data = fallback.data;
+            }
 
             const formattedData: Itinerary[] = (data || []).map((item: any) => ({
                 id: item.id,
@@ -94,15 +118,18 @@ function ExploreContent() {
                 difficulty_level: item.difficulty_level
             }));
 
+            console.log(`Successfully loaded ${formattedData.length} itineraries`);
             setItineraries(formattedData);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Fetch error:", error);
-            if (error instanceof Error) {
-                console.error("Error message:", error.message);
-                console.error("Error stack:", error.stack);
-            } else {
-                console.error("Unknown error object:", JSON.stringify(error, null, 2));
-            }
+            console.error("Error details:", {
+                message: error?.message,
+                code: error?.code,
+                details: error?.details,
+                hint: error?.hint,
+                type: typeof error,
+                keys: error ? Object.keys(error) : []
+            });
         } finally {
             setIsLoading(false);
         }
