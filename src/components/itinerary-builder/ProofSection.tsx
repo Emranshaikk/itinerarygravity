@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ItineraryContent } from "@/types/itinerary";
 import { Camera, Wand2, Plus, Trash2, Image as ImageIcon, MessageSquare } from "lucide-react";
+import ImageUpload from "@/components/ImageUpload";
 
 interface ProofSectionProps {
     data: ItineraryContent["proofOfVisit"];
@@ -85,22 +86,11 @@ export default function ProofSection({ data, onChange }: ProofSectionProps) {
                                     <Trash2 size={14} />
                                 </button>
 
-                                {img.url ? (
-                                    <div style={{ width: '100%', height: '150px', borderRadius: '0.5rem', overflow: 'hidden', marginBottom: '0.5rem' }}>
-                                        <img src={img.url} alt={`Proof ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    </div>
-                                ) : (
-                                    <div style={{ width: '100%', height: '150px', borderRadius: '0.5rem', backgroundColor: 'var(--surface)', border: '2px dashed var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gray-400)', marginBottom: '0.5rem' }}>
-                                        <ImageIcon size={32} />
-                                    </div>
-                                )}
-
-                                <input
-                                    className="form-input"
-                                    style={{ fontSize: '0.875rem', width: '100%', background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--foreground)' }}
-                                    placeholder="Image URL (e.g. Unsplash or Supabase URL)"
+                                <ImageUpload
                                     value={img.url}
-                                    onChange={(e) => updateImage(i, "url", e.target.value)}
+                                    onChange={(url) => updateImage(i, "url", url)}
+                                    folder="proof-of-visit"
+                                    label=""
                                 />
                                 <textarea
                                     className="form-input"

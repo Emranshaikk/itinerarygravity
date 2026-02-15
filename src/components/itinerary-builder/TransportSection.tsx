@@ -74,7 +74,10 @@ export default function TransportSection({ data, onChange }: TransportSectionPro
                 scams: "Ignore 'free' bracelets offered by street vendors. Always ensure the taxi meter is running.",
                 apps: ["CityMapper", "Uber/Bolt", "Google Maps Offline"],
                 modes: [
+                    { type: "Flight", tips: "Book 2-3 months in advance for best prices. Check budget airlines.", cost: "$200-500", bestFor: "Long distances" },
                     { type: "Metro", tips: "Clean, fast, and safe. Runs until midnight.", cost: "$2 per ride", bestFor: "Long distances" },
+                    { type: "Bus", tips: "Cheaper than trains but slower. Good for scenic routes.", cost: "$15-30", bestFor: "Budget travel" },
+                    { type: "Train", tips: "Comfortable and scenic. Book early for discounts.", cost: "$50-100", bestFor: "Inter-city travel" },
                     { type: "Taxi/Rideshare", tips: "Use apps instead of hailing. Reliable at night.", cost: "$10-20 avg", bestFor: "Night travel & groups" }
                 ]
             });
@@ -178,10 +181,47 @@ export default function TransportSection({ data, onChange }: TransportSectionPro
             {/* Transport Modes */}
             <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--foreground)', margin: 0 }}>Transport Modes (Metro, Taxi, etc.)</h3>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--foreground)', margin: 0 }}>Transport Modes</h3>
                     <button onClick={addMode} style={{ fontSize: '0.75rem', color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        <Plus size={16} /> Add Mode
+                        <Plus size={16} /> Add Custom Mode
                     </button>
+                </div>
+
+                {/* Preset Transport Buttons */}
+                <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'var(--input-bg)', borderRadius: '1rem', border: '1px solid var(--border)' }}>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--gray-400)', marginBottom: '0.75rem', fontWeight: '600' }}>Quick Add Presets:</p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        {['Flight', 'Bus', 'Train', 'Metro', 'Taxi/Rideshare', 'Walking'].map((preset) => (
+                            <button
+                                key={preset}
+                                onClick={() => onChange({
+                                    ...data,
+                                    modes: [...data.modes, { type: preset, tips: "", cost: "", bestFor: "" }]
+                                })}
+                                style={{
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '0.5rem',
+                                    border: '1px solid var(--border)',
+                                    background: 'var(--surface)',
+                                    color: 'var(--foreground)',
+                                    cursor: 'pointer',
+                                    fontSize: '0.875rem',
+                                    fontWeight: '600',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseOver={(e) => {
+                                    e.currentTarget.style.background = 'var(--primary)';
+                                    e.currentTarget.style.color = 'white';
+                                }}
+                                onMouseOut={(e) => {
+                                    e.currentTarget.style.background = 'var(--surface)';
+                                    e.currentTarget.style.color = 'var(--foreground)';
+                                }}
+                            >
+                                + {preset}
+                            </button>
+                        ))}
+                    </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {data.modes.map((mode, index) => (

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ShoppingBag, Plus, Trash2, Link as LinkIcon, Tag, DollarSign, Image as ImageIcon } from "lucide-react";
+import ImageUpload from "@/components/ImageUpload";
 
 interface AffiliateProduct {
     id?: string;
@@ -104,19 +105,15 @@ export default function AffiliateSection({ data, onChange }: AffiliateSectionPro
                     </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--gray-400)', marginBottom: '4px' }}>Image URL (Optional)</label>
-                        <div style={{ position: 'relative' }}>
-                            <ImageIcon size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray-400)' }} />
-                            <input
-                                type="text"
-                                value={newItem.imageUrl}
-                                onChange={(e) => setNewItem({ ...newItem, imageUrl: e.target.value })}
-                                placeholder="https://..."
-                                style={{ width: '100%', padding: '10px 10px 10px 36px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--foreground)' }}
-                            />
-                        </div>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--gray-400)', marginBottom: '4px' }}>Product Image</label>
+                        <ImageUpload
+                            value={newItem.imageUrl}
+                            onChange={(url) => setNewItem({ ...newItem, imageUrl: url })}
+                            folder="affiliate-products"
+                            label=""
+                        />
                     </div>
                     <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--gray-400)', marginBottom: '4px' }}>Price Display</label>
