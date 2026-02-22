@@ -123,6 +123,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
 
     // Comprehensive mock data matching the new creator fields
     let itinerary = {
+        id: isKyoto ? "kyoto-traditional" : isBali ? "bali-hidden" : "",
         title: isKyoto ? "7 Days in Kyoto: The Ultimate Guide" : "Bali: Hidden Gems & Waterfalls",
         creator: isKyoto ? "@SarahTravels" : "@BaliExplorer",
         location: isKyoto ? "Kyoto, Japan" : "Ubud, Bali",
@@ -193,6 +194,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
             creator: liveData.profiles?.full_name || "@Influencer",
             average_rating: Number(liveData.average_rating) || 0,
             review_count: liveData.review_count || 0,
+            id: liveData.id,
             content: liveData.content || { days: [], proofOfVisit: { images: [], notes: "" }, affiliateProducts: [], creatorProducts: [] },
             ...liveData.content,
             days: liveData.content?.days?.map((d: any, idx: number) => ({
@@ -604,7 +606,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                             </section>
                         )}
 
-                        <TravelerGallery itineraryId={id} isPurchased={isPurchased} />
+                        <TravelerGallery itineraryId={itinerary.id || id} isPurchased={isPurchased} />
 
                         <AffiliateShowcase
                             products={itinerary.content.affiliateProducts}
@@ -628,7 +630,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                         <section style={{ marginBottom: '60px' }}>
                             <div id="review-form" style={{ display: 'grid', gap: '40px' }}>
                                 <ReviewSection
-                                    itineraryId={id}
+                                    itineraryId={itinerary.id || id}
                                     averageRating={itinerary.average_rating}
                                     reviewCount={itinerary.review_count}
                                 />

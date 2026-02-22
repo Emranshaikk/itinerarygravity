@@ -4,14 +4,34 @@ import { createClient } from '@/lib/supabase/server';
 // GET - Fetch reviews for an itinerary
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
-    const itineraryId = searchParams.get('itinerary_id');
+    const idOrSlug = searchParams.get('itinerary_id');
 
-    if (!itineraryId) {
-        return NextResponse.json({ error: 'Itinerary ID required' }, { status: 400 });
+    if (!idOrSlug) {
+        return NextResponse.json({ error: 'Itinerary ID or Slug required' }, { status: 400 });
     }
 
     try {
         const supabase = await createClient();
+        let finalItineraryId = idOrSlug;
+
+        // Check if idOrSlug is a UUID
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
+
+        if (!isUuid) {
+            // Try to resolve slug to UUID
+            const { data: itinerary } = await supabase
+                .from('itineraries')
+                .select('id')
+                .eq('slug', idOrSlug)
+                .maybeSingle();
+
+            if (itinerary) {
+                finalItineraryId = itinerary.id;
+            } else {
+                // If no itinerary found by slug, return empty reviews
+                return NextResponse.json([]);
+            }
+        }
 
         const { data: reviews, error } = await supabase
             .from('reviews')
@@ -23,15 +43,18 @@ export async function GET(request: Request) {
                     avatar_url
                 )
             `)
-            .eq('itinerary_id', itineraryId)
+            .eq('itinerary_id', finalItineraryId)
             .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (error) {
+            console.error('[REVIEWS_QUERY_ERROR]', error);
+            return NextResponse.json([]);
+        }
 
         return NextResponse.json(reviews || []);
     } catch (error: any) {
         console.error('[REVIEWS_FETCH_ERROR]', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json([], { status: 500 });
     }
 }
 

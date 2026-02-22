@@ -56,13 +56,33 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
-        const itinerary_id = searchParams.get('itinerary_id');
+        const idOrSlug = searchParams.get('itinerary_id');
 
-        if (!itinerary_id) {
+        if (!idOrSlug) {
             return NextResponse.json({ error: "Missing itinerary_id" }, { status: 400 });
         }
 
         const supabase = await createClient();
+        let finalItineraryId = idOrSlug;
+
+        // Check if idOrSlug is a UUID
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
+
+        if (!isUuid) {
+            // Try to resolve slug to UUID
+            const { data: itinerary } = await supabase
+                .from('itineraries')
+                .select('id')
+                .eq('slug', idOrSlug)
+                .maybeSingle();
+
+            if (itinerary) {
+                finalItineraryId = itinerary.id;
+            } else {
+                return NextResponse.json([]);
+            }
+        }
+
         const { data, error } = await supabase
             .from('traveler_photos')
             .select(`
@@ -72,16 +92,17 @@ export async function GET(req: Request) {
                     avatar_url
                 )
             `)
-            .eq('itinerary_id', itinerary_id)
+            .eq('itinerary_id', finalItineraryId)
             .order('created_at', { ascending: false });
 
         if (error) {
-            return NextResponse.json({ error: "Database Error" }, { status: 500 });
+            console.error("[API_PHOTOS_QUERY_ERROR]", error);
+            return NextResponse.json([]);
         }
 
-        return NextResponse.json(data);
+        return NextResponse.json(data || []);
     } catch (error: any) {
-        console.error("[API_PHOTOS_GET]", error);
-        return NextResponse.json({ error: "Internal Error" }, { status: 500 });
+        console.error("[API_PHOTOS_GET_ERROR]", error);
+        return NextResponse.json([], { status: 500 });
     }
 }
