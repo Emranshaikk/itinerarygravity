@@ -244,11 +244,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
     if (!mounted || isLoading) return <div style={{ minHeight: '100vh', background: 'var(--background)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gray-400)' }}>Loading adventure...</div>;
 
     const pdfData = {
-        title: itinerary.title,
-        location: itinerary.location,
-        description: itinerary.description,
-        price: itinerary.price,
-        creator: itinerary.creator,
+        ...itinerary,
         duration_days: liveData?.duration_days,
         content: liveData?.content || itinerary.content
     };
