@@ -269,7 +269,7 @@ async function TrendingItineraries() {
     .from('itineraries')
     .select(`
       *,
-      profiles:creator_id (
+      profiles!creator_id (
         full_name,
         is_verified
       )
@@ -286,7 +286,7 @@ async function TrendingItineraries() {
       .from('itineraries')
       .select(`
         *,
-        profiles:creator_id (
+        profiles!creator_id (
           full_name,
           is_verified
         )

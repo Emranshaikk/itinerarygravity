@@ -104,7 +104,7 @@ export default function AdminDashboard() {
             .from('itineraries')
             .select(`
                 *,
-                profiles:creator_id (
+                profiles!creator_id (
                     full_name,
                     email
                 )

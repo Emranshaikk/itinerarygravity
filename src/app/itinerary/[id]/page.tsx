@@ -38,7 +38,7 @@ async function getItinerary(id: string) {
             .from('itineraries')
             .select(`
                 *,
-                profiles:creator_id (
+                profiles!creator_id (
                     full_name,
                     avatar_url,
                     is_verified

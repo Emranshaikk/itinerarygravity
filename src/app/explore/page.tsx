@@ -62,102 +62,99 @@ function ExploreContent() {
 
     async function fetchItineraries() {
         try {
-            // First, try to fetch with profiles join
-            let { data, error } = await supabase
+            console.log("--- Supabase Schema-Aware Fetch Start ---");
+            setIsLoading(true);
+
+            // 1. Diagnostic: Fetch one row to see actual column names
+            const { data: diagData, error: diagError } = await supabase
                 .from('itineraries')
-                .select(`
-                    *,
-                    profiles:creator_id (
-                        full_name,
-                        email,
-                        is_verified
-                    )
-                `)
-                .eq('is_published', true)
-                .eq('is_approved', true)
-                .order('created_at', { ascending: false });
+                .select('*')
+                .limit(1);
 
-            if (error) {
-                console.error("Supabase query error:", error);
+            const columns = diagData && diagData[0] ? Object.keys(diagData[0]) : [];
+            console.log("Detected Columns:", columns.join(", "));
 
-                // Fallback 1: Try without profiles join but with is_approved
-                console.log("Fallback 1: Attempting query without profiles join...");
-                const fb1 = await supabase
-                    .from('itineraries')
-                    .select('*')
-                    .eq('is_published', true)
-                    .eq('is_approved', true)
-                    .order('created_at', { ascending: false });
+            const hasIsPublished = columns.includes('is_published');
+            const hasIsApproved = columns.includes('is_approved');
+            const hasCreatorId = columns.includes('creator_id');
 
-                if (!fb1.error) {
-                    data = fb1.data;
-                } else {
-                    console.error("Fallback 1 failed:", fb1.error);
+            // 2. Fetch Itineraries with available filters
+            console.log("Fetching itineraries data...");
+            let baseQuery = supabase.from('itineraries').select('*');
 
-                    // Fallback 2: Try without is_approved (most likely cause of failure)
-                    console.log("Fallback 2: Attempting query without is_approved...");
-                    const fb2 = await supabase
-                        .from('itineraries')
-                        .select(`
-                            *,
-                            profiles:creator_id (
-                                full_name,
-                                email,
-                                is_verified
-                            )
-                        `)
-                        .eq('is_published', true)
-                        .order('created_at', { ascending: false });
+            if (hasIsPublished) baseQuery = baseQuery.eq('is_published', true);
+            // If we have is_approved, we can filter by it, but maybe let's be lenient for now 
+            // since we're debugging. I'll add it if it exists.
+            if (hasIsApproved) baseQuery = baseQuery.eq('is_approved', true);
 
-                    if (!fb2.error) {
-                        data = fb2.data;
-                    } else {
-                        console.error("Fallback 2 failed:", fb2.error);
+            const { data: itinerariesData, error: itError } = await baseQuery.order('created_at', { ascending: false });
 
-                        // Fallback 3: Absolute simplest query
-                        console.log("Fallback 3: Absolute simplest query...");
-                        const fb3 = await supabase
-                            .from('itineraries')
-                            .select('*')
-                            .limit(20);
+            if (itError) {
+                console.error("Fetch failed even without join:", itError.message);
+                throw itError;
+            }
 
-                        if (fb3.error) {
-                            console.error("All fallbacks failed:", fb3.error);
-                            throw fb3.error;
-                        }
-                        data = fb3.data;
-                    }
+            if (!itinerariesData || itinerariesData.length === 0) {
+                console.log("No itineraries found matching filters.");
+                setItineraries([]);
+                return;
+            }
+
+            // 3. Manual Merge with Profiles (Safest way since joins are failing)
+            console.log("Merging with profiles...");
+            const creatorIds = hasCreatorId
+                ? [...new Set(itinerariesData.map(it => it.creator_id).filter(Boolean))]
+                : [];
+
+            let profilesMap: Record<string, any> = {};
+            if (creatorIds.length > 0) {
+                const { data: profilesData } = await supabase
+                    .from('profiles')
+                    .select('id, full_name, email, is_verified')
+                    .in('id', creatorIds);
+
+                if (profilesData) {
+                    profilesData.forEach(p => { profilesMap[p.id] = p; });
                 }
             }
 
-            const formattedData: Itinerary[] = (data || []).map((item: any) => ({
+            const formatted = itinerariesData.map((item: any) => ({
                 id: item.id,
                 title: item.title,
-                creator: item.profiles?.full_name || item.profiles?.email || "@Creator",
+                creator: profilesMap[item.creator_id]?.full_name || profilesMap[item.creator_id]?.email || "@Creator",
                 creator_id: item.creator_id,
-                location: item.location || "Unknown",
+                location: item.location || item.destination || "Unknown",
                 price: Number(item.price) || 0,
                 average_rating: Number(item.average_rating) || 0,
                 review_count: item.review_count || 0,
                 image: item.image_url || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800&auto=format&fit=crop",
                 tags: item.tags || [],
-                is_verified: item.profiles?.is_verified || false,
+                is_verified: profilesMap[item.creator_id]?.is_verified || false,
                 duration_days: item.duration_days,
-                difficulty_level: item.difficulty_level
+                difficulty_level: item.difficulty_level,
+                currency: item.currency || "USD"
             }));
 
-            console.log(`Successfully loaded ${formattedData.length} itineraries`);
-            setItineraries(formattedData);
-        } catch (error: any) {
-            console.error("Fetch error:", error);
-            console.error("Error details:", {
-                message: error?.message,
-                code: error?.code,
-                details: error?.details,
-                hint: error?.hint,
-                type: typeof error,
-                keys: error ? Object.keys(error) : []
-            });
+            setItineraries(formatted);
+            console.log(`Successfully rendered ${formatted.length} itineraries.`);
+            console.log("--- Supabase Schema-Aware Fetch End ---");
+        } catch (err: any) {
+            console.error("CRITICAL ERROR in fetchItineraries:", err.message || err);
+            // Last resort: just try to get anything at all
+            try {
+                const { data } = await supabase.from('itineraries').select('*').limit(10);
+                if (data) {
+                    const simple = data.map((item: any) => ({
+                        id: item.id,
+                        title: item.title,
+                        creator: "@Creator",
+                        location: item.location || "Unknown",
+                        price: Number(item.price) || 0,
+                        image: item.image_url || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800&auto=format&fit=crop"
+                    }));
+                    setItineraries(simple as any);
+                }
+            } catch (e) { }
         } finally {
             setIsLoading(false);
         }
