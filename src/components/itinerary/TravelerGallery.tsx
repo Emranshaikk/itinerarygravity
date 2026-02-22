@@ -33,12 +33,16 @@ export default function TravelerGallery({ itineraryId, isPurchased }: TravelerGa
     async function fetchPhotos() {
         try {
             const response = await fetch(`/api/photos?itinerary_id=${itineraryId}`);
-            if (response.ok) {
-                const data = await response.json();
+            const data = await response.json();
+            if (Array.isArray(data)) {
                 setPhotos(data);
+            } else {
+                console.error("Photos API expected array, got:", data);
+                setPhotos([]);
             }
         } catch (error) {
             console.error("Error fetching traveler photos:", error);
+            setPhotos([]);
         } finally {
             setIsLoading(false);
         }

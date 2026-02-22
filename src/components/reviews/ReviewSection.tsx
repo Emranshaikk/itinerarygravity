@@ -36,9 +36,15 @@ export default function ReviewSection({ itineraryId, averageRating, reviewCount 
         try {
             const response = await fetch(`/api/reviews?itinerary_id=${itineraryId}`);
             const data = await response.json();
-            setReviews(data);
+            if (Array.isArray(data)) {
+                setReviews(data);
+            } else {
+                console.error("Reviews API expected array, got:", data);
+                setReviews([]);
+            }
         } catch (error) {
             console.error('Error fetching reviews:', error);
+            setReviews([]);
         } finally {
             setLoading(false);
         }

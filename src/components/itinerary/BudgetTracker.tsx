@@ -37,12 +37,16 @@ export default function BudgetTracker({ itineraryId, dailyBudgetEstimate, totalD
     async function fetchExpenses() {
         try {
             const response = await fetch(`/api/expenses?itinerary_id=${itineraryId}`);
-            if (response.ok) {
-                const data = await response.json();
+            const data = await response.json();
+            if (Array.isArray(data)) {
                 setExpenses(data);
+            } else {
+                console.error("Expenses API expected array, got:", data);
+                setExpenses([]);
             }
         } catch (error) {
             console.error("Error fetching expenses:", error);
+            setExpenses([]);
         } finally {
             setIsLoading(false);
         }

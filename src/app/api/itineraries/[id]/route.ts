@@ -98,3 +98,45 @@ export async function PATCH(
         return NextResponse.json({ error: "Internal Error", message: error.message }, { status: 500 });
     }
 }
+
+export async function DELETE(
+    req: Request,
+    { params }: { params: { id: string } }
+) {
+    try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const { id } = params;
+
+        // Check ownership
+        const { data: existing } = await supabase
+            .from('itineraries')
+            .select('creator_id')
+            .eq('id', id)
+            .single();
+
+        if (!existing || existing.creator_id !== user.id) {
+            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+
+        const { error } = await supabase
+            .from('itineraries')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            console.error("[ITINERARY_DELETE_ERROR]", error);
+            return NextResponse.json({ error: "Database Error", details: error.message }, { status: 500 });
+        }
+
+        return NextResponse.json({ success: true });
+    } catch (error: any) {
+        console.error("[ITINERARY_DELETE]", error);
+        return NextResponse.json({ error: "Internal Error", message: error.message }, { status: 500 });
+    }
+}

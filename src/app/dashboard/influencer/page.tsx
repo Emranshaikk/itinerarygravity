@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { PieChart, TrendingUp, Calendar, Star, DollarSign, MapPin } from "@/components/Icons";
+import { PieChart, TrendingUp, Calendar, Star, DollarSign, MapPin, Trash2, Share2, Eye } from "@/components/Icons";
 
 export default function InfluencerDashboard() {
     const router = useRouter();
@@ -75,6 +75,22 @@ export default function InfluencerDashboard() {
         }
     }
 
+    async function handleDelete(id: string) {
+        if (!confirm("Are you sure you want to delete this itinerary? This cannot be undone.")) return;
+
+        try {
+            const res = await fetch(`/api/itineraries/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setItineraries(prev => prev.filter(it => it.id !== id));
+            } else {
+                alert("Failed to delete itinerary.");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting itinerary.");
+        }
+    }
+
     if (loading) {
         return (
             <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
@@ -84,7 +100,7 @@ export default function InfluencerDashboard() {
     }
 
     return (
-        <div className="container">
+        <div className="container" style={{ paddingBottom: '100px' }}>
             <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     <div style={{
@@ -294,23 +310,31 @@ export default function InfluencerDashboard() {
 
                                     <div style={{ display: 'flex', gap: '24px', marginBottom: '20px', fontSize: '0.9rem', color: 'var(--gray-400)' }}>
                                         <span>Price: ₹{itinerary.price}</span>
-                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><TrendingUp size={14} color="#10b981" /> 142 Sold this month</span>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><TrendingUp size={14} color="#10b981" /> 142 Sold</span>
                                     </div>
 
                                     <div style={{ display: 'flex', gap: '12px' }}>
                                         <button
                                             className="btn btn-outline"
-                                            style={{ flex: 1, padding: '8px' }}
+                                            style={{ flex: 1, padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                                             onClick={() => router.push(`/dashboard/influencer/edit/${itinerary.id}`)}
                                         >
                                             Edit
                                         </button>
                                         <button
                                             className="btn btn-outline"
-                                            style={{ flex: 1, padding: '8px' }}
+                                            style={{ flex: 1, padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                                             onClick={() => handleShare(itinerary)}
                                         >
-                                            Share Link
+                                            <Share2 size={14} /> Share
+                                        </button>
+                                        <button
+                                            className="btn btn-outline"
+                                            style={{ padding: '8px', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' }}
+                                            onClick={() => handleDelete(itinerary.id)}
+                                            title="Delete Itinerary"
+                                        >
+                                            <Trash2 size={14} />
                                         </button>
                                     </div>
                                 </div>
