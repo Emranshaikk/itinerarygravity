@@ -424,7 +424,10 @@ export default function AdminDashboard() {
                                         <td style={{ padding: '16px 32px', color: 'var(--gray-400)' }}>
                                             {itinerary.profiles?.full_name || itinerary.profiles?.email || 'Unknown'}
                                         </td>
-                                        <td style={{ padding: '16px 32px' }}>₹{itinerary.price}</td>
+                                        <td style={{ padding: '16px 32px' }}>
+                                            {(itinerary as any).currency === 'INR' ? '₹' : (itinerary as any).currency === 'USD' ? '$' : (itinerary as any).currency === 'EUR' ? '€' : (itinerary as any).currency || '₹'}
+                                            {itinerary.price}
+                                        </td>
                                         <td style={{ padding: '16px 32px' }}>
                                             <span className="badge" style={{
                                                 background: itinerary.is_published ? 'rgba(16, 185, 129, 0.2)' : 'rgba(107, 114, 128, 0.2)',

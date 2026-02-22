@@ -78,28 +78,56 @@ function ExploreContent() {
                 .order('created_at', { ascending: false });
 
             if (error) {
-                console.error("Supabase query error:", {
-                    message: error.message,
-                    details: error.details,
-                    hint: error.hint,
-                    code: error.code
-                });
+                console.error("Supabase query error:", error);
 
-                // Fallback: try without the profiles join
-                console.log("Attempting fallback query without profiles join...");
-                const fallback = await supabase
+                // Fallback 1: Try without profiles join but with is_approved
+                console.log("Fallback 1: Attempting query without profiles join...");
+                const fb1 = await supabase
                     .from('itineraries')
                     .select('*')
                     .eq('is_published', true)
                     .eq('is_approved', true)
                     .order('created_at', { ascending: false });
 
-                if (fallback.error) {
-                    console.error("Fallback query also failed:", fallback.error);
-                    throw fallback.error;
-                }
+                if (!fb1.error) {
+                    data = fb1.data;
+                } else {
+                    console.error("Fallback 1 failed:", fb1.error);
 
-                data = fallback.data;
+                    // Fallback 2: Try without is_approved (most likely cause of failure)
+                    console.log("Fallback 2: Attempting query without is_approved...");
+                    const fb2 = await supabase
+                        .from('itineraries')
+                        .select(`
+                            *,
+                            profiles:creator_id (
+                                full_name,
+                                email,
+                                is_verified
+                            )
+                        `)
+                        .eq('is_published', true)
+                        .order('created_at', { ascending: false });
+
+                    if (!fb2.error) {
+                        data = fb2.data;
+                    } else {
+                        console.error("Fallback 2 failed:", fb2.error);
+
+                        // Fallback 3: Absolute simplest query
+                        console.log("Fallback 3: Absolute simplest query...");
+                        const fb3 = await supabase
+                            .from('itineraries')
+                            .select('*')
+                            .limit(20);
+
+                        if (fb3.error) {
+                            console.error("All fallbacks failed:", fb3.error);
+                            throw fb3.error;
+                        }
+                        data = fb3.data;
+                    }
+                }
             }
 
             const formattedData: Itinerary[] = (data || []).map((item: any) => ({
@@ -309,7 +337,7 @@ function ExploreContent() {
                             {/* Price Range */}
                             <div>
                                 <h4 style={{ marginBottom: '12px', fontSize: '0.9rem', color: 'var(--gray-400)' }}>
-                                    Price Range: ₹{priceRange[0]} - ₹{priceRange[1]}
+                                    Price Range: {priceRange[0]} - {priceRange[1]}
                                 </h4>
                                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                                     <input

@@ -7,10 +7,12 @@ import { CreditCard, Wifi, Smartphone, Wand2, DollarSign, Zap, Power, Globe } fr
 interface LogisticsSectionProps {
     data: ItineraryContent["logistics"];
     onChange: (data: ItineraryContent["logistics"]) => void;
+    currency?: string;
 }
 
-export default function LogisticsSection({ data, onChange }: LogisticsSectionProps) {
+export default function LogisticsSection({ data, onChange, currency }: LogisticsSectionProps) {
     const [isGenerating, setIsGenerating] = useState(false);
+    const currencySymbol = currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : (currency || '$');
 
     const handleCurrencyChange = (field: string, value: string) => {
         onChange({ ...data, currency: { ...data.currency, [field]: value } });
@@ -28,7 +30,7 @@ export default function LogisticsSection({ data, onChange }: LogisticsSectionPro
                     code: "JPY (Japanese Yen)",
                     exchangeTips: "Withdraw cash from 7-Eleven (7-Bank) ATMs. They have the best rates and lowest fees.",
                     cashVsCard: "Kyoto is surprisingly cash-heavy. Use cards for hotels and big stores, but keep ¥10,000 in cash for temples and small ramen shops.",
-                    dailyBudgetEstimate: "$80 - $150 per day (excluding accommodation)"
+                    dailyBudgetEstimate: `${currencySymbol}80 - ${currencySymbol}150 per day (excluding accommodation)`
                 },
                 connectivity: {
                     simOptions: ["Ubigi eSIM (Best for data)", "Airalo (Easiest setup)", "Pocket WiFi (Best for groups)"],
@@ -91,7 +93,7 @@ export default function LogisticsSection({ data, onChange }: LogisticsSectionPro
                                 <input
                                     className="form-input"
                                     style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
-                                    placeholder="e.g. $100/day"
+                                    placeholder={`e.g. ${currencySymbol}100/day`}
                                     value={data.currency.dailyBudgetEstimate}
                                     onChange={(e) => handleCurrencyChange("dailyBudgetEstimate", e.target.value)}
                                 />

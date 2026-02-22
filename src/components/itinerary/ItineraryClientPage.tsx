@@ -333,8 +333,10 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                         </div>
                         <div className="glass card" style={{ padding: '24px' }}>
                             <div className="no-print">
-                                <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem', marginBottom: '4px' }}>Price {itinerary.priceType}</p>
-                                <h2 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>₹{itinerary.price} <span style={{ fontSize: '1rem', color: 'var(--gray-400)' }}>{itinerary.currency}</span></h2>
+                                <h2 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>
+                                    {itinerary.currency === 'INR' || !itinerary.currency ? '₹' : itinerary.currency === 'USD' ? '$' : itinerary.currency === 'EUR' ? '€' : itinerary.currency + ' '}
+                                    {itinerary.price}
+                                </h2>
 
                                 {!isPurchased ? (
                                     <button className="btn btn-primary" style={{ width: '100%', padding: '14px', marginBottom: '12px' }} onClick={handlePurchase}>Buy Full Itinerary</button>
@@ -377,7 +379,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                             </div>
                             <div className="print-only">
                                 <p>Verified Itinerary Guide</p>
-                                <p>Price: {itinerary.price} {itinerary.currency}</p>
+                                <p>Price: {itinerary.currency === 'INR' ? '₹' : itinerary.currency === 'USD' ? '$' : itinerary.currency} {itinerary.price}</p>
                             </div>
 
                             <div style={{ marginTop: '24px' }}>
@@ -611,6 +613,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                 itineraryId={id}
                                 dailyBudgetEstimate={itinerary.logistics.currency.dailyBudgetEstimate}
                                 totalDays={itinerary.days.length}
+                                currency={itinerary.currency}
                             />
                         )}
 

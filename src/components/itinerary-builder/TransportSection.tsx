@@ -21,11 +21,13 @@ interface TransportSectionProps {
         airportTransfer: string;
         dailyStrategy: string;
     };
+    currency?: string;
     onChange: (data: any) => void;
 }
 
-export default function TransportSection({ data, onChange }: TransportSectionProps) {
+export default function TransportSection({ data, onChange, currency }: TransportSectionProps) {
     const [isGenerating, setIsGenerating] = useState(false);
+    const currencySymbol = currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : (currency || '$');
 
     const handleModeChange = (index: number, field: keyof TransportMode, value: string) => {
         const newModes = [...data.modes];
@@ -74,11 +76,11 @@ export default function TransportSection({ data, onChange }: TransportSectionPro
                 scams: "Ignore 'free' bracelets offered by street vendors. Always ensure the taxi meter is running.",
                 apps: ["CityMapper", "Uber/Bolt", "Google Maps Offline"],
                 modes: [
-                    { type: "Flight", tips: "Book 2-3 months in advance for best prices. Check budget airlines.", cost: "$200-500", bestFor: "Long distances" },
-                    { type: "Metro", tips: "Clean, fast, and safe. Runs until midnight.", cost: "$2 per ride", bestFor: "Long distances" },
-                    { type: "Bus", tips: "Cheaper than trains but slower. Good for scenic routes.", cost: "$15-30", bestFor: "Budget travel" },
-                    { type: "Train", tips: "Comfortable and scenic. Book early for discounts.", cost: "$50-100", bestFor: "Inter-city travel" },
-                    { type: "Taxi/Rideshare", tips: "Use apps instead of hailing. Reliable at night.", cost: "$10-20 avg", bestFor: "Night travel & groups" }
+                    { type: "Flight", tips: "Book 2-3 months in advance for best prices. Check budget airlines.", cost: `${currencySymbol}200-500`, bestFor: "Long distances" },
+                    { type: "Metro", tips: "Clean, fast, and safe. Runs until midnight.", cost: `${currencySymbol}2 per ride`, bestFor: "Long distances" },
+                    { type: "Bus", tips: "Cheaper than trains but slower. Good for scenic routes.", cost: `${currencySymbol}15-30`, bestFor: "Budget travel" },
+                    { type: "Train", tips: "Comfortable and scenic. Book early for discounts.", cost: `${currencySymbol}50-100`, bestFor: "Inter-city travel" },
+                    { type: "Taxi/Rideshare", tips: "Use apps instead of hailing. Reliable at night.", cost: `${currencySymbol}10-20 avg`, bestFor: "Night travel & groups" }
                 ]
             });
             setIsGenerating(false);

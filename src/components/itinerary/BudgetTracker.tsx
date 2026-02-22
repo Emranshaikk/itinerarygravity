@@ -15,9 +15,10 @@ interface BudgetTrackerProps {
     itineraryId: string;
     dailyBudgetEstimate: string;
     totalDays: number;
+    currency?: string;
 }
 
-export default function BudgetTracker({ itineraryId, dailyBudgetEstimate, totalDays }: BudgetTrackerProps) {
+export default function BudgetTracker({ itineraryId, dailyBudgetEstimate, totalDays, currency }: BudgetTrackerProps) {
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -100,6 +101,7 @@ export default function BudgetTracker({ itineraryId, dailyBudgetEstimate, totalD
     // Try to parse estimate (very basic)
     const estimateNumeric = parseFloat(dailyBudgetEstimate.replace(/[^0-9.]/g, '')) || 0;
     const totalEstimate = estimateNumeric * totalDays;
+    const currencySymbol = currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : (currency || '$');
 
     return (
         <section style={{ marginBottom: '80px' }}>
@@ -129,7 +131,7 @@ export default function BudgetTracker({ itineraryId, dailyBudgetEstimate, totalD
                         <DollarSign size={20} /> Total Spent
                     </div>
                     <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--foreground)' }}>
-                        ${totalSpent.toFixed(2)}
+                        {currencySymbol}{totalSpent.toFixed(2)}
                     </div>
                 </div>
 
@@ -169,7 +171,7 @@ export default function BudgetTracker({ itineraryId, dailyBudgetEstimate, totalD
                             />
                         </div>
                         <div>
-                            <label className="label">Amount ($)</label>
+                            <label className="label">Amount ({currencySymbol})</label>
                             <input
                                 type="number"
                                 className="form-input"
@@ -240,7 +242,7 @@ export default function BudgetTracker({ itineraryId, dailyBudgetEstimate, totalD
                                         <span className="badge" style={{ textTransform: 'capitalize' }}>{expense.category}</span>
                                     </td>
                                     <td style={{ padding: '16px', color: 'var(--gray-400)' }}>{expense.description || "-"}</td>
-                                    <td style={{ padding: '16px', textAlign: 'right', fontWeight: 700 }}>${expense.amount.toFixed(2)}</td>
+                                    <td style={{ padding: '16px', textAlign: 'right', fontWeight: 700 }}>{currencySymbol}{expense.amount.toFixed(2)}</td>
                                     <td style={{ padding: '16px', textAlign: 'center' }}>
                                         <button
                                             onClick={() => handleDeleteExpense(expense.id)}

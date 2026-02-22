@@ -109,7 +109,7 @@ export default function CreateItineraryPage() {
             case 2:
                 return <PreTripSection data={content.preTrip} onChange={(d) => setContent({ ...content, preTrip: d })} />;
             case 3:
-                return <LogisticsSection data={content.logistics} onChange={(d) => setContent({ ...content, logistics: d })} />;
+                return <LogisticsSection data={content.logistics} onChange={(d) => setContent({ ...content, logistics: d })} currency={content.cover.currency} />;
             case 4:
                 return <ArrivalSection data={content.arrival} onChange={(d) => setContent({ ...content, arrival: d })} />;
             case 5:
@@ -117,7 +117,7 @@ export default function CreateItineraryPage() {
             case 6:
                 return <FoodSection data={content.food} onChange={(d) => setContent({ ...content, food: d })} />;
             case 7:
-                return <TransportSection data={content.transport} onChange={(d) => setContent({ ...content, transport: d })} />;
+                return <TransportSection data={content.transport} onChange={(d) => setContent({ ...content, transport: d })} currency={content.cover.currency} />;
             case 8:
                 return <SecretsSection data={content.secrets} onChange={(d) => setContent({ ...content, secrets: d })} />;
             case 9:

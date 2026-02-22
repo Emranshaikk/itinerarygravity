@@ -74,7 +74,8 @@ export default function ItineraryCard({ itinerary }: ItineraryCardProps) {
                     color: 'white',
                     zIndex: 2
                 }}>
-                    ₹{itinerary.price.toFixed(2)}
+                    {(itinerary as any).currency === 'INR' ? '₹' : (itinerary as any).currency === 'USD' ? '$' : (itinerary as any).currency === 'EUR' ? '€' : (itinerary as any).currency || '₹'}
+                    {itinerary.price.toFixed(2)}
                 </div>
                 {itinerary.duration_days && (
                     <div style={{

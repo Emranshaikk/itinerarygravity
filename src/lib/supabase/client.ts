@@ -20,6 +20,11 @@ export function createClient() {
   });
 
   if (!supabaseUrl || !supabaseAnonKey) {
+    if (typeof window === 'undefined') {
+      console.warn('⚠️ Supabase configuration is missing during server-side execution/build.');
+      // Return a dummy client or handle gracefully to prevent build failure
+      return createBrowserClient('https://placeholder.supabase.co', 'placeholder');
+    }
     console.error('❌ Supabase configuration is incomplete!', {
       urlExists: !!supabaseUrl,
       keyExists: !!supabaseAnonKey,

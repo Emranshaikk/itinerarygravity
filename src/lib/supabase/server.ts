@@ -7,7 +7,7 @@ export async function createClient() {
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
 
     if (!supabaseUrl || !supabaseAnonKey) {
-        console.error('Supabase URL or Anon Key is missing on the server! Check your .env.local file.')
+        console.warn('⚠️ Supabase configuration is missing on the server! Using placeholder during build/initialization.')
     }
 
     return createServerClient(

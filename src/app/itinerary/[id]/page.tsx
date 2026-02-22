@@ -132,7 +132,7 @@ export default async function Page({ params }: Props) {
                 'offers': {
                     '@type': 'Offer',
                     'price': itinerary?.price,
-                    'priceCurrency': itinerary?.currency || 'INR',
+                    'priceCurrency': itinerary?.currency || 'USD',
                     'availability': 'https://schema.org/InStock',
                     'url': url
                 },
