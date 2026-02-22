@@ -16,6 +16,7 @@ import Breadcrumbs from "@/components/itinerary/Breadcrumbs";
 import RelatedItineraries from "@/components/itinerary/RelatedItineraries";
 import ShareModal from "@/components/itinerary/ShareModal";
 import JourneyMap from "@/components/itinerary/JourneyMap";
+import CreatorStore from "@/components/itinerary/CreatorStore";
 import { Share2, Compass, Navigation } from "@/components/Icons";
 
 interface Props {
@@ -150,7 +151,8 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
         content: {
             days: [] as any[],
             proofOfVisit: { images: [] as any[], notes: "" },
-            affiliateProducts: [] as any[]
+            affiliateProducts: [] as any[],
+            creatorProducts: [] as any[]
         },
         days: [
             {
@@ -191,7 +193,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
             creator: liveData.profiles?.full_name || "@Influencer",
             average_rating: Number(liveData.average_rating) || 0,
             review_count: liveData.review_count || 0,
-            content: liveData.content || { days: [], proofOfVisit: { images: [], notes: "" }, affiliateProducts: [] },
+            content: liveData.content || { days: [], proofOfVisit: { images: [], notes: "" }, affiliateProducts: [], creatorProducts: [] },
             ...liveData.content,
             days: liveData.content?.days?.map((d: any, idx: number) => ({
                 ...d,
@@ -604,9 +606,15 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
 
                         <TravelerGallery itineraryId={id} isPurchased={isPurchased} />
 
-                        {isPurchased && (
-                            <AffiliateShowcase products={itinerary.content.affiliateProducts} />
-                        )}
+                        <AffiliateShowcase
+                            products={itinerary.content.affiliateProducts}
+                            showAll={isPurchased}
+                        />
+
+                        <CreatorStore
+                            products={itinerary.content.creatorProducts}
+                            creatorName={itinerary.creator}
+                        />
 
                         {isPurchased && (
                             <BudgetTracker

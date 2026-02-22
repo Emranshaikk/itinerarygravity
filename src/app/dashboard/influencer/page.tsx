@@ -64,6 +64,17 @@ export default function InfluencerDashboard() {
         }
     }
 
+    async function handleShare(itinerary: any) {
+        const url = `${window.location.origin}/itinerary/${itinerary.slug || itinerary.id}`;
+        try {
+            await navigator.clipboard.writeText(url);
+            alert("Link copied to clipboard!");
+        } catch (err) {
+            console.error("Failed to copy:", err);
+            alert("Could not copy link. Manually copy: " + url);
+        }
+    }
+
     if (loading) {
         return (
             <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
@@ -287,8 +298,20 @@ export default function InfluencerDashboard() {
                                     </div>
 
                                     <div style={{ display: 'flex', gap: '12px' }}>
-                                        <button className="btn btn-outline" style={{ flex: 1, padding: '8px' }}>Edit</button>
-                                        <button className="btn btn-outline" style={{ flex: 1, padding: '8px' }}>Share Link</button>
+                                        <button
+                                            className="btn btn-outline"
+                                            style={{ flex: 1, padding: '8px' }}
+                                            onClick={() => router.push(`/dashboard/influencer/edit/${itinerary.id}`)}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            className="btn btn-outline"
+                                            style={{ flex: 1, padding: '8px' }}
+                                            onClick={() => handleShare(itinerary)}
+                                        >
+                                            Share Link
+                                        </button>
                                     </div>
                                 </div>
                             ))

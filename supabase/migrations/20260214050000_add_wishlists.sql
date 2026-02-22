@@ -11,11 +11,24 @@ CREATE TABLE wishlists (
 ALTER TABLE wishlists ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
-CREATE POLICY "Users can view their own wishlists" ON wishlists
-  FOR SELECT USING (auth.uid()::text = user_id);
+DO $$ BEGIN
+    DROP POLICY IF EXISTS "Users can view their own wishlists" ON wishlists;
+    CREATE POLICY "Users can view their own wishlists" ON wishlists
+      FOR SELECT USING (auth.uid()::text = user_id);
+EXCEPTION WHEN undefined_table THEN
+    -- Table might not be created yet in some scenarios (though it's above)
+END $$;
 
-CREATE POLICY "Users can insert into their own wishlists" ON wishlists
-  FOR INSERT WITH CHECK (auth.uid()::text = user_id);
+DO $$ BEGIN
+    DROP POLICY IF EXISTS "Users can insert into their own wishlists" ON wishlists;
+    CREATE POLICY "Users can insert into their own wishlists" ON wishlists
+      FOR INSERT WITH CHECK (auth.uid()::text = user_id);
+EXCEPTION WHEN undefined_table THEN
+END $$;
 
-CREATE POLICY "Users can delete from their own wishlists" ON wishlists
-  FOR DELETE USING (auth.uid()::text = user_id);
+DO $$ BEGIN
+    DROP POLICY IF EXISTS "Users can delete from their own wishlists" ON wishlists;
+    CREATE POLICY "Users can delete from their own wishlists" ON wishlists
+      FOR DELETE USING (auth.uid()::text = user_id);
+EXCEPTION WHEN undefined_table THEN
+END $$;

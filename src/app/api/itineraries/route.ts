@@ -80,7 +80,7 @@ export async function GET() {
             .from('itineraries')
             .select(`
         *,
-        profiles (
+        profiles!creator_id (
           full_name,
           avatar_url
         )

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShoppingBag, Plus, Trash2, Link as LinkIcon, Tag, DollarSign, Image as ImageIcon } from "lucide-react";
+import { ShoppingBag, Plus, Trash2, Link as LinkIcon, Tag, DollarSign } from "lucide-react";
 import ImageUpload from "@/components/ImageUpload";
 
 interface AffiliateProduct {
@@ -11,6 +11,7 @@ interface AffiliateProduct {
     imageUrl?: string;
     priceDisplay?: string;
     category?: string;
+    isPublic?: boolean;
 }
 
 interface AffiliateSectionProps {
@@ -24,7 +25,8 @@ export default function AffiliateSection({ data, onChange }: AffiliateSectionPro
         productUrl: "",
         imageUrl: "",
         priceDisplay: "",
-        category: "Gear"
+        category: "Gear",
+        isPublic: false
     });
 
     const addItem = () => {
@@ -35,7 +37,8 @@ export default function AffiliateSection({ data, onChange }: AffiliateSectionPro
             productUrl: "",
             imageUrl: "",
             priceDisplay: "",
-            category: "Gear"
+            category: "Gear",
+            isPublic: false
         });
     };
 
@@ -67,7 +70,7 @@ export default function AffiliateSection({ data, onChange }: AffiliateSectionPro
                         </button>
                         <div style={{ fontWeight: 600, marginBottom: '4px' }}>{item.title}</div>
                         <div style={{ fontSize: '0.8rem', color: 'var(--gray-400)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <Tag size={12} /> {item.category} • {item.priceDisplay || 'No price'}
+                            <Tag size={12} /> {item.category} • {item.priceDisplay || 'No price'} • {item.isPublic ? 'Public' : 'Buyer Only'}
                         </div>
                     </div>
                 ))}
@@ -105,16 +108,17 @@ export default function AffiliateSection({ data, onChange }: AffiliateSectionPro
                     </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
-                    <div>
-                        <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--gray-400)', marginBottom: '4px' }}>Product Image</label>
-                        <ImageUpload
-                            value={newItem.imageUrl}
-                            onChange={(url) => setNewItem({ ...newItem, imageUrl: url })}
-                            folder="affiliate-products"
-                            label=""
-                        />
-                    </div>
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--gray-400)', marginBottom: '4px' }}>Product Image</label>
+                    <ImageUpload
+                        value={newItem.imageUrl}
+                        onChange={(url) => setNewItem({ ...newItem, imageUrl: url })}
+                        folder="affiliate-products"
+                        label=""
+                    />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
                     <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--gray-400)', marginBottom: '4px' }}>Price Display</label>
                         <div style={{ position: 'relative' }}>
@@ -142,9 +146,29 @@ export default function AffiliateSection({ data, onChange }: AffiliateSectionPro
                             <option value="Other" style={{ background: '#1a1a1a', color: '#ffffff' }}>Other</option>
                         </select>
                     </div>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--gray-400)', marginBottom: '4px' }}>Visibility</label>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                            <button
+                                type="button"
+                                onClick={() => setNewItem({ ...newItem, isPublic: true })}
+                                style={{ flex: 1, padding: '8px', fontSize: '0.75rem', borderRadius: '6px', border: '1px solid', borderColor: newItem.isPublic ? 'var(--primary)' : 'var(--border)', background: newItem.isPublic ? 'rgba(255,133,162,0.1)' : 'transparent', color: newItem.isPublic ? 'var(--primary)' : 'var(--gray-400)', cursor: 'pointer' }}
+                            >
+                                Free
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setNewItem({ ...newItem, isPublic: false })}
+                                style={{ flex: 1, padding: '8px', fontSize: '0.75rem', borderRadius: '6px', border: '1px solid', borderColor: !newItem.isPublic ? 'var(--primary)' : 'var(--border)', background: !newItem.isPublic ? 'rgba(255,133,162,0.1)' : 'transparent', color: !newItem.isPublic ? 'var(--primary)' : 'var(--gray-400)', cursor: 'pointer' }}
+                            >
+                                Buyer
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <button
+                    type="button"
                     onClick={addItem}
                     className="btn btn-outline"
                     disabled={!newItem.title || !newItem.productUrl}

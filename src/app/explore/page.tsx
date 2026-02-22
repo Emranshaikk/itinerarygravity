@@ -62,99 +62,72 @@ function ExploreContent() {
 
     async function fetchItineraries() {
         try {
-            console.log("--- Supabase Schema-Aware Fetch Start ---");
             setIsLoading(true);
-
-            // 1. Diagnostic: Fetch one row to see actual column names
-            const { data: diagData, error: diagError } = await supabase
+            const { data, error } = await supabase
                 .from('itineraries')
-                .select('*')
-                .limit(1);
+                .select(`
+                    *,
+                    profiles!creator_id (
+                        full_name,
+                        email,
+                        is_verified
+                    )
+                `)
+                .eq('is_published', true)
+                .eq('is_approved', true)
+                .order('created_at', { ascending: false });
 
-            const columns = diagData && diagData[0] ? Object.keys(diagData[0]) : [];
-            console.log("Detected Columns:", columns.join(", "));
+            if (error) {
+                console.error("Supabase query error:", error);
+                // Simple fallback if join fails for some reason
+                const { data: fallback } = await supabase
+                    .from('itineraries')
+                    .select('*')
+                    .eq('is_published', true)
+                    .order('created_at', { ascending: false });
 
-            const hasIsPublished = columns.includes('is_published');
-            const hasIsApproved = columns.includes('is_approved');
-            const hasCreatorId = columns.includes('creator_id');
-
-            // 2. Fetch Itineraries with available filters
-            console.log("Fetching itineraries data...");
-            let baseQuery = supabase.from('itineraries').select('*');
-
-            if (hasIsPublished) baseQuery = baseQuery.eq('is_published', true);
-            // If we have is_approved, we can filter by it, but maybe let's be lenient for now 
-            // since we're debugging. I'll add it if it exists.
-            if (hasIsApproved) baseQuery = baseQuery.eq('is_approved', true);
-
-            const { data: itinerariesData, error: itError } = await baseQuery.order('created_at', { ascending: false });
-
-            if (itError) {
-                console.error("Fetch failed even without join:", itError.message);
-                throw itError;
-            }
-
-            if (!itinerariesData || itinerariesData.length === 0) {
-                console.log("No itineraries found matching filters.");
-                setItineraries([]);
+                if (fallback) {
+                    const formatted = fallback.map((item: any) => ({
+                        id: item.id,
+                        title: item.title,
+                        creator: "@Creator",
+                        creator_id: item.creator_id,
+                        location: item.location || "Unknown",
+                        price: Number(item.price) || 0,
+                        average_rating: Number(item.average_rating) || 0,
+                        review_count: item.review_count || 0,
+                        image: item.image_url || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800&auto=format&fit=crop",
+                        tags: item.tags || [],
+                        is_verified: false,
+                        duration_days: item.duration_days,
+                        difficulty_level: item.difficulty_level,
+                        currency: item.currency || "USD"
+                    }));
+                    setItineraries(formatted as any);
+                }
                 return;
             }
 
-            // 3. Manual Merge with Profiles (Safest way since joins are failing)
-            console.log("Merging with profiles...");
-            const creatorIds = hasCreatorId
-                ? [...new Set(itinerariesData.map(it => it.creator_id).filter(Boolean))]
-                : [];
-
-            let profilesMap: Record<string, any> = {};
-            if (creatorIds.length > 0) {
-                const { data: profilesData } = await supabase
-                    .from('profiles')
-                    .select('id, full_name, email, is_verified')
-                    .in('id', creatorIds);
-
-                if (profilesData) {
-                    profilesData.forEach(p => { profilesMap[p.id] = p; });
-                }
-            }
-
-            const formatted = itinerariesData.map((item: any) => ({
+            const formattedData: Itinerary[] = (data || []).map((item: any) => ({
                 id: item.id,
                 title: item.title,
-                creator: profilesMap[item.creator_id]?.full_name || profilesMap[item.creator_id]?.email || "@Creator",
+                creator: item.profiles?.full_name || item.profiles?.email || "@Creator",
                 creator_id: item.creator_id,
-                location: item.location || item.destination || "Unknown",
+                location: item.location || "Unknown",
                 price: Number(item.price) || 0,
                 average_rating: Number(item.average_rating) || 0,
                 review_count: item.review_count || 0,
                 image: item.image_url || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800&auto=format&fit=crop",
                 tags: item.tags || [],
-                is_verified: profilesMap[item.creator_id]?.is_verified || false,
+                is_verified: item.profiles?.is_verified || false,
                 duration_days: item.duration_days,
                 difficulty_level: item.difficulty_level,
                 currency: item.currency || "USD"
             }));
 
-            setItineraries(formatted);
-            console.log(`Successfully rendered ${formatted.length} itineraries.`);
-            console.log("--- Supabase Schema-Aware Fetch End ---");
-        } catch (err: any) {
-            console.error("CRITICAL ERROR in fetchItineraries:", err.message || err);
-            // Last resort: just try to get anything at all
-            try {
-                const { data } = await supabase.from('itineraries').select('*').limit(10);
-                if (data) {
-                    const simple = data.map((item: any) => ({
-                        id: item.id,
-                        title: item.title,
-                        creator: "@Creator",
-                        location: item.location || "Unknown",
-                        price: Number(item.price) || 0,
-                        image: item.image_url || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800&auto=format&fit=crop"
-                    }));
-                    setItineraries(simple as any);
-                }
-            } catch (e) { }
+            setItineraries(formattedData);
+        } catch (error: any) {
+            console.error("Fetch error:", error);
         } finally {
             setIsLoading(false);
         }

@@ -9,14 +9,19 @@ interface AffiliateProduct {
     imageUrl?: string;
     priceDisplay?: string;
     category?: string;
+    isPublic?: boolean;
 }
 
 interface AffiliateShowcaseProps {
     products?: AffiliateProduct[];
+    showAll: boolean;
 }
 
-export default function AffiliateShowcase({ products }: AffiliateShowcaseProps) {
+export default function AffiliateShowcase({ products, showAll }: AffiliateShowcaseProps) {
     if (!products || products.length === 0) return null;
+
+    const visibleProducts = showAll ? products : products.filter(p => p.isPublic);
+    if (visibleProducts.length === 0) return null;
 
     return (
         <section style={{ marginBottom: '80px' }}>
@@ -31,7 +36,7 @@ export default function AffiliateShowcase({ products }: AffiliateShowcaseProps) 
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
-                {products.map((product, idx) => (
+                {visibleProducts.map((product, idx) => (
                     <div key={idx} className="glass card" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                         {product.imageUrl && (
                             <div style={{ height: '180px', overflow: 'hidden', position: 'relative' }}>

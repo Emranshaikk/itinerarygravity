@@ -201,6 +201,14 @@ export interface ItineraryContent {
         imageUrl?: string;
         priceDisplay?: string;
         category?: string;
+        isPublic?: boolean; // If true, visible even before purchase
+    }[];
+    creatorProducts?: {
+        title: string;
+        url: string;
+        imageUrl?: string;
+        description?: string;
+        price?: string;
     }[];
 }
 
@@ -259,5 +267,6 @@ export const initialItineraryContent: ItineraryContent = {
         images: [],
         notes: ""
     },
-    affiliateProducts: []
+    affiliateProducts: [],
+    creatorProducts: []
 };
