@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ArrowLeft, CheckCircle, MapPin, Star, ShieldCheck, Calendar, Clock, Info, Shield, Truck, Hotel, Coffee } from "@/components/Icons";
+import { ArrowLeft, CheckCircle, MapPin, Star, ShieldCheck, Calendar, Clock, Info, Shield, Truck, Hotel, Coffee, MessageCircle, Share2, Compass, Navigation, ListChecks, Smartphone, Layout } from "@/components/Icons";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -17,7 +17,8 @@ import RelatedItineraries from "@/components/itinerary/RelatedItineraries";
 import ShareModal from "@/components/itinerary/ShareModal";
 import JourneyMap from "@/components/itinerary/JourneyMap";
 import CreatorStore from "@/components/itinerary/CreatorStore";
-import { Share2, Compass, Navigation } from "@/components/Icons";
+import SocialHub from "@/components/itinerary/SocialHub";
+
 
 interface Props {
     id: string;
@@ -37,6 +38,11 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
     const [userReview, setUserReview] = useState<any>(null);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const supabase = createClient();
+    const [socialProofIndex, setSocialProofIndex] = useState(0);
+    const socialProofs = [
+        { id: 'sales', text: "34 people bought this in last 24 hours", type: 'sales' },
+        { id: 'views', text: "Popular! 5 people are viewing this right now", type: 'views' }
+    ];
 
     const isKyoto = id === "kyoto-traditional";
     const isBali = id === "bali-hidden";
@@ -44,6 +50,14 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
     useEffect(() => {
         setMounted(true);
 
+        const interval = setInterval(() => {
+            setSocialProofIndex((prev) => (prev + 1) % socialProofs.length);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
         async function fetchData() {
             try {
                 // If we already have initial data and user, we might still want to check for purchases if not provided
@@ -123,8 +137,13 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
 
     // Comprehensive mock data matching the new creator fields
     let itinerary = {
-        id: isKyoto ? "kyoto-traditional" : isBali ? "bali-hidden" : "",
-        title: isKyoto ? "7 Days in Kyoto: The Ultimate Guide" : "Bali: Hidden Gems & Waterfalls",
+        id: id,
+        title: isKyoto ? "7 Days in Kyoto: The Ultimate Guide" : isBali ? "Bali: Hidden Gems & Waterfalls" : "",
+        image_url: isKyoto
+            ? "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2070&auto=format&fit=crop"
+            : isBali
+                ? "https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=2076&auto=format&fit=crop"
+                : "",
         creator: isKyoto ? "@SarahTravels" : "@BaliExplorer",
         location: isKyoto ? "Kyoto, Japan" : "Ubud, Bali",
         duration: isKyoto ? "7 Days & 6 Nights" : "5 Days & 4 Nights",
@@ -185,16 +204,17 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
     if (liveData) {
         itinerary = {
             ...itinerary,
-            title: liveData.title,
-            location: liveData.location,
-            price: Number(liveData.price),
-            currency: liveData.currency,
-            description: liveData.description,
-            tags: liveData.content?.cover?.tags || [],
-            creator: liveData.profiles?.full_name || "@Influencer",
-            average_rating: Number(liveData.average_rating) || 0,
-            review_count: liveData.review_count || 0,
-            id: liveData.id,
+            title: liveData.title || itinerary.title,
+            location: liveData.location || itinerary.location,
+            price: liveData.price ? Number(liveData.price) : itinerary.price,
+            currency: liveData.currency || itinerary.currency,
+            description: liveData.description || itinerary.description,
+            tags: liveData.content?.cover?.tags || itinerary.tags,
+            creator: liveData.profiles?.full_name || itinerary.creator,
+            average_rating: liveData.average_rating ? Number(liveData.average_rating) : itinerary.average_rating,
+            review_count: liveData.review_count !== undefined ? liveData.review_count : itinerary.review_count,
+            id: liveData.id || id,
+            image_url: liveData.image_url || itinerary.image_url,
             content: liveData.content || { days: [], proofOfVisit: { images: [], notes: "" }, affiliateProducts: [], creatorProducts: [] },
             ...liveData.content,
             days: liveData.content?.days?.map((d: any, idx: number) => ({
@@ -317,10 +337,10 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                         </div>
                     </div>
 
-                    {itinerary.id && liveData?.image_url && (
+                    {itinerary.image_url && (
                         <div style={{ marginBottom: '32px', borderRadius: '24px', overflow: 'hidden', height: '400px', position: 'relative', border: '1px solid var(--border)' }}>
                             <Image
-                                src={liveData.image_url}
+                                src={itinerary.image_url}
                                 alt={itinerary.title}
                                 fill
                                 style={{ objectFit: 'cover' }}
@@ -382,9 +402,79 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                             </div>
 
                             <TravelerGallery itineraryId={itinerary.id || id} isPurchased={isPurchased} />
+
+                            {/* Actionable Travel Tools (Premium Section) */}
+                            {isPurchased && (
+                                <div style={{ marginTop: '48px', borderTop: '1px solid var(--border)', paddingTop: '48px' }}>
+                                    <h2 style={{ fontSize: '2rem', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <Layout size={32} color="var(--primary)" /> Expert Travel Tools
+                                    </h2>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+                                        {/* Checklist Tool */}
+                                        <div className="glass card" style={{ padding: '24px' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <ListChecks size={20} color="var(--primary)" /> Pre-Trip Checklist
+                                            </h3>
+                                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '12px' }}>
+                                                {['Verify Visa Requirements', 'Book Airport Transfer', 'Download Offline Maps', 'Notify Bank of Travel'].map((item, i) => (
+                                                    <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', color: 'var(--gray-400)' }}>
+                                                        <div style={{ width: '18px', height: '18px', borderRadius: '4px', border: '2px solid var(--border)' }}></div>
+                                                        {item}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+
+                                        {/* Mobile App Sync Tool */}
+                                        <div className="glass card" style={{ padding: '24px', background: 'linear-gradient(135deg, rgba(var(--primary-rgb), 0.1), transparent)' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <Smartphone size={20} color="var(--primary)" /> Mobile Sync (PWA)
+                                            </h3>
+                                            <p style={{ fontSize: '0.85rem', color: 'var(--gray-400)', marginBottom: '16px' }}>
+                                                Sync this guide to your phone for 100% offline access in areas without signal.
+                                            </p>
+                                            <button className="btn btn-outline" style={{ width: '100%', fontSize: '0.8rem' }}>Generate Offline Key</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {isPurchased && <SocialHub itineraryId={itinerary.id || id} currentUser={user} />}
                         </div>
                         <div className="glass card" style={{ padding: '24px' }}>
                             <div className="no-print">
+                                <div style={{
+                                    marginBottom: '20px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    padding: '12px 16px',
+                                    background: 'var(--surface)',
+                                    borderRadius: '12px',
+                                    border: '1px solid var(--border)',
+                                    height: '50px'
+                                }}>
+                                    <div style={{ position: 'relative', width: '8px', height: '8px', borderRadius: '50%', background: socialProofs[socialProofIndex].type === 'views' ? '#f43f5e' : '#10b981', flexShrink: 0 }}>
+                                        <div style={{
+                                            position: 'absolute',
+                                            inset: -4,
+                                            borderRadius: '50%',
+                                            background: socialProofs[socialProofIndex].type === 'views' ? '#f43f5e' : '#10b981',
+                                            opacity: 0.4,
+                                            animation: 'pulse 2s infinite'
+                                        }}></div>
+                                    </div>
+                                    <div key={socialProofIndex} style={{
+                                        fontSize: '0.85rem',
+                                        fontWeight: 600,
+                                        color: 'var(--foreground)',
+                                        animation: 'slideUp 0.3s ease-out'
+                                    }}>
+                                        {socialProofs[socialProofIndex].text}
+                                    </div>
+                                </div>
+
                                 <h2 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>
                                     {itinerary.currency === 'INR' || !itinerary.currency ? '₹' : itinerary.currency === 'USD' ? '$' : itinerary.currency === 'EUR' ? '€' : itinerary.currency + ' '}
                                     {itinerary.price}
@@ -451,6 +541,15 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                     <div style={{ fontSize: '0.75rem', color: 'var(--gray-400)', fontWeight: 600 }}>
                                         Instant Delivery
                                     </div>
+                                </div>
+
+                                <div style={{ marginTop: '24px', padding: '16px', background: 'rgba(16,185,129,0.05)', borderRadius: '16px', border: '1px dashed #10b981' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#10b981', fontWeight: 700, fontSize: '0.9rem', marginBottom: '8px' }}>
+                                        <VerifiedBadge size={18} /> Verified & Accurate
+                                    </div>
+                                    <p style={{ fontSize: '0.8rem', color: 'var(--gray-400)', lineHeight: '1.5', margin: 0 }}>
+                                        We independently verify every itinerary. If any major recommendation (Hotel/Transport) is wildly inaccurate, we'll credit your account. **100% Peace of Mind.**
+                                    </p>
                                 </div>
                             </div>
                             <div className="print-only">
@@ -672,9 +771,9 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                         {isPurchased && (
                             <BudgetTracker
                                 itineraryId={id}
-                                dailyBudgetEstimate={itinerary.logistics.currency.dailyBudgetEstimate}
-                                totalDays={itinerary.days.length}
-                                currency={itinerary.currency}
+                                dailyBudgetEstimate={itinerary.logistics?.currency?.dailyBudgetEstimate || "$50-$100"}
+                                totalDays={itinerary.days?.length || 0}
+                                currency={itinerary.currency || "USD"}
                             />
                         )}
 
@@ -778,6 +877,17 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                 isOpen={isShareModalOpen}
                 onClose={() => setIsShareModalOpen(false)}
             />
+            <style>{`
+                @keyframes pulse {
+                    0% { transform: scale(1); opacity: 0.4; }
+                    50% { transform: scale(1.5); opacity: 0.1; }
+                    100% { transform: scale(1); opacity: 0.4; }
+                }
+                @keyframes slideUp {
+                    from { transform: translateY(10px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+            `}</style>
         </div>
     );
 }
