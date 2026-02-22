@@ -216,6 +216,10 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
         router.push(`/checkout/${id}`);
     };
 
+    const handleShare = () => {
+        setIsShareModalOpen(true);
+    };
+
     const handleReviewSubmitted = async () => {
         const { data: review } = await supabase
             .from('reviews')
@@ -259,7 +263,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '24px' }}>
                 <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{timeOfDay}</span>
                 <div>
-                    <p style={{ color: 'var(--gray-400)' }}>{text}</p>
+                    <p style={{ color: 'var(--gray-400)', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{text}</p>
                     {location && (
                         <a
                             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`}
@@ -300,7 +304,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
     return (
         <div style={{ paddingBottom: '100px' }}>
             {/* Header Section */}
-            <div style={{ background: 'var(--background)', borderBottom: '1px solid var(--border)', padding: '60px 0' }}>
+            <div style={{ background: 'var(--background)', borderBottom: '1px solid var(--border)', padding: '40px 0' }}>
                 <div className="container">
                     <Breadcrumbs
                         items={[
@@ -308,39 +312,94 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                             { label: itinerary.title }
                         ]}
                     />
-                    <button className="no-print" onClick={() => router.back()} style={{ background: 'none', border: 'none', color: 'var(--gray-400)', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '32px' }}>
-                        <ArrowLeft size={16} /> Back to Explore
-                    </button>
+                    <div className="no-print" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', color: 'var(--gray-400)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <ArrowLeft size={16} /> Back to Explore
+                        </button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fbbf24', fontSize: '0.9rem', fontWeight: 600 }}>
+                            <Star size={16} fill="#fbbf24" /> Top Rated Experience
+                        </div>
+                    </div>
+
+                    {itinerary.id && liveData?.image_url && (
+                        <div style={{ marginBottom: '32px', borderRadius: '24px', overflow: 'hidden', height: '400px', position: 'relative', border: '1px solid var(--border)' }}>
+                            <Image
+                                src={liveData.image_url}
+                                alt={itinerary.title}
+                                fill
+                                style={{ objectFit: 'cover' }}
+                                priority
+                            />
+                            <div style={{ position: 'absolute', bottom: '24px', left: '24px', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', padding: '8px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <MapPin size={16} color="var(--primary)" /> {itinerary.location}
+                            </div>
+                        </div>
+                    )}
 
                     <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '48px', alignItems: 'flex-start' }}>
                         <div>
-                            <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
+                            <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
                                 <span className="badge" style={{ background: 'rgba(255,133,162,0.2)', color: 'var(--primary)', border: '1px solid var(--primary)' }}>{itinerary.tripTheme}</span>
                                 <span className="badge" style={{ background: 'var(--surface)', color: 'var(--foreground)', border: '1px solid var(--border)' }}>{itinerary.duration}</span>
-                                {itinerary.tags && itinerary.tags.map((tag: string, i: number) => (
-                                    <span key={i} className="badge" style={{ background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6', border: '1px solid rgba(139, 92, 246, 0.3)' }}>#{tag}</span>
-                                ))}
                             </div>
-                            <h1 className="text-gradient" style={{ fontSize: '3.5rem', fontWeight: 800, marginBottom: '20px', lineHeight: 1.1 }}>
+                            <h1 className="text-gradient" style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '12px', lineHeight: 1.1 }}>
                                 {itinerary.title}
                             </h1>
-                            <div style={{ display: 'flex', gap: '32px', color: 'var(--gray-400)', fontSize: '1.1rem', marginBottom: '20px', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', color: 'var(--gray-400)', fontSize: '1rem', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <span style={{ fontWeight: 600, color: 'var(--foreground)' }}>by {itinerary.creator}</span>
                                     {itinerary.is_verified && <VerifiedBadge size={18} />}
                                 </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={18} color="var(--primary)" /> {itinerary.location}</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Star size={18} color="#fbbf24" fill="#fbbf24" /> <strong style={{ color: 'var(--foreground)' }}>{itinerary.average_rating > 0 ? itinerary.average_rating.toFixed(1) : itinerary.rating}</strong> ({itinerary.review_count > 0 ? itinerary.review_count : itinerary.reviews} reviews)</div>
                             </div>
-                            <div style={{ display: 'flex', gap: '32px', color: 'var(--gray-400)', fontSize: '1.1rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={20} color="var(--primary)" /> {itinerary.location}</div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Star size={20} color="#fbbf24" fill="#fbbf24" /> <strong style={{ color: 'var(--foreground)' }}>{itinerary.average_rating > 0 ? itinerary.average_rating.toFixed(1) : itinerary.rating}</strong> ({itinerary.review_count > 0 ? itinerary.review_count : itinerary.reviews} reviews)</div>
+                            {itinerary.tags && (
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                                    {itinerary.tags.map((tag: string, i: number) => (
+                                        <span key={i} style={{ fontSize: '0.8rem', color: '#8b5cf6', background: 'rgba(139, 92, 246, 0.1)', padding: '2px 10px', borderRadius: '99px' }}>#{tag}</span>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Moved content to fill space */}
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginTop: '32px', marginBottom: '32px' }}>
+                                <div className="glass card" style={{ padding: '16px' }}>
+                                    <Calendar size={18} color="var(--primary)" style={{ marginBottom: '8px' }} />
+                                    <p style={{ fontSize: '0.7rem', color: 'var(--gray-400)', textTransform: 'uppercase' }}>Best Time</p>
+                                    <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>{itinerary.bestTimeToVisit}</p>
+                                </div>
+                                <div className="glass card" style={{ padding: '16px' }}>
+                                    <ShieldCheck size={18} color="var(--primary)" style={{ marginBottom: '8px' }} />
+                                    <p style={{ fontSize: '0.7rem', color: 'var(--gray-400)', textTransform: 'uppercase' }}>Ideal For</p>
+                                    <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>{itinerary.idealFor}</p>
+                                </div>
+                                <div className="glass card" style={{ padding: '16px' }}>
+                                    <CheckCircle size={18} color="var(--primary)" style={{ marginBottom: '8px' }} />
+                                    <p style={{ fontSize: '0.7rem', color: 'var(--gray-400)', textTransform: 'uppercase' }}>Language</p>
+                                    <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>{itinerary.language}</p>
+                                </div>
                             </div>
+
+                            <div style={{ padding: '20px', background: 'rgba(var(--primary-rgb), 0.03)', borderRadius: '16px', border: '1px solid var(--border)', marginBottom: '32px' }}>
+                                <h4 style={{ fontSize: '1rem', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}><Info size={16} color="var(--primary)" /> About this Trip</h4>
+                                <p style={{ color: 'var(--gray-400)', lineHeight: '1.6', fontSize: '0.95rem' }}>{itinerary.description}</p>
+                            </div>
+
+                            <TravelerGallery itineraryId={itinerary.id || id} isPurchased={isPurchased} />
                         </div>
                         <div className="glass card" style={{ padding: '24px' }}>
                             <div className="no-print">
                                 <h2 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>
                                     {itinerary.currency === 'INR' || !itinerary.currency ? '₹' : itinerary.currency === 'USD' ? '$' : itinerary.currency === 'EUR' ? '€' : itinerary.currency + ' '}
                                     {itinerary.price}
+                                    <span style={{ fontSize: '1rem', color: 'var(--gray-400)', marginLeft: '8px', fontWeight: 500 }}>{itinerary.priceType}</span>
                                 </h2>
+
+                                <div style={{ background: 'rgba(255,133,162,0.1)', border: '1px solid var(--primary)', borderRadius: '8px', padding: '8px 12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <div style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.85rem' }}>Limited Time Price</div>
+                                    <div style={{ background: 'var(--primary)', height: '14px', width: '1px' }}></div>
+                                    <div style={{ color: 'var(--foreground)', fontSize: '0.8rem', fontWeight: 500 }}>Saves 20+ hours of prep</div>
+                                </div>
 
                                 {!isPurchased ? (
                                     <button className="btn btn-primary" style={{ width: '100%', padding: '14px', marginBottom: '12px' }} onClick={handlePurchase}>Buy Full Itinerary</button>
@@ -363,22 +422,39 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                     </div>
                                 )}
 
-                                <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <div style={{ marginTop: '24px', display: 'flex', gap: '16px', justifyContent: 'center', borderTop: '1px solid var(--border)', paddingTop: '24px' }}>
                                     <button
                                         onClick={exportToGoogleMaps}
-                                        className="btn btn-outline"
-                                        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                        title="Open in Google Maps"
+                                        style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--foreground)', width: '50px', height: '50px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s' }}
+                                        onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--primary)'}
+                                        onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
                                     >
-                                        <MapPin size={18} /> Open in Google Maps
+                                        <MapPin size={22} />
                                     </button>
                                     <button
-                                        onClick={() => setIsShareModalOpen(true)}
-                                        className="btn btn-outline"
-                                        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                        onClick={handleShare}
+                                        title="Share Itinerary"
+                                        style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--foreground)', width: '50px', height: '50px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s' }}
+                                        onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--primary)'}
+                                        onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
                                     >
-                                        <Share2 size={18} /> Share Itinerary
+                                        <Share2 size={22} />
                                     </button>
-                                    <PDFGenerator itineraryData={pdfData} isPurchased={isPurchased} />
+                                    <div style={{ width: '50px', height: '50px' }}>
+                                        <PDFGenerator itineraryData={pdfData} isPurchased={isPurchased} iconOnly={true} />
+                                    </div>
+                                </div>
+                                <div style={{ marginTop: '20px', display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#10b981', fontWeight: 600 }}>
+                                        <ShieldCheck size={14} /> Secure Checkout
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: 'var(--gray-400)' }}>
+                                        •
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--gray-400)', fontWeight: 600 }}>
+                                        Instant Delivery
+                                    </div>
                                 </div>
                             </div>
                             <div className="print-only">
@@ -394,42 +470,12 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                 </div>
             </div>
 
-            <div className="container" style={{ marginTop: '60px' }}>
+            <div className="container" style={{ marginTop: '40px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '60px' }}>
 
                     {/* Left Side: Rich Content */}
                     <div>
-                        {/* Quick Stats Grid */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '60px' }}>
-                            <div className="glass card" style={{ padding: '20px' }}>
-                                <Calendar size={20} color="var(--primary)" style={{ marginBottom: '12px' }} />
-                                <p style={{ fontSize: '0.8rem', color: 'var(--gray-400)' }}>Best Time</p>
-                                <p style={{ fontWeight: 600 }}>{itinerary.bestTimeToVisit}</p>
-                            </div>
-                            <div className="glass card" style={{ padding: '20px' }}>
-                                <ShieldCheck size={20} color="var(--primary)" style={{ marginBottom: '12px' }} />
-                                <p style={{ fontSize: '0.8rem', color: 'var(--gray-400)' }}>Ideal For</p>
-                                <p style={{ fontWeight: 600 }}>{itinerary.idealFor}</p>
-                            </div>
-                            <div className="glass card" style={{ padding: '20px' }}>
-                                <CheckCircle size={20} color="var(--primary)" style={{ marginBottom: '12px' }} />
-                                <p style={{ fontSize: '0.8rem', color: 'var(--gray-400)' }}>Language</p>
-                                <p style={{ fontWeight: 600 }}>{itinerary.language}</p>
-                            </div>
-                        </div>
-
-                        {/* Overview Section */}
-                        <section style={{ marginBottom: '60px' }}>
-                            <h2 style={{ fontSize: '1.8rem', marginBottom: '24px' }}>About this Trip</h2>
-                            <p style={{ color: 'var(--gray-400)', lineHeight: '1.8', fontSize: '1.1rem' }}>{itinerary.description}</p>
-
-                            <div style={{ marginTop: '32px', padding: '24px', border: '1px solid var(--border)', borderRadius: '16px' }}>
-                                <h4 style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}><Info size={16} /> What you get</h4>
-                                <p style={{ fontSize: '0.95rem', color: 'var(--gray-400)' }}>{itinerary.priceIncludes}</p>
-                            </div>
-                        </section>
-
-                        {/* Daily Itinerary Tabs */}
+                        {/* Daily Schedule Tabs */}
                         <section style={{ marginBottom: '60px' }}>
                             <div style={{
                                 display: 'flex',
@@ -437,11 +483,15 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                 alignItems: 'center',
                                 marginBottom: '32px',
                                 position: 'sticky',
-                                top: '0',
+                                top: '80px',
                                 zIndex: 50,
-                                background: 'var(--background)',
-                                padding: '16px 0',
-                                borderBottom: '1px solid var(--border)'
+                                background: 'rgba(var(--background-rgb), 0.8)',
+                                backdropFilter: 'blur(12px)',
+                                padding: '20px 0',
+                                borderBottom: '1px solid var(--border)',
+                                margin: '0 -20px',
+                                paddingLeft: '20px',
+                                paddingRight: '20px'
                             }}>
                                 <h2 style={{ fontSize: '1.8rem', margin: 0 }}>Daily Schedule</h2>
                                 <div className="no-print" style={{ display: 'flex', gap: '8px', overflowX: 'auto', maxWidth: '100%', paddingBottom: '4px' }}>
@@ -534,7 +584,13 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                                             <button className="btn btn-primary" onClick={handlePurchase}>Unlock Full Itinerary</button>
                                                         </div>
                                                     )}
-                                                    <div style={{ filter: (!isPurchased && activeDay === 1) ? 'blur(4px)' : 'none', opacity: (!isPurchased && activeDay === 1) ? 0.5 : 1, userSelect: (!isPurchased && activeDay === 1) ? 'none' : 'auto' }}>
+                                                    <div style={{
+                                                        display: 'grid',
+                                                        gap: '32px',
+                                                        filter: (!isPurchased && activeDay === 1) ? 'blur(4px)' : 'none',
+                                                        opacity: (!isPurchased && activeDay === 1) ? 0.5 : 1,
+                                                        userSelect: (!isPurchased && activeDay === 1) ? 'none' : 'auto'
+                                                    }}>
                                                         {renderActivity(day.afternoon, "Afternoon")}
                                                         {renderActivity(day.evening, "Evening")}
                                                     </div>
@@ -606,7 +662,6 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                             </section>
                         )}
 
-                        <TravelerGallery itineraryId={itinerary.id || id} isPurchased={isPurchased} />
 
                         <AffiliateShowcase
                             products={itinerary.content.affiliateProducts}
@@ -651,30 +706,9 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                             creatorId={liveData?.creator_id || ""}
                         />
 
-                        <section style={{ marginBottom: '60px', marginTop: '80px' }}>
-                            <h2 style={{ fontSize: '1.8rem', marginBottom: '32px' }}>Fine Print</h2>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
-                                <div className="glass card" style={{ padding: '32px' }}>
-                                    <h4 style={{ marginBottom: '16px', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <Info size={18} /> Refund Policy
-                                    </h4>
-                                    <p style={{ color: 'var(--gray-400)', fontSize: '0.95rem', lineHeight: '1.6' }}>
-                                        {itinerary.refundPolicy || "No refunds once the guide has been accessed or downloaded."}
-                                    </p>
-                                </div>
-                                <div className="glass card" style={{ padding: '32px' }}>
-                                    <h4 style={{ marginBottom: '16px', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <Shield size={18} /> Cancellation Terms
-                                    </h4>
-                                    <p style={{ color: 'var(--gray-400)', fontSize: '0.95rem', lineHeight: '1.6' }}>
-                                        {itinerary.cancellationPolicy || "Digital product. Final sale once accessed."}
-                                    </p>
-                                </div>
-                            </div>
-                        </section>
                     </div>
 
-                    <div style={{ position: 'sticky', top: '24px' }}>
+                    <div style={{ position: 'sticky', top: '104px' }}>
                         <div className="glass card" style={{ padding: '32px', marginBottom: '24px' }}>
                             <h3 style={{ marginBottom: '24px', fontSize: '1.2rem' }}>Logistics & Transfers</h3>
                             <div style={{ display: 'grid', gap: '16px' }}>
@@ -693,7 +727,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                             </div>
                         </div>
 
-                        <div className="glass card" style={{ padding: '32px' }}>
+                        <div className="glass card" style={{ padding: '32px', marginBottom: '24px' }}>
                             <h3 style={{ marginBottom: '24px', fontSize: '1.2rem' }}>Safety & Policy</h3>
                             <div style={{ display: 'grid', gap: '20px' }}>
                                 <div style={{ display: 'flex', gap: '12px' }}>
@@ -709,6 +743,28 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                         <p style={{ fontSize: '0.9rem', fontWeight: 600 }}>Advance Booking</p>
                                         <p style={{ fontSize: '0.8rem', color: 'var(--gray-400)' }}>{itinerary.advanceBooking}</p>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="glass card" style={{ padding: '32px', marginBottom: '24px' }}>
+                            <h3 style={{ marginBottom: '24px', fontSize: '1.2rem' }}>Fine Print</h3>
+                            <div style={{ display: 'grid', gap: '20px' }}>
+                                <div>
+                                    <h4 style={{ fontSize: '0.9rem', marginBottom: '8px', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Info size={16} /> Refund Policy
+                                    </h4>
+                                    <p style={{ color: 'var(--gray-400)', fontSize: '0.85rem', lineHeight: '1.5' }}>
+                                        {itinerary.refundPolicy || "No refunds once the guide has been accessed or downloaded."}
+                                    </p>
+                                </div>
+                                <div style={{ paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
+                                    <h4 style={{ fontSize: '0.9rem', marginBottom: '8px', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Shield size={16} /> Cancellation Terms
+                                    </h4>
+                                    <p style={{ color: 'var(--gray-400)', fontSize: '0.85rem', lineHeight: '1.5' }}>
+                                        {itinerary.cancellationPolicy || "Digital product. Final sale once accessed."}
+                                    </p>
                                 </div>
                             </div>
                         </div>

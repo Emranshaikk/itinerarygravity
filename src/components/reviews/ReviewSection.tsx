@@ -30,7 +30,7 @@ export default function ReviewSection({ itineraryId, averageRating, reviewCount 
 
     useEffect(() => {
         fetchReviews();
-    }, [itineraryId]);
+    }, [itineraryId, reviewCount]);
 
     async function fetchReviews() {
         try {

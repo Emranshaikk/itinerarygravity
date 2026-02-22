@@ -17,9 +17,10 @@ interface ItineraryData {
 interface PDFGeneratorProps {
     itineraryData: ItineraryData;
     isPurchased: boolean;
+    iconOnly?: boolean;
 }
 
-export default function PDFGenerator({ itineraryData, isPurchased }: PDFGeneratorProps) {
+export default function PDFGenerator({ itineraryData, isPurchased, iconOnly = false }: PDFGeneratorProps) {
     const [generating, setGenerating] = useState(false);
 
     const generatePDF = (isPreview: boolean) => {
@@ -145,6 +146,34 @@ export default function PDFGenerator({ itineraryData, isPurchased }: PDFGenerato
             setGenerating(false);
         }
     };
+
+    if (iconOnly) {
+        return (
+            <button
+                onClick={() => generatePDF(!isPurchased)}
+                disabled={generating}
+                title={isPurchased ? "Download Full PDF" : "Download Preview PDF"}
+                style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--foreground)',
+                    width: '50px',
+                    height: '50px',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: generating ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s',
+                    opacity: generating ? 0.7 : 1
+                }}
+                onMouseOver={(e) => !generating && (e.currentTarget.style.borderColor = 'var(--primary)')}
+                onMouseOut={(e) => !generating && (e.currentTarget.style.borderColor = 'var(--border)')}
+            >
+                <Download size={22} />
+            </button>
+        );
+    }
 
     return (
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
