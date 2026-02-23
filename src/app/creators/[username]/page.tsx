@@ -26,7 +26,8 @@ export default function CreatorProfilePage() {
                 .single();
 
             // Fallback: If not found by username, try by ID (legacy support during migration)
-            if (!profileData) {
+            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(username);
+            if (!profileData && isUUID) {
                 const { data: profileById } = await supabase
                     .from('profiles')
                     .select('*')

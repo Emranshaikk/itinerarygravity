@@ -165,7 +165,7 @@ export default function InfluencerSettingsPage() {
                                 <div style={{ width: '40px', height: '40px', background: '#10b981', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700 }}>R</div>
                                 <div>
                                     <p style={{ fontWeight: 600 }}>Razorpay Connected</p>
-                                    <p style={{ fontSize: '0.8rem', color: '#10b981 opacity 0.8' }}>Verified to receive payouts via Razorpay.</p>
+                                    <p style={{ fontSize: '0.8rem', color: '#10b981', opacity: 0.8 }}>Verified to receive payouts via Razorpay.</p>
                                 </div>
                             </div>
                             <button className="btn btn-outline" style={{ fontSize: '0.8rem', padding: '6px 12px' }}>Manage</button>
