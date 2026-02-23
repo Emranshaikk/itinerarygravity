@@ -125,11 +125,11 @@ export default function InfluencerDashboard() {
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>
                     <Link
-                        href={`/creators/${user?.id}`}
+                        href={`/creators/${profile?.username || user?.id}`}
                         className="btn btn-outline"
                         style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                     >
-                        <MapPin size={16} /> View Public Profile
+                        <Eye size={16} /> View Public Profile
                     </Link>
                     <button
                         className="btn btn-outline"

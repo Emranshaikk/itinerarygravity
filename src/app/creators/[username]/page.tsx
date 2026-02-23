@@ -72,8 +72,12 @@ export default function CreatorProfilePage() {
     if (!creator) {
         return (
             <div className="container" style={{ padding: '60px 0', minHeight: '60vh', textAlign: 'center' }}>
-                <h2>Creator not found</h2>
-                <Link href="/" className="btn btn-primary" style={{ marginTop: '20px' }}>Go Home</Link>
+                <h2 style={{ fontSize: '2rem', marginBottom: '16px' }}>Creator not found</h2>
+                <p style={{ color: 'var(--gray-400)', marginBottom: '32px' }}>This profile might be private or doesn't exist yet.</p>
+                <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+                    <Link href="/dashboard/influencer" className="btn btn-outline">Go to Dashboard</Link>
+                    <Link href="/" className="btn btn-primary">Go Home</Link>
+                </div>
             </div>
         );
     }

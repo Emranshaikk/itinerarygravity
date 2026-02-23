@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Save, Shield, Star, Info, ShieldCheck, Camera } from "@/components/Icons";
+import { ArrowLeft, Save, Shield, Star, Info, ShieldCheck, Camera, CreditCard, Landmark, Send } from "@/components/Icons";
+import ImageUpload from "@/components/ImageUpload";
 
 export default function InfluencerSettingsPage() {
     const router = useRouter();
@@ -25,8 +26,10 @@ export default function InfluencerSettingsPage() {
     const [payment, setPayment] = useState({
         stripeConnected: false,
         paypalEmail: "",
+        upiId: "",
+        bankAccount: "",
         payoutFrequency: "Weekly",
-        currency: "USD"
+        currency: "INR"
     });
 
     useEffect(() => {
@@ -90,17 +93,6 @@ export default function InfluencerSettingsPage() {
         }
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            // In a real app, upload to Supabase Storage here
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setProfileImg(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
 
     return (
         <div className="container" style={{ padding: '40px 0', maxWidth: '900px' }}>
@@ -124,58 +116,13 @@ export default function InfluencerSettingsPage() {
                         <span className="badge" style={{ background: 'var(--primary)', fontSize: '0.7rem' }}>Verified</span>
                     </h3>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '32px', marginBottom: '32px', paddingBottom: '32px', borderBottom: '1px solid var(--border)' }}>
-                        <div style={{ position: 'relative' }}>
-                            <div style={{
-                                width: '100px',
-                                height: '100px',
-                                borderRadius: '50%',
-                                background: profileImg ? `url(${profileImg})` : 'var(--surface)',
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '2rem',
-                                color: 'var(--gray-400)',
-                                border: '2px solid var(--border)',
-                                overflow: 'hidden'
-                            }}>
-                                {!profileImg && profile.name.charAt(0)}
-                            </div>
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                style={{
-                                    position: 'absolute',
-                                    bottom: '0',
-                                    right: '0',
-                                    background: 'var(--primary)',
-                                    color: 'white',
-                                    border: 'none',
-                                    width: '32px',
-                                    height: '32px',
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer',
-                                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-                                }}
-                            >
-                                <Camera size={16} />
-                            </button>
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                style={{ display: 'none' }}
-                                accept="image/*"
-                                onChange={handleFileChange}
-                            />
-                        </div>
-                        <div>
-                            <h4 style={{ marginBottom: '4px' }}>Profile Picture</h4>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--gray-400)' }}>JPG, GIF or PNG. Max size 2MB.</p>
-                        </div>
+                    <div style={{ marginBottom: '32px' }}>
+                        <ImageUpload
+                            value={profileImg || ""}
+                            onChange={(url) => setProfileImg(url)}
+                            folder="profiles"
+                            label="Profile Picture"
+                        />
                     </div>
 
                     <div style={{ display: 'grid', gap: '20px' }}>
@@ -232,9 +179,29 @@ export default function InfluencerSettingsPage() {
                     )}
 
                     <div style={{ display: 'grid', gap: '20px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                            <div className="form-group">
+                                <label className="form-label">UPI ID (Settlement)</label>
+                                <div style={{ position: 'relative' }}>
+                                    <Send size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray-400)' }} />
+                                    <input className="form-input" style={{ paddingLeft: '36px' }} placeholder="e.g. user@upi" value={payment.upiId} onChange={(e) => setPayment({ ...payment, upiId: e.target.value })} />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">PayPal Email</label>
+                                <div style={{ position: 'relative' }}>
+                                    <CreditCard size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray-400)' }} />
+                                    <input className="form-input" style={{ paddingLeft: '36px' }} placeholder="e.g. user@paypal.com" value={payment.paypalEmail} onChange={(e) => setPayment({ ...payment, paypalEmail: e.target.value })} />
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="form-group">
-                            <label className="form-label">UPI ID / Bank Account (Settlement)</label>
-                            <input className="form-input" placeholder="e.g. user@upi" value={payment.paypalEmail} onChange={(e) => setPayment({ ...payment, paypalEmail: e.target.value })} />
+                            <label className="form-label">Bank Account Details (Alternate)</label>
+                            <div style={{ position: 'relative' }}>
+                                <Landmark size={14} style={{ position: 'absolute', left: '12px', top: '16px', color: 'var(--gray-400)' }} />
+                                <textarea className="form-input" style={{ paddingLeft: '36px', minHeight: '80px' }} placeholder="Bank Name, Account Number, IFSC Code..." value={payment.bankAccount} onChange={(e) => setPayment({ ...payment, bankAccount: e.target.value })} />
+                            </div>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
