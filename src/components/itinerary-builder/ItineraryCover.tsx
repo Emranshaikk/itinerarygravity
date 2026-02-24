@@ -67,7 +67,7 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
                 {/* Cover Image */}
                 <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '2rem', backgroundColor: 'var(--surface)' }}>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--foreground)', mb: '1rem', marginBottom: '1rem' }}>Cover Image</h3>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--foreground)', marginBottom: '1rem' }}>Cover Image</h3>
                     <ImageUpload
                         value={data.coverImage}
                         onChange={(url) => onChange({ ...data, coverImage: url })}
