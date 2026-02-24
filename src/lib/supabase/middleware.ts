@@ -34,12 +34,24 @@ export async function updateSession(request: NextRequest) {
         }
     )
 
-    // IMPORTANT: Avoid writing any logic between createServerClient and
-    // getUser. A simple mistake could make it very hard to debug
-    // issues with users being randomly logged out.
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
+    let user = null;
+    try {
+        const { data } = await supabase.auth.getUser();
+        user = data.user;
+    } catch (err) {
+        // Stale or invalid refresh token (e.g. after DB reset) — clear and redirect to login
+        console.warn('[Middleware] Auth error, clearing session:', err);
+        const url = request.nextUrl.clone();
+        url.pathname = '/login';
+        const response = NextResponse.redirect(url);
+        // Clear the stale auth cookies
+        request.cookies.getAll().forEach(cookie => {
+            if (cookie.name.startsWith('sb-')) {
+                response.cookies.delete(cookie.name);
+            }
+        });
+        return response;
+    }
 
     // Redirect to login if accessing protected routes without being logged in
     const isProtectedRoute =
