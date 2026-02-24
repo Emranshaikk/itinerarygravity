@@ -299,12 +299,21 @@ export default function InfluencerDashboard() {
                             itineraries.map((itinerary) => (
                                 <div key={itinerary.id} className="glass card" style={{ padding: '24px' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                                        <h3 style={{ fontSize: '1.2rem' }}>{itinerary.title}</h3>
+                                        <h3 style={{ fontSize: '1.2rem', flex: 1, marginRight: '12px' }}>{itinerary.title}</h3>
                                         <span className="badge" style={{
-                                            background: itinerary.is_published ? 'rgba(16, 185, 129, 0.2)' : 'rgba(234, 179, 8, 0.2)',
-                                            color: itinerary.is_published ? '#10b981' : '#eab308'
+                                            background: !itinerary.is_approved
+                                                ? 'rgba(234, 179, 8, 0.2)'
+                                                : itinerary.is_published
+                                                    ? 'rgba(16, 185, 129, 0.2)'
+                                                    : 'rgba(100, 116, 139, 0.2)',
+                                            color: !itinerary.is_approved
+                                                ? '#eab308'
+                                                : itinerary.is_published
+                                                    ? '#10b981'
+                                                    : '#94a3b8',
+                                            whiteSpace: 'nowrap'
                                         }}>
-                                            {itinerary.is_published ? 'Live' : 'Draft'}
+                                            {!itinerary.is_approved ? '⏳ Pending Review' : itinerary.is_published ? '✓ Live' : 'Draft'}
                                         </span>
                                     </div>
 

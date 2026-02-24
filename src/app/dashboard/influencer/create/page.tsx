@@ -1,30 +1,32 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Eye, ChevronRight } from "lucide-react";
 import { ItineraryContent, initialItineraryContent } from "@/types/itinerary";
 import BuilderStepper from "@/components/itinerary-builder/BuilderStepper";
 import { ALL_SECTIONS } from "@/lib/itinerary-sections";
-import ItineraryCover from "@/components/itinerary-builder/ItineraryCover";
-import PreTripSection from "@/components/itinerary-builder/PreTripSection";
-import LogisticsSection from "@/components/itinerary-builder/LogisticsSection";
-import DailyItineraryBuilder from "@/components/itinerary-builder/DailyItineraryBuilder";
-import PlaceholderSection from "@/components/itinerary-builder/PlaceholderSection";
-import TransportSection from "@/components/itinerary-builder/TransportSection";
-import SecretsSection from "@/components/itinerary-builder/SecretsSection";
-import BonusSection from "@/components/itinerary-builder/BonusSection";
-import FoodSection from "@/components/itinerary-builder/FoodSection";
-import SafetySection from "@/components/itinerary-builder/SafetySection";
-import ArrivalSection from "@/components/itinerary-builder/ArrivalSection";
-import ShoppingSection from "@/components/itinerary-builder/ShoppingSection";
-import CustomizationSection from "@/components/itinerary-builder/CustomizationSection";
-import EmergencySection from "@/components/itinerary-builder/EmergencySection";
-import DepartureSection from "@/components/itinerary-builder/DepartureSection";
-import PostTripSection from "@/components/itinerary-builder/PostTripSection";
-import ProofSection from "@/components/itinerary-builder/ProofSection";
-import AffiliateSection from "@/components/itinerary-builder/AffiliateSection";
-import CreatorStoreSection from "@/components/itinerary-builder/CreatorStoreSection";
+
+const ItineraryCover = lazy(() => import("@/components/itinerary-builder/ItineraryCover"));
+const PreTripSection = lazy(() => import("@/components/itinerary-builder/PreTripSection"));
+const LogisticsSection = lazy(() => import("@/components/itinerary-builder/LogisticsSection"));
+const DailyItineraryBuilder = lazy(() => import("@/components/itinerary-builder/DailyItineraryBuilder"));
+const TransportSection = lazy(() => import("@/components/itinerary-builder/TransportSection"));
+const SecretsSection = lazy(() => import("@/components/itinerary-builder/SecretsSection"));
+const BonusSection = lazy(() => import("@/components/itinerary-builder/BonusSection"));
+const FoodSection = lazy(() => import("@/components/itinerary-builder/FoodSection"));
+const SafetySection = lazy(() => import("@/components/itinerary-builder/SafetySection"));
+const ArrivalSection = lazy(() => import("@/components/itinerary-builder/ArrivalSection"));
+const ShoppingSection = lazy(() => import("@/components/itinerary-builder/ShoppingSection"));
+const CustomizationSection = lazy(() => import("@/components/itinerary-builder/CustomizationSection"));
+const EmergencySection = lazy(() => import("@/components/itinerary-builder/EmergencySection"));
+const DepartureSection = lazy(() => import("@/components/itinerary-builder/DepartureSection"));
+const PostTripSection = lazy(() => import("@/components/itinerary-builder/PostTripSection"));
+const ProofSection = lazy(() => import("@/components/itinerary-builder/ProofSection"));
+const AffiliateSection = lazy(() => import("@/components/itinerary-builder/AffiliateSection"));
+const CreatorStoreSection = lazy(() => import("@/components/itinerary-builder/CreatorStoreSection"));
+
+const SectionLoader = () => <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--gray-400)' }}>Loading section...</div>;
 
 // To make percentage more alive, we check more fields
 const checkSectionCompletion = (step: number, content: ItineraryContent) => {
@@ -187,7 +189,9 @@ export default function CreateItineraryPage() {
                 />
 
                 <div className="card glass" style={{ minHeight: '60vh', marginTop: '2rem' }}>
-                    {renderSection()}
+                    <Suspense fallback={<SectionLoader />}>
+                        {renderSection()}
+                    </Suspense>
                 </div>
 
                 <div style={{ marginTop: '3rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
