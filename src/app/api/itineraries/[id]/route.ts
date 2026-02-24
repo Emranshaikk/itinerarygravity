@@ -80,8 +80,7 @@ export async function PATCH(
                 description: body.description,
                 seo_title: body.seo_title,
                 seo_description: body.seo_description,
-                content: body.content,
-                updated_at: new Date().toISOString()
+                content: body.content
             })
             .eq('id', id)
             .select()
