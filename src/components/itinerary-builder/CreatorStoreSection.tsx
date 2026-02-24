@@ -17,7 +17,7 @@ interface CreatorStoreSectionProps {
     onChange: (data: Product[]) => void;
 }
 
-export default function CreatorStoreSection({ data, onChange }: CreatorStoreSectionProps) {
+export default function CreatorStoreSection({ data = [], onChange }: CreatorStoreSectionProps) {
     const [newItem, setNewItem] = useState<Product>({
         title: "",
         url: "",

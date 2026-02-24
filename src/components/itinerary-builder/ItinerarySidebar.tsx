@@ -12,26 +12,10 @@ interface BuilderSidebarProps {
     completedSteps: number[];
 }
 
-const SECTIONS = [
-    { id: 1, label: "Cover & Basic Info", icon: Book, desc: "Title, Price & Look" },
-    { id: 2, label: "Before You Travel", icon: Plane, desc: "Flights, Packing, Prep" },
-    { id: 3, label: "Money & Connectivity", icon: CreditCard, desc: "Sims, Cash, Budget" },
-    { id: 4, label: "Arrival Experience", icon: MapPin, desc: "First Impressions" },
-    { id: 5, label: "Day-by-Day Itinerary", icon: Calendar, desc: "The Core Journey" },
-    { id: 6, label: "Local Food Guide", icon: Utensils, desc: "Must-eats & Dining" },
-    { id: 7, label: "Transport Playbook", icon: Bus, desc: "Getting Around" },
-    { id: 8, label: "Hidden Gems", icon: Star, desc: "Secret Spots" },
-    { id: 9, label: "Safety & Culture", icon: Shield, desc: "Stay Safe & Respectful" },
-    { id: 10, label: "Customization", icon: Sliders, desc: "Couples, Families, Solos" },
-    { id: 11, label: "Emergency Info", icon: AlertTriangle, desc: "Better safe than sorry" },
-    { id: 12, label: "Shopping Guide", icon: ShoppingBag, desc: "Souvenirs & Markets" },
-    { id: 13, label: "Departure Plan", icon: LogOut, desc: "Leaving smoothly" },
-    { id: 14, label: "Post-Trip & Reflection", icon: ImageIcon, desc: "Memories & sharing" },
-    { id: 15, label: "Bonus & Extras", icon: Gift, desc: "Freebies & Links" },
-];
+import { ITINERARY_PHASES, ALL_SECTIONS } from "@/lib/itinerary-sections";
 
 export default function ItinerarySidebar({ activeStep, onStepChange, completedSteps }: BuilderSidebarProps) {
-    const progress = Math.round((completedSteps.length / SECTIONS.length) * 100);
+    const progress = Math.round((completedSteps.length / ALL_SECTIONS.length) * 100);
 
     return (
         <div className="glass rounded-2xl h-fit sticky top-24 overflow-hidden border border-white/10 shadow-2xl flex flex-col max-h-[85vh]">
@@ -55,68 +39,70 @@ export default function ItinerarySidebar({ activeStep, onStepChange, completedSt
             </div>
 
             {/* Scrollable List */}
-            <div className="overflow-y-auto flex-1 p-2 space-y-0.5 custom-scrollbar">
-                {SECTIONS.map((section, index) => {
-                    const Icon = section.icon;
-                    const isActive = activeStep === section.id;
-                    const isCompleted = completedSteps.includes(section.id);
-                    const isNext = activeStep + 1 === section.id;
-
+            <div className="overflow-y-auto flex-1 p-4 space-y-6 custom-scrollbar pb-12">
+                {ITINERARY_PHASES.map((phase, pIdx) => {
                     return (
-                        <button
-                            key={section.id}
-                            onClick={() => onStepChange(section.id)}
-                            className={`
-                                group w-full flex items-center gap-4 px-4 py-3 text-left transition-all duration-200 relative
-                                ${isActive
-                                    ? "bg-accent"
-                                    : "hover:bg-accent/50"
-                                }
-                            `}
-                        >
-                            {/* Left Highlight Line for Active State */}
-                            {isActive && (
-                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 to-purple-500" />
-                            )}
-
-                            {/* Icon Container */}
-                            <div className={`
-                                relative z-10 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 border
-                                ${isActive
-                                    ? "bg-primary/10 border-primary text-primary shadow-[0_0_15px_rgba(59,130,246,0.3)]"
-                                    : isCompleted
-                                        ? "bg-green-500/10 border-green-500/30 text-green-400"
-                                        : "bg-secondary/50 border-border text-muted-foreground group-hover:text-foreground group-hover:border-border"
-                                }
-                            `}>
-                                {isCompleted && !isActive ? (
-                                    <CheckCircle2 size={18} />
-                                ) : (
-                                    <Icon size={18} />
-                                )}
+                        <div key={pIdx} className="space-y-2">
+                            <div className="px-2 mb-3">
+                                <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Phase {pIdx + 1}: {phase.title}</h4>
                             </div>
+                            <div className="space-y-1">
+                                {phase.sections.map((section) => {
+                                    const Icon = section.icon;
+                                    const isActive = activeStep === section.id;
+                                    const isCompleted = completedSteps.includes(section.id);
 
-                            {/* Text Content */}
-                            <div className="flex-1 min-w-0">
-                                <p className={`text-sm font-semibold truncate transition-colors ${isActive ? "text-foreground" : isCompleted ? "text-green-600 dark:text-green-400" : "text-muted-foreground group-hover:text-foreground"}`}>
-                                    {section.label}
-                                </p>
-                                <p className={`text-[10px] truncate ${isActive ? "text-primary/70" : "text-muted-foreground/70 group-hover:text-muted-foreground"}`}>
-                                    {section.desc}
-                                </p>
+                                    return (
+                                        <button
+                                            key={section.id}
+                                            onClick={() => onStepChange(section.id)}
+                                            className={`
+                                            group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-200 relative
+                                            ${isActive
+                                                    ? "bg-accent/80 shadow-sm"
+                                                    : "hover:bg-accent/40"
+                                                }
+                                        `}
+                                        >
+                                            {/* Icon Container */}
+                                            <div className={`
+                                            relative z-10 w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 border shrink-0
+                                            ${isActive
+                                                    ? "bg-primary/20 border-primary/50 text-primary shadow-[0_0_10px_rgba(59,130,246,0.2)]"
+                                                    : isCompleted
+                                                        ? "bg-green-500/10 border-green-500/30 text-green-500"
+                                                        : "bg-secondary/50 border-border text-muted-foreground group-hover:text-foreground group-hover:border-border"
+                                                }
+                                        `}>
+                                                {isCompleted && !isActive ? (
+                                                    <CheckCircle2 size={16} />
+                                                ) : (
+                                                    <Icon size={16} />
+                                                )}
+                                            </div>
+
+                                            {/* Text Content */}
+                                            <div className="flex-1 min-w-0">
+                                                <p className={`text-sm font-medium truncate transition-colors ${isActive ? "text-foreground" : isCompleted ? "text-foreground/80 font-semibold" : "text-muted-foreground group-hover:text-foreground/90"}`}>
+                                                    {section.label}
+                                                </p>
+                                            </div>
+
+                                            {/* Active Chevron */}
+                                            {isActive && (
+                                                <ChevronRight size={14} className="text-primary animate-pulse" />
+                                            )}
+                                        </button>
+                                    );
+                                })}
                             </div>
-
-                            {/* Active Chevron */}
-                            {isActive && (
-                                <ChevronRight size={14} className="text-foreground/50 animate-pulse" />
-                            )}
-                        </button>
+                        </div>
                     );
                 })}
             </div>
 
             {/* Bottom Fade Effect */}
-            <div className="h-6 bg-gradient-to-t from-black/50 to-transparent pointer-events-none absolute bottom-0 left-0 right-0" />
+            <div className="h-8 bg-gradient-to-t from-background to-transparent pointer-events-none absolute bottom-0 left-0 right-0 z-10" />
         </div>
     );
 }

@@ -56,7 +56,7 @@ export async function POST(req: Request) {
                 seo_title: body.seo_title || body.content?.cover?.seoTitle,
                 seo_description: body.seo_description || body.content?.cover?.seoDescription,
                 content: body.content,
-                is_published: true
+                is_published: false
             })
             .select()
             .single();

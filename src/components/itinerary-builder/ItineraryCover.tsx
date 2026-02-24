@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ItineraryContent } from "@/types/itinerary";
 import { Upload, ImageIcon, MapPin, Clock, Tag, User, DollarSign, Wand2, Star } from "lucide-react";
+import ImageUpload from "@/components/ImageUpload";
 
 interface CoverSectionProps {
     data: ItineraryContent["cover"];
@@ -64,6 +65,18 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
+                {/* Cover Image */}
+                <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '2rem', backgroundColor: 'var(--surface)' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--foreground)', mb: '1rem', marginBottom: '1rem' }}>Cover Image</h3>
+                    <ImageUpload
+                        value={data.coverImage}
+                        onChange={(url) => onChange({ ...data, coverImage: url })}
+                        folder="covers"
+                        label="Main Itinerary Graphic"
+                        maxSizeMB={5}
+                    />
+                </div>
+
                 {/* Main Identity */}
                 <div style={{ padding: '2rem', border: '1px solid var(--border)', borderRadius: '2rem', backgroundColor: 'var(--surface)' }}>
                     <div style={{ marginBottom: '1.5rem' }}>

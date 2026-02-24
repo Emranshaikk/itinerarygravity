@@ -19,7 +19,7 @@ interface AffiliateSectionProps {
     onChange: (data: AffiliateProduct[]) => void;
 }
 
-export default function AffiliateSection({ data, onChange }: AffiliateSectionProps) {
+export default function AffiliateSection({ data = [], onChange }: AffiliateSectionProps) {
     const [newItem, setNewItem] = useState<AffiliateProduct>({
         title: "",
         productUrl: "",

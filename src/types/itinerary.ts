@@ -9,6 +9,7 @@ export interface ItineraryContent {
         targetAudience: string;
         brandName?: string;
         brandLogo?: string; // URL
+        coverImage?: string; // URL
         version?: string;
         lastUpdated?: string;
         tagline?: string;
@@ -223,6 +224,7 @@ export const initialItineraryContent: ItineraryContent = {
         price: 0,
         currency: "USD",
         tags: [],
+        coverImage: "",
     },
     preTrip: {
         flightGuide: { bestAirports: [], arrivalDepartureStats: "" },

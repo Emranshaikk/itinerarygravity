@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Save, Eye, ChevronRight } from "lucide-react";
 import { ItineraryContent, initialItineraryContent } from "@/types/itinerary";
 import BuilderStepper from "@/components/itinerary-builder/BuilderStepper";
+import { ALL_SECTIONS } from "@/lib/itinerary-sections";
 import ItineraryCover from "@/components/itinerary-builder/ItineraryCover";
 import PreTripSection from "@/components/itinerary-builder/PreTripSection";
 import LogisticsSection from "@/components/itinerary-builder/LogisticsSection";
@@ -91,6 +92,12 @@ export default function EditItineraryPage() {
     };
 
     const handleSave = async () => {
+        if (!content.cover.title?.trim() || !content.cover.destination?.trim()) {
+            alert("Please fill out the Itinerary Title and Destination in the Cover section before saving.");
+            setActiveStep(1); // Jump back to step 1
+            return;
+        }
+
         setIsSaving(true);
         try {
             const payload = {
@@ -112,7 +119,7 @@ export default function EditItineraryPage() {
             });
 
             if (response.ok) {
-                router.push("/dashboard/influencer");
+                alert("Saved successfully!");
             } else {
                 const error = await response.text();
                 throw new Error(error || "Failed to update itinerary");
@@ -183,11 +190,16 @@ export default function EditItineraryPage() {
                 </div>
 
                 <div style={{ marginTop: '3rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
-                    {activeStep > 1 && (
+                    {ALL_SECTIONS.findIndex(s => s.id === activeStep) > 0 && (
                         <button
                             className="btn btn-outline"
                             style={{ minWidth: '140px', padding: '1rem 2rem', borderRadius: '1.5rem', fontWeight: 'bold', cursor: 'pointer' }}
-                            onClick={() => setActiveStep(prev => Math.max(1, prev - 1))}
+                            onClick={() => {
+                                const currentIndex = ALL_SECTIONS.findIndex(s => s.id === activeStep);
+                                if (currentIndex > 0) {
+                                    setActiveStep(ALL_SECTIONS[currentIndex - 1].id);
+                                }
+                            }}
                         >
                             <ChevronRight size={20} style={{ marginRight: '0.5rem', transform: 'rotate(180deg)' }} />
                             Back
@@ -208,14 +220,15 @@ export default function EditItineraryPage() {
                         className="btn btn-primary"
                         style={{ minWidth: '140px', padding: '1rem 2rem', borderRadius: '1.5rem', fontWeight: 'bold', cursor: 'pointer' }}
                         onClick={() => {
-                            if (activeStep < 18) {
-                                setActiveStep(prev => prev + 1);
+                            const currentIndex = ALL_SECTIONS.findIndex(s => s.id === activeStep);
+                            if (currentIndex < ALL_SECTIONS.length - 1) {
+                                setActiveStep(ALL_SECTIONS[currentIndex + 1].id);
                             }
                             else handleSave();
                         }}
                     >
-                        {activeStep === 18 ? "Finish" : "Next"}
-                        {activeStep !== 18 && <ChevronRight size={20} style={{ marginLeft: '0.5rem' }} />}
+                        {ALL_SECTIONS.findIndex(s => s.id === activeStep) === ALL_SECTIONS.length - 1 ? "Finish" : "Next"}
+                        {ALL_SECTIONS.findIndex(s => s.id === activeStep) !== ALL_SECTIONS.length - 1 && <ChevronRight size={20} style={{ marginLeft: '0.5rem' }} />}
                     </button>
                 </div>
             </div>
