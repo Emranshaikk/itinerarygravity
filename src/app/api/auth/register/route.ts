@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import connectToDatabase from "@/lib/mongodb";
 import { User } from "@/models/User";
+import { handleApiError } from "@/lib/api-errorhandler";
 
 export async function POST(req: Request) {
     try {
@@ -41,10 +42,6 @@ export async function POST(req: Request) {
             { status: 201 }
         );
     } catch (error: any) {
-        console.error("Registration error:", error);
-        return NextResponse.json(
-            { message: "Internal server error" },
-            { status: 500 }
-        );
+        return handleApiError(error);
     }
 }

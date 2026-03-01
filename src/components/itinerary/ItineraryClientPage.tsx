@@ -263,12 +263,10 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
 
                     {itinerary.image_url && (
                         <div style={{ marginBottom: '32px', borderRadius: '24px', overflow: 'hidden', height: '400px', position: 'relative', border: '1px solid var(--border)' }}>
-                            <Image
+                            <img
                                 src={itinerary.image_url}
                                 alt={itinerary.title}
-                                fill
-                                style={{ objectFit: 'cover' }}
-                                priority
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                             <div style={{ position: 'absolute', bottom: '24px', left: '24px', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', padding: '8px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <MapPin size={16} color="var(--primary)" /> {itinerary.location}
@@ -662,12 +660,10 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                     {itinerary.content.proofOfVisit.images.map((img: any, i: number) => (
                                         <div key={i} className="glass card" style={{ overflow: 'hidden', padding: 0 }}>
                                             <div style={{ height: '250px', width: '100%', position: 'relative' }}>
-                                                <Image
+                                                <img
                                                     src={img.url}
                                                     alt={`Proof ${i}`}
-                                                    fill
-                                                    style={{ objectFit: 'cover' }}
-                                                    sizes="(max-width: 768px) 100vw, 300px"
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                 />
                                             </div>
                                             <div style={{ padding: '20px' }}>

@@ -46,13 +46,13 @@ export interface IItinerary extends Document {
 }
 
 const DaySchema = new Schema({
-    dayNumber: { type: Number, required: true },
-    title: String,
-    morningPlan: String,
-    afternoonPlan: String,
-    eveningPlan: String,
-    hotelName: String,
-    transportMode: String,
+    dayNumber: { type: Number, required: true, min: 1, max: 30 },
+    title: { type: String, maxlength: 100 },
+    morningPlan: { type: String, maxlength: 1000 },
+    afternoonPlan: { type: String, maxlength: 1000 },
+    eveningPlan: { type: String, maxlength: 1000 },
+    hotelName: { type: String, maxlength: 100 },
+    transportMode: { type: String, maxlength: 100 },
     meals: {
         breakfast: { type: Boolean, default: false },
         lunch: { type: Boolean, default: false },
@@ -70,48 +70,81 @@ const ItinerarySchema: Schema<IItinerary> = new Schema(
         title: {
             type: String,
             required: true,
+            trim: true,
+            maxlength: [150, "Title cannot exceed 150 characters"]
         },
         location: {
             type: String,
             required: true,
+            trim: true,
+            maxlength: [100, "Location cannot exceed 100 characters"]
         },
         price: {
             type: Number,
             required: true,
             default: 0,
+            min: [0, "Price cannot be negative"],
+            max: [10000, "Price exceeds maximum allowed limit"]
         },
         currency: {
             type: String,
             default: 'USD',
+            enum: ['USD', 'EUR', 'GBP', 'INR', 'AUD', 'CAD', 'JPY']
         },
-        description: String,
-        image_url: String,
+        description: {
+            type: String,
+            maxlength: [5000, "Description cannot exceed 5000 characters"]
+        },
+        image_url: {
+            type: String,
+            match: [/^https?:\/\/.*/, 'Please enter a valid URL']
+        },
         is_published: {
             type: Boolean,
             default: false,
         },
         is_approved: {
             type: Boolean,
-            default: true, // Auto-approve for now unless needed otherwise
+            default: true,
         },
         duration_days: {
             type: Number,
             default: 1,
+            min: [1, "Duration must be at least 1 day"],
+            max: [30, "Duration cannot exceed 30 days"]
         },
-        tags: [String],
+        tags: {
+            type: [String],
+            validate: [
+                { validator: (val: string[]) => val.length <= 10, msg: '{PATH} exceeds the limit of 10' }
+            ]
+        },
         average_rating: {
             type: Number,
             default: 0,
+            min: 0,
+            max: 5
         },
         review_count: {
             type: Number,
             default: 0,
+            min: 0
         },
         content: {
-            days: [DaySchema],
+            days: {
+                type: [DaySchema],
+                validate: [
+                    { validator: (val: any[]) => val.length <= 30, msg: '{PATH} exceeds maximum of 30 days' }
+                ]
+            },
             proofOfVisit: {
-                images: [String],
-                notes: String,
+                images: {
+                    type: [String],
+                    validate: [
+                        { validator: (val: string[]) => val.length <= 20, msg: '{PATH} exceeds maximum of 20 images' }
+                    ]
+                },
+                notes: { type: String, maxlength: 2000 },
             },
             logistics: Schema.Types.Mixed,
             preTrip: Schema.Types.Mixed,
@@ -119,24 +152,29 @@ const ItinerarySchema: Schema<IItinerary> = new Schema(
         views_count: {
             type: Number,
             default: 0,
+            min: 0
         },
         purchases_count: {
             type: Number,
             default: 0,
+            min: 0
         },
         total_revenue: {
             type: Number,
             default: 0,
+            min: 0
         },
     },
     {
         timestamps: true,
+        strict: true // Enforce strict schema validation
     }
 );
 
-// Create indexes for search and filtering
+// Search and performance indexes
 ItinerarySchema.index({ title: 'text', location: 'text', tags: 'text' });
 ItinerarySchema.index({ creator_id: 1 });
-ItinerarySchema.index({ is_published: 1, is_approved: 1 });
+// Compound index for trending itineraries queries
+ItinerarySchema.index({ is_published: 1, is_approved: 1, average_rating: -1 });
 
 export const Itinerary: Model<IItinerary> = mongoose.models.Itinerary || mongoose.model<IItinerary>('Itinerary', ItinerarySchema);

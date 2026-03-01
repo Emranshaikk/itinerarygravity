@@ -283,9 +283,13 @@ async function TrendingItineraries() {
 
   if (!itineraries || itineraries.length === 0) return null;
 
+  // Convert the Mongoose documents (which may contain ObjectIds or Dates)
+  // to plain Javascript objects to safely pass to the Client Component
+  const safeItineraries = JSON.parse(JSON.stringify(itineraries));
+
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
-      {itineraries.map((item: any) => (
+      {safeItineraries.map((item: any) => (
         <ItineraryCard
           key={item._id.toString()}
           itinerary={{
@@ -301,3 +305,4 @@ async function TrendingItineraries() {
     </div>
   );
 }
+

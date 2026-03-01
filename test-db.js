@@ -1,15 +1,29 @@
-import { createClient } from '@supabase/supabase-js';
-import * as dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
+const { loadEnvConfig } = require('@next/env');
+const mongoose = require('mongoose');
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const projectDir = process.cwd();
+loadEnvConfig(projectDir);
 
-async function run() {
-    const { data, error } = await supabase
-        .from('itineraries')
-        .select('id, title, purchases(count)')
-        .limit(2);
-    console.log('Error Message:', error?.message);
-    console.log('Data:', JSON.stringify(data, null, 2));
+async function testConnection() {
+    try {
+        const uri = process.env.MONGODB_URI;
+        if (!uri) {
+            throw new Error("MONGODB_URI is not defined in your .env.local file.");
+        }
+
+        console.log("Attempting to connect to MongoDB...");
+        // Hide password in logs
+        const safeUri = uri.replace(/:([^:@]+)@/, ':****@');
+        console.log(`Using URI: ${safeUri}`);
+
+        await mongoose.connect(uri);
+        console.log("✅ Successfully connected to MongoDB Atlas!");
+        process.exit(0);
+    } catch (error) {
+        console.error("❌ Connection failed:");
+        console.error(error.message);
+        process.exit(1);
+    }
 }
-run();
+
+testConnection();

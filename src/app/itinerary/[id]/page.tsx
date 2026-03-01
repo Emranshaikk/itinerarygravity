@@ -35,7 +35,7 @@ async function getItinerary(id: string) {
         } : null,
     };
 
-    return mapped;
+    return JSON.parse(JSON.stringify(mapped));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

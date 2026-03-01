@@ -25,9 +25,12 @@ async function connectToDatabase() {
     if (!cached.promise) {
         const opts = {
             bufferCommands: false,
+            maxPoolSize: 10, // Maintain up to 10 socket connections
+            minPoolSize: 1, // Keep at least 1 socket connection open
         };
 
         cached.promise = mongoose.connect(MONGODB_URI as string, opts).then((mongoose) => {
+            console.log("✅ MongoDB Connection Pool Initialized");
             return mongoose;
         });
     }
@@ -36,10 +39,16 @@ async function connectToDatabase() {
         cached.conn = await cached.promise;
     } catch (e) {
         cached.promise = null;
+        console.error("❌ MongoDB Connection Failed:", e);
         throw e;
     }
 
     return cached.conn;
 }
+
+// Global Connection Error Listener
+mongoose.connection.on('error', err => {
+    console.error('🔥 MongoDB Runtime Error:', err);
+});
 
 export default connectToDatabase;

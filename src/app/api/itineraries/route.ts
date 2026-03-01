@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectToDatabase from "@/lib/mongodb";
 import { User, IUser } from "@/models/User";
 import { Itinerary } from "@/models/Itinerary";
+import { handleApiError } from "@/lib/api-errorhandler";
 
 export async function POST(req: Request) {
     try {
@@ -54,8 +55,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json(newItinerary);
     } catch (error: any) {
-        console.error("[ITINERARIES_POST]", error);
-        return NextResponse.json({ error: "Internal Error", message: error.message }, { status: 500 });
+        return handleApiError(error);
     }
 }
 
