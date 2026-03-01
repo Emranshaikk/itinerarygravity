@@ -3,34 +3,21 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import ThemeToggle from "./ThemeToggle";
-import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { User } from "@supabase/supabase-js";
+import { useSession, signOut } from "next-auth/react";
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
-    const [user, setUser] = useState<User | null>(null);
-    const supabase = createClient();
+    const { data: session } = useSession();
     const router = useRouter();
 
     useEffect(() => {
         setMounted(true);
-        const getUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            setUser(user);
-        };
-        getUser();
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
-        });
-
-        return () => subscription.unsubscribe();
     }, []);
 
     const handleSignOut = async () => {
-        await supabase.auth.signOut();
+        await signOut({ redirect: false });
         router.push("/");
         router.refresh();
     };
@@ -61,7 +48,7 @@ export default function Navbar() {
                     <div style={{ marginLeft: '12px', borderLeft: '1px solid var(--border)', paddingLeft: '24px', display: 'flex', gap: '20px', alignItems: 'center' }}>
                         <ThemeToggle />
 
-                        {user ? (
+                        {session?.user ? (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                                 <Link href="/dashboard" style={{ fontWeight: 600, color: 'var(--primary)' }}>Dashboard</Link>
                                 <button
@@ -110,7 +97,7 @@ export default function Navbar() {
                     <Link href="/explore" onClick={() => setIsMenuOpen(false)}>Explore</Link>
                     <Link href="/creators" onClick={() => setIsMenuOpen(false)}>Creators</Link>
 
-                    {user ? (
+                    {session?.user ? (
                         <>
                             <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 600 }}>Dashboard</Link>
                             <button onClick={() => { handleSignOut(); setIsMenuOpen(false); }} style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--foreground)', padding: '10px', borderRadius: '8px', cursor: 'pointer' }}>Sign Out</button>

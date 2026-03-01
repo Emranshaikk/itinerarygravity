@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 interface AuthFormProps {
     mode: "login" | "signup";
@@ -16,7 +16,6 @@ export default function AuthForm({ mode }: AuthFormProps) {
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
     const router = useRouter();
-    const supabase = createClient();
 
     useEffect(() => {
         const pendingRole = sessionStorage.getItem('pending_role');
@@ -35,30 +34,41 @@ export default function AuthForm({ mode }: AuthFormProps) {
 
         try {
             if (mode === "signup") {
-                const { data, error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        emailRedirectTo: `${window.location.origin}/auth/callback`,
-                        data: {
-                            role: selectedRole, // Store role in user metadata
-                        }
-                    },
+                const res = await fetch("/api/auth/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password, role: selectedRole }),
                 });
-                if (error) throw error;
 
-                if (data.session) {
-                    router.push("/dashboard");
-                    router.refresh();
-                } else {
-                    setMessage("Check your email for the confirmation link!");
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.message || "Registration failed");
                 }
-            } else {
-                const { error } = await supabase.auth.signInWithPassword({
+
+                // Auto sign-in after successful registration
+                const signInRes = await signIn("credentials", {
+                    redirect: false,
                     email,
                     password,
                 });
-                if (error) throw error;
+
+                if (signInRes?.error) {
+                    throw new Error(signInRes.error);
+                }
+
+                router.push("/dashboard");
+                router.refresh();
+            } else {
+                const signInRes = await signIn("credentials", {
+                    redirect: false,
+                    email,
+                    password,
+                });
+
+                if (signInRes?.error) {
+                    throw new Error("Invalid email or password");
+                }
+
                 router.push("/dashboard");
                 router.refresh();
             }

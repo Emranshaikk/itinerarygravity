@@ -1,7 +1,6 @@
 import { ImageResponse } from 'next/og';
-import { createClient } from '@/lib/supabase/server';
-
-export const runtime = 'edge';
+import connectToDatabase from '@/lib/mongodb';
+import { Itinerary } from '@/models/Itinerary';
 
 export const alt = 'Itinerary Preview';
 export const size = {
@@ -12,20 +11,22 @@ export const size = {
 export const contentType = 'image/png';
 
 async function getItinerary(id: string) {
-    // Note: We use a service role or public client here as it's edge runtime
-    // For simplicity in this demo, we assume the URL provides enough context
-    const supabase = await createClient();
-    const { data } = await supabase
-        .from('itineraries')
-        .select(`
-            *,
-            profiles:creator_id (
-                full_name
-            )
-        `)
-        .eq('id', id)
-        .single();
-    return data;
+    await connectToDatabase();
+
+    // Handle both ObjectId and Slug
+    const query = /^[0-9a-fA-F]{24}$/.test(id) ? { _id: id } : { slug: id };
+
+    const itinerary = await Itinerary.findOne(query).populate('creator_id', 'full_name').lean();
+
+    if (itinerary) {
+        return {
+            ...itinerary,
+            id: itinerary._id.toString(),
+            profiles: { full_name: (itinerary.creator_id as any)?.full_name }
+        };
+    }
+
+    return null;
 }
 
 export default async function Image({ params }: { params: { id: string } }) {

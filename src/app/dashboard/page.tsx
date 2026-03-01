@@ -1,45 +1,21 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export default async function DashboardPage() {
-    const supabase = await createClient();
+    const session = await getServerSession(authOptions);
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user) {
         redirect("/login");
     }
 
-    // Role check from Supabase - try Profile Table first, then User Metadata
-    try {
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single();
+    const { role } = session.user as any;
 
-        // Source of truth prioritizing DB profile, then user metadata (set during signup)
-        const role = profile?.role || user.user_metadata?.role || "buyer";
-
-        if (role === "admin") {
-            redirect("/dashboard/admin");
-        } else if (role === "influencer") {
-            redirect("/dashboard/influencer");
-        } else {
-            redirect("/dashboard/buyer");
-        }
-    } catch (e) {
-        // Next.js Redirects throw an error, we must re-throw it
-        if ((e as Error).message === 'NEXT_REDIRECT') {
-            throw e;
-        }
-
-        // Even if DB check fails, trust metadata as fallback during initial signup
-        const metaRole = user.user_metadata?.role;
-        if (metaRole === 'influencer') redirect("/dashboard/influencer");
-        if (metaRole === 'admin') redirect("/dashboard/admin");
-
-        console.error("Dashboard role check failed", e);
-        redirect("/dashboard/buyer"); // Safe fallback
+    if (role === "admin") {
+        redirect("/dashboard/admin");
+    } else if (role === "influencer") {
+        redirect("/dashboard/influencer");
+    } else {
+        redirect("/dashboard/buyer");
     }
 }

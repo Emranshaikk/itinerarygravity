@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server';
 import { razorpay } from '@/lib/razorpay';
-import { createClient } from '@/lib/supabase/server';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(req: Request) {
     try {
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const session = await getServerSession(authOptions);
 
-        if (!user) {
+        if (!session?.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const userId = user.id;
+        const userId = (session.user as any).id;
         const { itineraryId, price, title } = await req.json();
 
         if (!itineraryId || !price) {

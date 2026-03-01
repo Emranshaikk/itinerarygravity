@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { ShieldCheck, Check, X, Eye, ExternalLink, Filter } from "lucide-react";
 import Link from "next/link";
 
@@ -16,19 +15,15 @@ export default function AdminItinerariesPage() {
 
     const fetchItineraries = async () => {
         setLoading(true);
-        const supabase = createClient();
-        const { data, error } = await supabase
-            .from('itineraries')
-            .select(`
-                *,
-                profiles:creator_id (
-                    full_name,
-                    email
-                )
-            `)
-            .order('created_at', { ascending: false });
-
-        if (data) setItineraries(data);
+        try {
+            const response = await fetch('/api/admin/itineraries');
+            if (response.ok) {
+                const data = await response.json();
+                setItineraries(data);
+            }
+        } catch (error) {
+            console.error("Fetch itineraries error:", error);
+        }
         setLoading(false);
     };
 

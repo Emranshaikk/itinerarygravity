@@ -3,62 +3,40 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { useSession } from "next-auth/react";
 import { PieChart, TrendingUp, Calendar, Star, DollarSign, MapPin, Trash2, Share2, Eye } from "@/components/Icons";
 
 export default function InfluencerDashboard() {
     const router = useRouter();
-    const [user, setUser] = useState<any>(null);
+    const { data: session, status } = useSession();
     const [profile, setProfile] = useState<any>(null);
     const [itineraries, setItineraries] = useState<any[]>([]);
     const [totalEarnings, setTotalEarnings] = useState(0);
     const [loading, setLoading] = useState(true);
-    const supabase = createClient();
 
     useEffect(() => {
-        const fetchUserAndData = async () => {
-            const { data: { user: authUser } } = await supabase.auth.getUser();
-            if (authUser) {
-                setUser(authUser);
-                await fetchDashboardData(authUser.id);
-            } else {
-                router.push("/login");
-            }
-        };
-        fetchUserAndData();
-    }, []);
+        if (status === "unauthenticated") {
+            router.push("/login");
+        } else if (status === "authenticated") {
+            fetchDashboardData();
+        }
+    }, [status]);
 
-    async function fetchDashboardData(userId: string) {
+    async function fetchDashboardData() {
         try {
             setLoading(true);
-
-            // 1. Fetch Profile
-            const { data: profileData } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', userId)
-                .single();
-
-            if (profileData) setProfile(profileData);
-
-            // 2. Fetch Itineraries
-            const { data: itineraryData } = await supabase
-                .from('itineraries')
-                .select('*, purchases(creator_earnings)')
-                .eq('creator_id', userId)
-                .order('created_at', { ascending: false });
-
-            if (itineraryData) {
-                setItineraries(itineraryData);
-                const total = itineraryData.reduce((acc, it) => {
-                    const itTotal = it.purchases?.reduce((pAcc: number, p: any) => pAcc + (Number(p.creator_earnings) || 0), 0) || 0;
-                    return acc + itTotal;
-                }, 0);
-                setTotalEarnings(total);
+            const res = await fetch("/api/dashboard/influencer");
+            if (!res.ok) {
+                throw new Error("Failed to load generic dashboard data.");
             }
 
+            const data = await res.json();
+            setProfile(data.profile);
+            setItineraries(data.itineraries);
+            setTotalEarnings(data.totalEarnings);
         } catch (error) {
             console.error("Error fetching dashboard data:", error);
+            alert("Error fetching dashboard data: " + (error as any).message);
         } finally {
             setLoading(false);
         }
@@ -116,7 +94,7 @@ export default function InfluencerDashboard() {
                         fontWeight: 800,
                         color: 'white'
                     }}>
-                        {!profile?.avatar_url && (profile?.full_name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'U')}
+                        {!profile?.avatar_url && (profile?.full_name?.charAt(0) || session?.user?.email?.charAt(0).toUpperCase() || 'U')}
                     </div>
                     <div>
                         <h1 className="text-gradient" style={{ fontSize: '2rem' }}>Welcome back, {profile?.full_name || 'Creator'}</h1>
@@ -125,7 +103,7 @@ export default function InfluencerDashboard() {
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>
                     <Link
-                        href={`/creators/${profile?.username || user?.id}`}
+                        href={`/creators/${profile?.username || (session?.user as any)?.id}`}
                         className="btn btn-outline"
                         style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                     >
@@ -318,8 +296,8 @@ export default function InfluencerDashboard() {
                                     </div>
 
                                     <div style={{ display: 'flex', gap: '24px', marginBottom: '20px', fontSize: '0.9rem', color: 'var(--gray-400)' }}>
-                                        <span>Price: ₹{itinerary.price}</span>
-                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><TrendingUp size={14} color="#10b981" /> 142 Sold</span>
+                                        <span>Price: {itinerary.currency === 'INR' || !itinerary.currency ? '₹' : itinerary.currency === 'USD' ? '$' : itinerary.currency === 'EUR' ? '€' : itinerary.currency}{itinerary.price}</span>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><TrendingUp size={14} color="#10b981" /> {itinerary.purchases?.length || 0} Sold</span>
                                     </div>
 
                                     <div style={{ display: 'flex', gap: '12px' }}>

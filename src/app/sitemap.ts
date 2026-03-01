@@ -1,23 +1,17 @@
 import { MetadataRoute } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import connectToDatabase from '@/lib/mongodb';
+import { Itinerary } from '@/models/Itinerary';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const supabase = await createClient();
+    await connectToDatabase();
     const baseUrl = 'https://itinerarygravity.com';
 
-    // Fetch all approved itineraries
-    const { data: itineraries } = await supabase
-        .from('itineraries')
-        .select('id, slug, updated_at')
-        .eq('is_approved', true);
+    // Fetch all published itineraries
+    const itineraries = await Itinerary.find({ is_published: true })
+        .select('_id slug updatedAt location')
+        .lean();
 
-    // Fetch all unique locations for destination pages
-    const { data: locations } = await supabase
-        .from('itineraries')
-        .select('location')
-        .eq('is_approved', true);
-
-    const uniqueLocations = Array.from(new Set((locations || []).map(l => l.location).filter(Boolean)));
+    const uniqueLocations = Array.from(new Set(itineraries.map((l: any) => l.location).filter(Boolean)));
     const destinationUrls = uniqueLocations.map(loc => ({
         url: `${baseUrl}/explore/${encodeURIComponent(loc as string)}`,
         lastModified: new Date(),
@@ -25,9 +19,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
     }));
 
-    const itineraryUrls = (itineraries || []).map((itinerary) => ({
-        url: `${baseUrl}/itinerary/${itinerary.slug || itinerary.id}`,
-        lastModified: itinerary.updated_at,
+    const itineraryUrls = itineraries.map((itinerary: any) => ({
+        url: `${baseUrl}/itinerary/${itinerary.slug || itinerary._id.toString()}`,
+        lastModified: itinerary.updatedAt || new Date(),
         changeFrequency: 'weekly' as const,
         priority: 0.8,
     }));

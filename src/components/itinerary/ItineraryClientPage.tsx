@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle, MapPin, Star, ShieldCheck, Calendar, Clock, Info, Shield, Truck, Hotel, Coffee, MessageCircle, Share2, Compass, Navigation, ListChecks, Smartphone, Layout } from "@/components/Icons";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import ReviewForm from "@/components/reviews/ReviewForm";
 import PDFGenerator from "@/components/pdf/PDFGenerator";
@@ -25,9 +24,10 @@ interface Props {
     initialData?: any;
     initialIsPurchased?: boolean;
     initialUser?: any;
+    initialUserReview?: any;
 }
 
-export default function ItineraryClientPage({ id, initialData, initialIsPurchased, initialUser }: Props) {
+export default function ItineraryClientPage({ id, initialData, initialIsPurchased, initialUser, initialUserReview }: Props) {
     const router = useRouter();
     const [activeDay, setActiveDay] = useState(1);
     const [mounted, setMounted] = useState(false);
@@ -35,109 +35,16 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
     const [isLoading, setIsLoading] = useState(!initialData);
     const [user, setUser] = useState<any>(initialUser);
     const [isPurchased, setIsPurchased] = useState(initialIsPurchased || false);
-    const [userReview, setUserReview] = useState<any>(null);
+    const [userReview, setUserReview] = useState<any>(initialUserReview || null);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-    const supabase = createClient();
     const [socialProofIndex, setSocialProofIndex] = useState(0);
-    const socialProofs = [
-        { id: 'sales', text: "34 people bought this in last 24 hours", type: 'sales' },
-        { id: 'views', text: "Popular! 5 people are viewing this right now", type: 'views' }
-    ];
 
     const isKyoto = id === "kyoto-traditional";
     const isBali = id === "bali-hidden";
 
-    useEffect(() => {
-        setMounted(true);
-
-        const interval = setInterval(() => {
-            setSocialProofIndex((prev) => (prev + 1) % socialProofs.length);
-        }, 5000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                // If we already have initial data and user, we might still want to check for purchases if not provided
-                if (!initialUser) {
-                    const { data: { user: authUser } } = await supabase.auth.getUser();
-                    setUser(authUser);
-                }
-
-                const currentUser = user || initialUser;
-                if (currentUser && !initialIsPurchased) {
-                    const { data: purchase } = await supabase
-                        .from('purchases')
-                        .select('id')
-                        .eq('user_id', currentUser.id)
-                        .eq('itinerary_id', id)
-                        .single();
-
-                    if (purchase) setIsPurchased(true);
-
-                    const { data: review } = await supabase
-                        .from('reviews')
-                        .select('*')
-                        .eq('user_id', currentUser.id)
-                        .eq('itinerary_id', id)
-                        .single();
-
-                    if (review) setUserReview(review);
-                }
-
-                if (isKyoto || isBali) {
-                    setIsLoading(false);
-                    return;
-                }
-
-                // If no initial data or we want to refresh
-                if (!initialData) {
-                    const { data: itineraryData } = await supabase
-                        .from('itineraries')
-                        .select(`
-                            *,
-                            profiles:creator_id (
-                                full_name,
-                                avatar_url,
-                                is_verified
-                            )
-                        `)
-                        .eq('id', id)
-                        .single();
-
-                    if (itineraryData) {
-                        setLiveData(itineraryData);
-                        localStorage.setItem(`itinerary_${id}`, JSON.stringify(itineraryData));
-
-                        fetch('/api/analytics', {
-                            method: 'POST',
-                            body: JSON.stringify({ itinerary_id: id })
-                        }).catch(console.error);
-                    }
-                }
-            } catch (err) {
-                console.error("Error fetching data:", err);
-                const cached = localStorage.getItem(`itinerary_${id}`);
-                if (cached && !liveData) {
-                    try {
-                        setLiveData(JSON.parse(cached));
-                    } catch (e) {
-                        console.error("Error parsing cache:", e);
-                    }
-                }
-            } finally {
-                setIsLoading(false);
-            }
-        }
-
-        fetchData();
-    }, [id, isKyoto, isBali, initialData, initialIsPurchased, initialUser]);
-
     // Comprehensive mock data matching the new creator fields
-    let itinerary = {
-        id: id,
+    let itinerary: any = initialData || {
+        id: "kyoto-traditional",
         title: isKyoto ? "7 Days in Kyoto: The Ultimate Guide" : isBali ? "Bali: Hidden Gems & Waterfalls" : "",
         image_url: isKyoto
             ? "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2070&auto=format&fit=crop"
@@ -199,7 +106,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
         preTrip: {
             essentials: { insurance: "Strongly Recommended" }
         }
-    };
+    } as any;
 
     if (liveData) {
         itinerary = {
@@ -232,6 +139,22 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
         };
     }
 
+    const purchaseCount = itinerary.purchases?.length || 0;
+    const socialProofs = [
+        ...(purchaseCount > 0 ? [{ id: 'sales', text: `${purchaseCount} people purchased since launch.`, type: 'sales' }] : []),
+        { id: 'views', text: "Popular! 5 people are viewing this right now", type: 'views' }
+    ];
+
+    useEffect(() => {
+        setMounted(true);
+
+        const interval = setInterval(() => {
+            setSocialProofIndex((prev) => (prev + 1) % socialProofs.length);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [socialProofs.length]);
+
     const handlePurchase = () => {
         router.push(`/checkout/${id}`);
     };
@@ -241,23 +164,24 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
     };
 
     const handleReviewSubmitted = async () => {
-        const { data: review } = await supabase
-            .from('reviews')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('itinerary_id', id)
-            .single();
+        try {
+            // Re-fetch all reviews and find the user's review
+            const reviewsRes = await fetch(`/api/reviews?itinerary_id=${id}`);
+            const reviews = await reviewsRes.json();
+            const myReview = reviews.find((r: any) => r.user_id === user.id);
+            if (myReview) {
+                setUserReview(myReview);
+            }
 
-        if (review) setUserReview(review);
+            // Re-fetch itinerary stats
+            const itineraryRes = await fetch(`/api/itineraries/${id}`);
+            const updatedItinerary = await itineraryRes.json();
 
-        const { data: updatedItinerary } = await supabase
-            .from('itineraries')
-            .select('average_rating, review_count')
-            .eq('id', id)
-            .single();
-
-        if (updatedItinerary) {
-            setLiveData({ ...liveData, ...updatedItinerary });
+            if (updatedItinerary) {
+                setLiveData({ ...liveData, average_rating: updatedItinerary.average_rating, review_count: updatedItinerary.review_count });
+            }
+        } catch (error) {
+            console.error("Failed to refresh review data", error);
         }
     };
 
@@ -590,7 +514,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                             }}>
                                 <h2 style={{ fontSize: '1.8rem', margin: 0 }}>Daily Schedule</h2>
                                 <div className="no-print" style={{ display: 'flex', gap: '8px', overflowX: 'auto', maxWidth: '100%', paddingBottom: '4px' }}>
-                                    {itinerary.days.map(day => (
+                                    {itinerary.days.map((day: any) => (
                                         <button
                                             key={day.number}
                                             onClick={() => setActiveDay(day.number)}
@@ -622,7 +546,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                         Full schedule available after purchase.
                                     </div>
                                 ) : (
-                                    itinerary.days.filter(d => d.number === activeDay).map(day => (
+                                    itinerary.days.filter((d: any) => d.number === activeDay).map((day: any) => (
                                         <div key={day.number} className="glass card" style={{ padding: '40px', position: 'relative', overflow: 'hidden' }}>
                                             {(!isPurchased && (activeDay > 1)) && (
                                                 <div style={{
@@ -712,7 +636,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                             </div>
 
                             <div className="print-only-show">
-                                {itinerary.days.map(day => (
+                                {itinerary.days.map((day: any) => (
                                     <div key={day.number} style={{ marginBottom: '40px', pageBreakInside: 'avoid', borderBottom: '1px solid #eee', paddingBottom: '32px' }}>
                                         <h3 style={{ fontSize: '1.4rem', marginBottom: '16px' }}>Day {day.number}: {day.title}</h3>
                                         <p style={{ marginBottom: '8px' }}><strong>Morning:</strong> {day.morning}</p>

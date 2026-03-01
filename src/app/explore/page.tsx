@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { MapPin, Star, Search, Filter, X } from "@/components/Icons";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import ItineraryCard from "@/components/ItineraryCard";
@@ -42,7 +41,6 @@ function ExploreContent() {
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
     const [sortBy, setSortBy] = useState<"newest" | "price-low" | "price-high" | "rating">("rating");
     const [showFilters, setShowFilters] = useState(false);
-    const supabase = createClient();
     const searchParams = useSearchParams();
 
     useEffect(() => {
@@ -63,50 +61,9 @@ function ExploreContent() {
     async function fetchItineraries() {
         try {
             setIsLoading(true);
-            const { data, error } = await supabase
-                .from('itineraries')
-                .select(`
-                    *,
-                    profiles!creator_id (
-                        full_name,
-                        email,
-                        is_verified
-                    )
-                `)
-                .eq('is_published', true)
-                .eq('is_approved', true)
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                console.error("Supabase query error:", error);
-                // Simple fallback if join fails for some reason
-                const { data: fallback } = await supabase
-                    .from('itineraries')
-                    .select('*')
-                    .eq('is_published', true)
-                    .order('created_at', { ascending: false });
-
-                if (fallback) {
-                    const formatted = fallback.map((item: any) => ({
-                        id: item.id,
-                        title: item.title,
-                        creator: "@Creator",
-                        creator_id: item.creator_id,
-                        location: item.location || "Unknown",
-                        price: Number(item.price) || 0,
-                        average_rating: Number(item.average_rating) || 0,
-                        review_count: item.review_count || 0,
-                        image: item.image_url || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800&auto=format&fit=crop",
-                        tags: item.tags || [],
-                        is_verified: false,
-                        duration_days: item.duration_days,
-                        difficulty_level: item.difficulty_level,
-                        currency: item.currency || "USD"
-                    }));
-                    setItineraries(formatted as any);
-                }
-                return;
-            }
+            const res = await fetch('/api/itineraries');
+            if (!res.ok) throw new Error("Failed to fetch itineraries");
+            const data = await res.json();
 
             const formattedData: Itinerary[] = (data || []).map((item: any) => ({
                 id: item.id,
@@ -122,7 +79,8 @@ function ExploreContent() {
                 is_verified: item.profiles?.is_verified || false,
                 duration_days: item.duration_days,
                 difficulty_level: item.difficulty_level,
-                currency: item.currency || "USD"
+                currency: item.currency || "USD",
+                purchase_count: item.purchases?.length || 0
             }));
 
             setItineraries(formattedData);

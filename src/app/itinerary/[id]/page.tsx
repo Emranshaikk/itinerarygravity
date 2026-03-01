@@ -1,5 +1,10 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import connectToDatabase from "@/lib/mongodb";
+import { Itinerary } from "@/models/Itinerary";
+import { Purchase } from "@/models/Purchase";
+import { Review } from "@/models/Review";
 import ItineraryClientPage from '@/components/itinerary/ItineraryClientPage';
 import { notFound } from 'next/navigation';
 
@@ -8,50 +13,29 @@ interface Props {
 }
 
 async function getItinerary(id: string) {
-    const supabase = await createClient();
+    await connectToDatabase();
 
-    // Check if id is a UUID (more inclusive regex)
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+    const query = isObjectId ? { _id: id } : { slug: id };
 
-    let query = supabase
-        .from('itineraries')
-        .select(`
-            *,
-            profiles:creator_id (
-                full_name,
-                avatar_url,
-                is_verified
-            )
-        `);
+    const itinerary = await Itinerary.findOne(query)
+        .populate('creator_id', 'full_name avatar_url is_verified')
+        .lean();
 
-    if (isUuid) {
-        query = query.or(`id.eq.${id},slug.eq.${id}`);
-    } else {
-        query = query.eq('slug', id);
-    }
+    if (!itinerary) return null;
 
-    const { data, error } = await query.single();
+    // Convert MongoDB document to match the structure the frontend expects
+    const mapped = {
+        ...itinerary,
+        id: itinerary._id.toString(),
+        profiles: itinerary.creator_id ? {
+            full_name: (itinerary.creator_id as any).full_name,
+            avatar_url: (itinerary.creator_id as any).avatar_url,
+            is_verified: (itinerary.creator_id as any).is_verified,
+        } : null,
+    };
 
-    // Fallback search if single() fails or no data found (in case slug looks like UUID or vice-versa)
-    if (error || !data) {
-        const { data: fallbackData } = await supabase
-            .from('itineraries')
-            .select(`
-                *,
-                profiles!creator_id (
-                    full_name,
-                    avatar_url,
-                    is_verified
-                )
-            `)
-            .or(`id.eq.${id},slug.eq.${id}`)
-            .limit(1)
-            .maybeSingle();
-
-        return fallbackData;
-    }
-
-    return data;
+    return mapped;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -95,18 +79,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function Page({ params }: Props) {
     const { id } = await params;
     const itinerary = await getItinerary(id);
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const session = await getServerSession(authOptions);
+    const user = session?.user as any;
 
     let isPurchased = false;
-    if (user) {
-        const { data: purchase } = await supabase
-            .from('purchases')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('itinerary_id', id)
-            .single();
+    let initialUserReview = null;
+
+    if (user && itinerary) {
+        await connectToDatabase();
+        const purchase = await Purchase.findOne({
+            user_id: user.id,
+            itinerary_id: itinerary.id,
+            status: 'completed'
+        }).lean();
+
         if (purchase) isPurchased = true;
+
+        const review = await Review.findOne({
+            user_id: user.id,
+            itinerary_id: itinerary.id
+        }).lean();
+
+        if (review) {
+            initialUserReview = { ...review, id: review._id.toString() };
+        }
     }
 
     if (!itinerary && id !== "kyoto-traditional" && id !== "bali-hidden") {
@@ -196,6 +192,7 @@ export default async function Page({ params }: Props) {
                 initialData={itinerary}
                 initialIsPurchased={isPurchased}
                 initialUser={user}
+                initialUserReview={initialUserReview}
             />
         </>
     );

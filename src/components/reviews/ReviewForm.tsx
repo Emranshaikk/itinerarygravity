@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Star } from "@/components/Icons";
 
 interface ReviewFormProps {
@@ -20,7 +19,6 @@ export default function ReviewForm({ itineraryId, onReviewSubmitted, existingRev
     const [comment, setComment] = useState(existingReview?.comment || "");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const supabase = createClient();
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();

@@ -1,37 +1,41 @@
-import { createClient } from "@/lib/supabase/server";
+import connectToDatabase from "@/lib/mongodb";
+import { Itinerary } from "@/models/Itinerary";
 import ItineraryCard from "@/components/ItineraryCard";
 import Breadcrumbs from "@/components/itinerary/Breadcrumbs";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 interface Props {
-    params: { destination: string };
+    params: Promise<{ destination: string }>;
 }
 
 async function getItinerariesByDestination(destination: string) {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-        .from('itineraries')
-        .select(`
-            *,
-            profiles:creator_id (
-                full_name,
-                avatar_url,
-                is_verified
-            )
-        `)
-        .eq('is_approved', true)
-        .ilike('location', `%${destination}%`)
-        .order('average_rating', { ascending: false });
+    await connectToDatabase();
 
-    if (error) return [];
+    const itineraries = await Itinerary.find({
+        is_published: true,
+        location: { $regex: destination, $options: 'i' }
+    })
+        .populate('creator_id', 'full_name avatar_url is_verified')
+        .lean();
+
+    const data = itineraries.map((item: any) => ({
+        ...item,
+        id: item._id.toString(),
+        created_at: item.createdAt,
+        profiles: {
+            full_name: item.creator_id?.full_name,
+            avatar_url: item.creator_id?.avatar_url,
+            is_verified: item.creator_id?.is_verified
+        }
+    }));
 
     // Multi-level ranking logic:
     // 1. Verified creators first
     // 2. Higher average rating
     // 3. Higher review count as tie-breaker
     // 4. Newer itineraries as final tie-breaker
-    return (data || []).sort((a: any, b: any) => {
+    return data.sort((a: any, b: any) => {
         // 1. Verified status
         const aVerified = a.profiles?.is_verified ? 1 : 0;
         const bVerified = b.profiles?.is_verified ? 1 : 0;
@@ -48,7 +52,7 @@ async function getItinerariesByDestination(destination: string) {
         }
 
         // 4. Recency (ID or created_at as proxy)
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
     });
 }
 

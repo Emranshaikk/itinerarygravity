@@ -21,6 +21,7 @@ export default function HeroSearch() {
         <form
             onSubmit={handleSearch}
             className="glass"
+            suppressHydrationWarning
             style={{
                 maxWidth: '600px',
                 margin: '0 auto 48px auto',
@@ -39,6 +40,7 @@ export default function HeroSearch() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Where do you want to go?"
+                    suppressHydrationWarning
                     style={{
                         width: '100%',
                         padding: '16px 16px 16px 48px',
@@ -53,6 +55,7 @@ export default function HeroSearch() {
             <button
                 type="submit"
                 className="btn btn-primary"
+                suppressHydrationWarning
                 style={{
                     padding: '0 32px',
                     borderRadius: '12px',

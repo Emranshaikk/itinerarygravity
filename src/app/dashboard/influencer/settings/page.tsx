@@ -2,17 +2,14 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { ArrowLeft, Save, Shield, Star, Info, ShieldCheck, Camera, CreditCard, Landmark, Send } from "@/components/Icons";
 import ImageUpload from "@/components/ImageUpload";
 
-export default function InfluencerSettingsPage() {
+export default function CreatorSettingsPage() {
     const router = useRouter();
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<{ id: string, email: string } | null>(null);
     const [status, setStatus] = useState<'idle' | 'saving' | 'loading'>('loading');
     const [profileImg, setProfileImg] = useState<string | null>(null);
-    const supabase = createClient();
 
     const [profile, setProfile] = useState({
         name: "",
@@ -34,16 +31,21 @@ export default function InfluencerSettingsPage() {
 
     useEffect(() => {
         const fetchProfile = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                setUser(user);
-                const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-                if (data) {
+            try {
+                const res = await fetch('/api/profile/settings');
+                if (res.status === 401) {
+                    router.push('/login');
+                    return;
+                }
+
+                if (res.ok) {
+                    const data = await res.json();
+                    setUser({ id: data._id, email: data.email });
                     setProfile({
                         name: data.full_name || "",
                         handle: data.username || "",
                         bio: data.bio || "",
-                        email: user.email || "",
+                        email: data.email || "",
                         instagram: data.social_links?.instagram || "",
                         tiktok: data.social_links?.tiktok || ""
                     });
@@ -52,11 +54,14 @@ export default function InfluencerSettingsPage() {
                         setPayment(prev => ({ ...prev, ...data.payment_info }));
                     }
                 }
+            } catch (err) {
+                console.error("Error fetching profile", err);
+            } finally {
+                setStatus('idle');
             }
-            setStatus('idle');
         };
         fetchProfile();
-    }, []);
+    }, [router]);
 
     const handleSave = async () => {
         if (!user) return;
@@ -64,7 +69,6 @@ export default function InfluencerSettingsPage() {
 
         try {
             const updates = {
-                id: user.id,
                 full_name: profile.name,
                 username: profile.handle,
                 bio: profile.bio,
@@ -74,20 +78,23 @@ export default function InfluencerSettingsPage() {
                     tiktok: profile.tiktok
                 },
                 payment_info: payment,
-                updated_at: new Date().toISOString(),
             };
 
-            const { error } = await supabase.from('profiles').upsert(updates);
+            const res = await fetch('/api/profile/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates)
+            });
 
-            if (error) {
-                console.error("Error saving settings:", error);
-                alert("Error saving settings: " + error.message);
-            } else {
-                alert("Settings saved successfully!");
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || "Failed to save settings");
             }
-        } catch (error) {
+
+            alert("Settings saved successfully!");
+        } catch (error: any) {
             console.error("Error:", error);
-            alert("An unexpected error occurred.");
+            alert("Error saving settings: " + error.message);
         } finally {
             setStatus('idle');
         }

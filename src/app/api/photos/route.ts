@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import connectToDatabase from "@/lib/mongodb";
+import { TravelerPhoto } from "@/models/TravelerPhoto";
+import { Purchase } from "@/models/Purchase";
+import { Itinerary } from "@/models/Itinerary";
 
 export async function POST(req: Request) {
     try {
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
+        const session = await getServerSession(authOptions);
+        if (!session?.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -17,36 +20,29 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
-        // 1. Verify purchase
-        const { data: purchase, error: purchaseError } = await supabase
-            .from('purchases')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('itinerary_id', itinerary_id)
-            .single();
+        await connectToDatabase();
+        const sessionUser = session.user as any;
 
-        if (purchaseError || !purchase) {
+        // 1. Verify purchase
+        const purchase = await Purchase.findOne({
+            user_id: sessionUser.id,
+            itinerary_id: itinerary_id,
+            status: 'completed'
+        }).lean();
+
+        if (!purchase) {
             return NextResponse.json({ error: "You must purchase this itinerary to upload photos." }, { status: 403 });
         }
 
         // 2. Insert photo record
-        const { data, error } = await supabase
-            .from('traveler_photos')
-            .insert({
-                user_id: user.id,
-                itinerary_id,
-                image_url,
-                caption: caption || ""
-            })
-            .select()
-            .single();
+        const photo = await TravelerPhoto.create({
+            user_id: sessionUser.id,
+            itinerary_id,
+            image_url,
+            caption: caption || ""
+        });
 
-        if (error) {
-            console.error("[PHOTOS_POST_ERROR]", error);
-            return NextResponse.json({ error: "Database Error", details: error.message }, { status: 500 });
-        }
-
-        return NextResponse.json(data);
+        return NextResponse.json(photo);
     } catch (error: any) {
         console.error("[API_PHOTOS_POST]", error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
@@ -62,45 +58,39 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: "Missing itinerary_id" }, { status: 400 });
         }
 
-        const supabase = await createClient();
+        await connectToDatabase();
         let finalItineraryId = idOrSlug;
 
-        // Check if idOrSlug is a UUID
-        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
+        // Check if idOrSlug is a MongoDB ObjectId
+        const isObjectId = /^[0-9a-fA-F]{24}$/.test(idOrSlug);
 
-        if (!isUuid) {
-            // Try to resolve slug to UUID
-            const { data: itinerary } = await supabase
-                .from('itineraries')
-                .select('id')
-                .eq('slug', idOrSlug)
-                .maybeSingle();
+        if (!isObjectId) {
+            // Try to resolve slug to ID
+            const itinerary = await Itinerary.findOne({ slug: idOrSlug }).select('_id').lean();
 
             if (itinerary) {
-                finalItineraryId = itinerary.id;
+                finalItineraryId = itinerary._id.toString();
             } else {
                 return NextResponse.json([]);
             }
         }
 
-        const { data, error } = await supabase
-            .from('traveler_photos')
-            .select(`
-                *,
-                profiles:user_id (
-                    full_name,
-                    avatar_url
-                )
-            `)
-            .eq('itinerary_id', finalItineraryId)
-            .order('created_at', { ascending: false });
+        const photos = await TravelerPhoto.find({ itinerary_id: finalItineraryId })
+            .populate('user_id', 'full_name avatar_url')
+            .sort({ createdAt: -1 })
+            .lean();
 
-        if (error) {
-            console.error("[API_PHOTOS_QUERY_ERROR]", error);
-            return NextResponse.json([]);
-        }
+        const data = photos.map((p: any) => ({
+            ...p,
+            id: p._id.toString(),
+            profiles: {
+                full_name: p.user_id?.full_name,
+                avatar_url: p.user_id?.avatar_url
+            },
+            created_at: p.createdAt
+        }));
 
-        return NextResponse.json(data || []);
+        return NextResponse.json(data);
     } catch (error: any) {
         console.error("[API_PHOTOS_GET_ERROR]", error);
         return NextResponse.json([], { status: 500 });

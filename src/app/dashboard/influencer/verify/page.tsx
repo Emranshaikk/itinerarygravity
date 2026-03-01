@@ -3,26 +3,19 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, CheckCircle2, ArrowLeft, Camera } from "@/components/Icons";
-import { createClient } from "@/lib/supabase/client";
+import { useSession } from "next-auth/react";
 
 export default function VerificationPage() {
-    const [user, setUser] = useState<any>(null);
+    const { data: session, status: sessionStatus } = useSession();
     const router = useRouter();
     const [status, setStatus] = useState<'idle' | 'processing' | 'success'>('idle');
     const [proof, setProof] = useState("");
-    const supabase = createClient();
 
     useEffect(() => {
-        const getUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                setUser(user);
-            } else {
-                router.push("/login");
-            }
-        };
-        getUser();
-    }, []);
+        if (sessionStatus === "unauthenticated") {
+            router.push("/login");
+        }
+    }, [sessionStatus, router]);
 
     const handleSubscribe = async () => {
         if (!proof.trim()) {
@@ -32,18 +25,10 @@ export default function VerificationPage() {
 
         setStatus('processing');
         try {
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .update({
-                    identity_proof: proof,
-                    verification_status: 'pending'
-                })
-                .eq('id', user?.id);
-
-            if (profileError) throw profileError;
-
             const response = await fetch('/api/verify', {
                 method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ proof })
             });
 
             const data = await response.json();

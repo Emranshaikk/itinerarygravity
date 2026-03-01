@@ -5,58 +5,32 @@ import { ShieldCheck, MapPin, Star } from "@/components/Icons";
 import Link from "next/link";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 export default function CreatorProfilePage() {
     const params = useParams();
     const username = params?.username as string;
     const [creator, setCreator] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const supabase = createClient();
-
     useEffect(() => {
         const fetchCreatorData = async () => {
             if (!username) return;
 
-            // 1. Fetch Profile by username
-            let { data: profileData, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('username', username)
-                .single();
+            try {
+                const res = await fetch(`/api/creators/${username}`);
+                if (!res.ok) {
+                    setCreator(null);
+                    setLoading(false);
+                    return;
+                }
 
-            // Fallback: If not found by username, try by ID (legacy support during migration)
-            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(username);
-            if (!profileData && isUUID) {
-                const { data: profileById } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', username)
-                    .single();
-                profileData = profileById;
+                const data = await res.json();
+                setCreator(data);
+            } catch (err) {
+                console.error("Error fetching creator:", err);
+                setCreator(null);
+            } finally {
+                setLoading(false);
             }
-
-            if (profileData) {
-                // 2. Fetch Itineraries
-                const { data: itineraryData } = await supabase
-                    .from('itineraries')
-                    .select('*')
-                    .eq('creator_id', profileData.id)
-                    .eq('is_published', true)
-                    .order('created_at', { ascending: false });
-
-                setCreator({
-                    ...profileData,
-                    name: profileData.full_name || "Traveler",
-                    handle: `@${profileData.username || "traveler"}`,
-                    image: profileData.avatar_url,
-                    followers: "0", // Placeholder for now
-                    rating: 5.0, // Placeholder
-                    reviews: 0, // Placeholder
-                    itineraries: itineraryData || []
-                });
-            }
-            setLoading(false);
         };
 
         fetchCreatorData();

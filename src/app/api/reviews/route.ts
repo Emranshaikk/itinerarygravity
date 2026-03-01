@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import connectToDatabase from "@/lib/mongodb";
+import { Review } from "@/models/Review";
+import { Purchase } from "@/models/Purchase";
+import { Itinerary } from "@/models/Itinerary";
 
 // GET - Fetch reviews for an itinerary
 export async function GET(request: Request) {
@@ -11,47 +16,39 @@ export async function GET(request: Request) {
     }
 
     try {
-        const supabase = await createClient();
+        await connectToDatabase();
         let finalItineraryId = idOrSlug;
 
-        // Check if idOrSlug is a UUID
-        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
+        // Check if idOrSlug is a MongoDB ObjectId
+        const isObjectId = /^[0-9a-fA-F]{24}$/.test(idOrSlug);
 
-        if (!isUuid) {
-            // Try to resolve slug to UUID
-            const { data: itinerary } = await supabase
-                .from('itineraries')
-                .select('id')
-                .eq('slug', idOrSlug)
-                .maybeSingle();
-
+        if (!isObjectId) {
+            // Try to resolve slug to ID
+            const itinerary = await Itinerary.findOne({ slug: idOrSlug }).select('_id').lean();
             if (itinerary) {
-                finalItineraryId = itinerary.id;
+                finalItineraryId = itinerary._id.toString();
             } else {
-                // If no itinerary found by slug, return empty reviews
                 return NextResponse.json([]);
             }
         }
 
-        const { data: reviews, error } = await supabase
-            .from('reviews')
-            .select(`
-                *,
-                profiles:user_id (
-                    full_name,
-                    email,
-                    avatar_url
-                )
-            `)
-            .eq('itinerary_id', finalItineraryId)
-            .order('created_at', { ascending: false });
+        const reviews = await Review.find({ itinerary_id: finalItineraryId })
+            .populate('user_id', 'full_name email avatar_url')
+            .sort({ createdAt: -1 })
+            .lean();
 
-        if (error) {
-            console.error('[REVIEWS_QUERY_ERROR]', error);
-            return NextResponse.json([]);
-        }
+        // Map to expected frontend structure
+        const mappedReviews = reviews.map((r: any) => ({
+            ...r,
+            id: r._id.toString(),
+            profiles: r.user_id ? {
+                full_name: r.user_id.full_name,
+                email: r.user_id.email,
+                avatar_url: r.user_id.avatar_url
+            } : { full_name: 'Unknown', email: '' }
+        }));
 
-        return NextResponse.json(reviews || []);
+        return NextResponse.json(mappedReviews);
     } catch (error: any) {
         console.error('[REVIEWS_FETCH_ERROR]', error);
         return NextResponse.json([], { status: 500 });
@@ -61,8 +58,8 @@ export async function GET(request: Request) {
 // POST - Create a new review
 export async function POST(request: Request) {
     try {
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const session = await getServerSession(authOptions);
+        const user = session?.user as any;
 
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -79,43 +76,47 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Rating must be between 1 and 5' }, { status: 400 });
         }
 
+        await connectToDatabase();
+
         // Check if user has purchased this itinerary
-        const { data: purchase } = await supabase
-            .from('purchases')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('itinerary_id', itinerary_id)
-            .single();
+        const purchase = await Purchase.findOne({
+            user_id: user.id,
+            itinerary_id: itinerary_id,
+            status: 'completed'
+        }).lean();
 
         if (!purchase) {
             return NextResponse.json({ error: 'You must purchase this itinerary before reviewing' }, { status: 403 });
         }
 
         // Check if user already reviewed
-        const { data: existingReview } = await supabase
-            .from('reviews')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('itinerary_id', itinerary_id)
-            .single();
+        const existingReview = await Review.findOne({
+            user_id: user.id,
+            itinerary_id: itinerary_id
+        }).lean();
 
         if (existingReview) {
             return NextResponse.json({ error: 'You have already reviewed this itinerary' }, { status: 409 });
         }
 
         // Create review
-        const { data: review, error } = await supabase
-            .from('reviews')
-            .insert({
-                itinerary_id,
-                user_id: user.id,
-                rating,
-                comment
-            })
-            .select()
-            .single();
+        const review = await Review.create({
+            itinerary_id,
+            user_id: user.id,
+            rating,
+            comment
+        });
 
-        if (error) throw error;
+        // Update itinerary average rating and review count
+        const allReviews = await Review.find({ itinerary_id }).lean();
+        const totalRating = allReviews.reduce((sum, r) => sum + r.rating, 0);
+        const average_rating = totalRating / allReviews.length;
+        const review_count = allReviews.length;
+
+        await Itinerary.findByIdAndUpdate(itinerary_id, {
+            average_rating,
+            review_count
+        });
 
         return NextResponse.json(review, { status: 201 });
     } catch (error: any) {
@@ -127,8 +128,8 @@ export async function POST(request: Request) {
 // PATCH - Update a review
 export async function PATCH(request: Request) {
     try {
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const session = await getServerSession(authOptions);
+        const user = session?.user as any;
 
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -150,15 +151,26 @@ export async function PATCH(request: Request) {
         }
         if (comment !== undefined) updateData.comment = comment;
 
-        const { data: review, error } = await supabase
-            .from('reviews')
-            .update(updateData)
-            .eq('id', review_id)
-            .eq('user_id', user.id)
-            .select()
-            .single();
+        await connectToDatabase();
 
-        if (error) throw error;
+        const review = await Review.findOneAndUpdate(
+            { _id: review_id, user_id: user.id },
+            updateData,
+            { new: true }
+        ).lean();
+
+        if (!review) {
+            return NextResponse.json({ error: 'Review not found or unauthorized' }, { status: 404 });
+        }
+
+        // Update itinerary average rating
+        const allReviews = await Review.find({ itinerary_id: review.itinerary_id }).lean();
+        const totalRating = allReviews.reduce((sum, r) => sum + r.rating, 0);
+        const average_rating = totalRating / allReviews.length;
+
+        await Itinerary.findByIdAndUpdate(review.itinerary_id, {
+            average_rating
+        });
 
         return NextResponse.json(review);
     } catch (error: any) {
@@ -170,8 +182,8 @@ export async function PATCH(request: Request) {
 // DELETE - Delete a review
 export async function DELETE(request: Request) {
     try {
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const session = await getServerSession(authOptions);
+        const user = session?.user as any;
 
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -184,13 +196,28 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'Review ID required' }, { status: 400 });
         }
 
-        const { error } = await supabase
-            .from('reviews')
-            .delete()
-            .eq('id', reviewId)
-            .eq('user_id', user.id);
+        await connectToDatabase();
 
-        if (error) throw error;
+        const review = await Review.findOneAndDelete({
+            _id: reviewId,
+            user_id: user.id
+        });
+
+        if (!review) {
+            return NextResponse.json({ error: 'Review not found or unauthorized' }, { status: 404 });
+        }
+
+        // Update itinerary average rating and review count
+        const allReviews = await Review.find({ itinerary_id: review.itinerary_id }).lean();
+        const review_count = allReviews.length;
+        const average_rating = review_count > 0
+            ? allReviews.reduce((sum, r) => sum + r.rating, 0) / review_count
+            : 0;
+
+        await Itinerary.findByIdAndUpdate(review.itinerary_id, {
+            average_rating,
+            review_count
+        });
 
         return NextResponse.json({ message: 'Review deleted successfully' });
     } catch (error: any) {

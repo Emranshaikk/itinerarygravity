@@ -1,37 +1,38 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useSession } from "next-auth/react";
 
 export default function DiagPage() {
-    const [user, setUser] = useState<any>(null);
+    const { data: session, status } = useSession();
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const supabase = createClient();
 
     useEffect(() => {
         async function fetchData() {
-            const { data: { user: authUser } } = await supabase.auth.getUser();
-            setUser(authUser);
-
-            if (authUser) {
-                const { data: profileData } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', authUser.id)
-                    .single();
-                setProfile(profileData);
+            if (status === 'authenticated') {
+                try {
+                    const res = await fetch('/api/profile/settings');
+                    if (res.ok) {
+                        const data = await res.json();
+                        setProfile(data);
+                    }
+                } catch (e) {
+                    console.error("Error fetching diagnostic data", e);
+                }
             }
-            setLoading(false);
+            if (status !== 'loading') {
+                setLoading(false);
+            }
         }
         fetchData();
-    }, []);
+    }, [status]);
 
-    if (loading) {
+    if (loading || status === 'loading') {
         return <div className="container" style={{ padding: '40px' }}>Loading...</div>;
     }
 
-    if (!user) {
+    if (status === 'unauthenticated' || !session?.user) {
         return (
             <div className="container" style={{ padding: '40px' }}>
                 <h1 className="text-gradient" style={{ fontSize: '2rem', marginBottom: '20px' }}>Not Logged In</h1>
@@ -42,25 +43,26 @@ export default function DiagPage() {
         );
     }
 
+    const sessionUser = session.user as any;
+
     return (
         <div className="container" style={{ padding: '40px' }}>
             <h1 className="text-gradient" style={{ fontSize: '2rem', marginBottom: '20px' }}>User Diagnostics</h1>
 
             <div className="glass card" style={{ padding: '32px', marginBottom: '24px' }}>
-                <h2 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Auth User Info</h2>
+                <h2 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Auth User Info (NextAuth)</h2>
                 <div style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                    <p style={{ marginBottom: '8px' }}><strong>User ID:</strong> {user.id}</p>
-                    <p style={{ marginBottom: '8px' }}><strong>Email:</strong> {user.email}</p>
-                    <p style={{ marginBottom: '8px' }}><strong>Email Confirmed:</strong> {user.email_confirmed_at ? '✅ Yes' : '❌ No'}</p>
-                    <p style={{ marginBottom: '8px' }}><strong>Created:</strong> {new Date(user.created_at).toLocaleString()}</p>
+                    <p style={{ marginBottom: '8px' }}><strong>User ID:</strong> {sessionUser.id}</p>
+                    <p style={{ marginBottom: '8px' }}><strong>Email:</strong> {sessionUser.email}</p>
+                    <p style={{ marginBottom: '8px' }}><strong>Name:</strong> {sessionUser.name}</p>
                 </div>
             </div>
 
             <div className="glass card" style={{ padding: '32px', marginBottom: '24px' }}>
-                <h2 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Profile Info</h2>
+                <h2 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Profile Info (MongoDB)</h2>
                 {profile ? (
                     <div style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                        <p style={{ marginBottom: '8px' }}><strong>Profile ID:</strong> {profile.id}</p>
+                        <p style={{ marginBottom: '8px' }}><strong>Profile ID:</strong> {profile._id}</p>
                         <p style={{ marginBottom: '8px' }}><strong>Email:</strong> {profile.email || 'Not set'}</p>
                         <p style={{ marginBottom: '8px' }}><strong>Full Name:</strong> {profile.full_name || 'Not set'}</p>
                         <p style={{ marginBottom: '8px' }}><strong>Role:</strong> <span style={{
@@ -68,37 +70,11 @@ export default function DiagPage() {
                             fontWeight: 700
                         }}>{profile.role || 'buyer'}</span></p>
                         <p style={{ marginBottom: '8px' }}><strong>Verified:</strong> {profile.is_verified ? '✅ Yes' : '❌ No'}</p>
-                        <p style={{ marginBottom: '8px' }}><strong>Verification Status:</strong> {profile.verification_status || 'none'}</p>
                     </div>
                 ) : (
                     <p style={{ color: '#ef4444' }}>❌ No profile found in database!</p>
                 )}
             </div>
-
-            {profile && profile.role !== 'admin' && (
-                <div className="glass card" style={{ padding: '32px', background: 'rgba(234, 179, 8, 0.1)', border: '1px solid #eab308' }}>
-                    <h2 style={{ fontSize: '1.5rem', marginBottom: '16px', color: '#eab308' }}>⚠️ Set Yourself as Admin</h2>
-                    <p style={{ marginBottom: '16px', color: 'var(--gray-300)' }}>
-                        To access the admin dashboard, run this SQL in your Supabase SQL Editor:
-                    </p>
-                    <div style={{
-                        background: 'rgba(0,0,0,0.3)',
-                        padding: '16px',
-                        borderRadius: '8px',
-                        fontFamily: 'monospace',
-                        fontSize: '0.9rem',
-                        color: '#10b981',
-                        marginBottom: '16px'
-                    }}>
-                        UPDATE profiles<br />
-                        SET role = 'admin'<br />
-                        WHERE id = '{user.id}';
-                    </div>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--gray-400)' }}>
-                        After running this, refresh this page to verify the change.
-                    </p>
-                </div>
-            )}
 
             {profile && profile.role === 'admin' && (
                 <div className="glass card" style={{ padding: '32px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981' }}>

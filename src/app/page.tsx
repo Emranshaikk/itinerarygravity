@@ -1,21 +1,19 @@
-import { createClient } from "@/lib/supabase/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import connectToDatabase from "@/lib/mongodb";
+import { User as DbUser } from "@/models/User";
+import { Itinerary } from "@/models/Itinerary";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import HeroSearch from "@/components/itinerary/HeroSearch";
 import ItineraryCard from "@/components/ItineraryCard";
 
 export default async function Home() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const session = await getServerSession(authOptions);
 
-  if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (profile?.role === 'influencer' || profile?.role === 'admin') {
+  if (session?.user) {
+    const role = (session.user as any).role;
+    if (role === 'influencer' || role === 'admin') {
       redirect("/dashboard");
     }
   }
@@ -262,40 +260,25 @@ export default async function Home() {
 }
 
 async function TrendingItineraries() {
-  const supabase = await createClient();
+  await connectToDatabase();
 
-  // First, try to get approved itineraries
-  let { data: itineraries } = await supabase
-    .from('itineraries')
-    .select(`
-      *,
-      profiles!creator_id (
-        full_name,
-        is_verified
-      )
-    `)
-    .eq('is_published', true)
-    .eq('is_approved', true)
-    .order('average_rating', { ascending: false })
-    .limit(3);
+  let itineraries: any = await Itinerary.find({
+    is_published: true,
+    is_approved: true
+  })
+    .populate('creator_id', 'full_name is_verified')
+    .sort({ average_rating: -1 })
+    .limit(3)
+    .lean();
 
-  // If no approved itineraries found, fallback to any published itineraries
-  // This ensures the section isn't empty during initial development/testing
   if (!itineraries || itineraries.length === 0) {
-    const { data: fallbackItineraries } = await supabase
-      .from('itineraries')
-      .select(`
-        *,
-        profiles!creator_id (
-          full_name,
-          is_verified
-        )
-      `)
-      .eq('is_published', true)
-      .order('created_at', { ascending: false })
-      .limit(3);
-
-    itineraries = fallbackItineraries;
+    itineraries = await Itinerary.find({
+      is_published: true
+    })
+      .populate('creator_id', 'full_name is_verified')
+      .sort({ createdAt: -1 })
+      .limit(3)
+      .lean();
   }
 
   if (!itineraries || itineraries.length === 0) return null;
@@ -304,12 +287,13 @@ async function TrendingItineraries() {
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
       {itineraries.map((item: any) => (
         <ItineraryCard
-          key={item.id}
+          key={item._id.toString()}
           itinerary={{
             ...item,
-            creator: item.profiles?.full_name || "@Creator",
+            id: item._id.toString(),
+            creator: item.creator_id?.full_name || "@Creator",
             image: item.image_url || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800",
-            is_verified: item.profiles?.is_verified,
+            is_verified: item.creator_id?.is_verified,
             tags: item.tags || []
           }}
         />

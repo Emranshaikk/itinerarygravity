@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import connectToDatabase from "@/lib/mongodb";
+import { TripExpense } from "@/models/TripExpense";
 
 export async function POST(req: Request) {
     try {
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
+        const session = await getServerSession(authOptions);
+        if (!session?.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -17,31 +18,32 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
-        const { data, error } = await supabase
-            .from('trip_expenses')
-            .insert({
-                user_id: user.id,
-                itinerary_id,
-                day_number,
-                amount,
-                category,
-                description
-            })
-            .select()
-            .single();
+        await connectToDatabase();
+        const sessionUser = session.user as any;
 
-        if (error) {
-            return NextResponse.json({ error: "Database Error", details: error.message }, { status: 500 });
-        }
+        const expense = await TripExpense.create({
+            user_id: sessionUser.id,
+            itinerary_id,
+            day_number,
+            amount,
+            category,
+            description
+        });
 
-        return NextResponse.json(data);
+        return NextResponse.json(expense);
     } catch (error: any) {
+        console.error("[EXPENSES_POST_ERROR]", error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
 }
 
 export async function GET(req: Request) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const { searchParams } = new URL(req.url);
         const itinerary_id = searchParams.get('itinerary_id');
 
@@ -49,32 +51,30 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: "Missing itinerary_id" }, { status: 400 });
         }
 
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        await connectToDatabase();
+        const sessionUser = session.user as any;
 
-        if (!user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+        const expenses = await TripExpense.find({
+            itinerary_id,
+            user_id: sessionUser.id
+        }).sort({ createdAt: 1 }).lean();
 
-        const { data, error } = await supabase
-            .from('trip_expenses')
-            .select('*')
-            .eq('itinerary_id', itinerary_id)
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: true });
-
-        if (error) {
-            return NextResponse.json({ error: "Database Error" }, { status: 500 });
-        }
+        const data = expenses.map((e: any) => ({ ...e, id: e._id.toString() }));
 
         return NextResponse.json(data);
     } catch (error: any) {
+        console.error("[EXPENSES_GET_ERROR]", error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
 }
 
 export async function DELETE(req: Request) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         const { searchParams } = new URL(req.url);
         const expense_id = searchParams.get('id');
 
@@ -82,25 +82,21 @@ export async function DELETE(req: Request) {
             return NextResponse.json({ error: "Missing expense_id" }, { status: 400 });
         }
 
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        await connectToDatabase();
+        const sessionUser = session.user as any;
 
-        if (!user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+        const result = await TripExpense.findOneAndDelete({
+            _id: expense_id,
+            user_id: sessionUser.id
+        });
 
-        const { error } = await supabase
-            .from('trip_expenses')
-            .delete()
-            .eq('id', expense_id)
-            .eq('user_id', user.id);
-
-        if (error) {
-            return NextResponse.json({ error: "Database Error" }, { status: 500 });
+        if (!result) {
+            return NextResponse.json({ error: "Expense not found or unauthorized" }, { status: 404 });
         }
 
         return NextResponse.json({ success: true });
     } catch (error: any) {
+        console.error("[EXPENSES_DELETE_ERROR]", error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
 }

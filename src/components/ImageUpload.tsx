@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import { Upload, X, Loader2, Check } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 
 interface ImageUploadProps {
     value?: string; // Current image URL
@@ -28,7 +27,6 @@ export default function ImageUpload({
     const [error, setError] = useState<string | null>(null);
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const supabase = createClient();
 
     const uploadFile = async (file: File) => {
         try {
@@ -46,34 +44,30 @@ export default function ImageUpload({
                 throw new Error('File must be an image');
             }
 
-            // Generate unique filename
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-            const filePath = `${folder}/${fileName}`;
+            // Generate FormData payload
+            const formData = new FormData();
+            formData.append('file', file);
 
             // Simulate progress for better UX
             const progressInterval = setInterval(() => {
                 setProgress(prev => Math.min(prev + 10, 90));
             }, 100);
 
-            // Upload to Supabase Storage
-            const { data, error: uploadError } = await supabase.storage
-                .from(bucket)
-                .upload(filePath, file, {
-                    cacheControl: '3600',
-                    upsert: false
-                });
+            // Upload via local API endpoint
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
 
             clearInterval(progressInterval);
 
-            if (uploadError) {
-                throw uploadError;
+            const uploadData = await res.json();
+
+            if (!res.ok || !uploadData.url) {
+                throw new Error(uploadData.error || "Failed to upload image");
             }
 
-            // Get public URL
-            const { data: { publicUrl } } = supabase.storage
-                .from(bucket)
-                .getPublicUrl(filePath);
+            const publicUrl = uploadData.url;
 
             setProgress(100);
             onChange(publicUrl);

@@ -20,6 +20,7 @@ interface ItineraryCardProps {
         tags: string[];
         is_verified?: boolean;
         duration_days?: number;
+        purchase_count?: number;
     };
 }
 
@@ -134,9 +135,16 @@ export default function ItineraryCard({ itinerary }: ItineraryCardProps) {
                                 </span>
                             )}
                         </div>
-                        <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem' }}>
-                            View Details →
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            {itinerary.purchase_count && itinerary.purchase_count > 0 ? (
+                                <span style={{ fontSize: '0.85rem', color: 'var(--gray-400)' }}>
+                                    {itinerary.purchase_count} Purchased
+                                </span>
+                            ) : null}
+                            <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem' }}>
+                                View Details →
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

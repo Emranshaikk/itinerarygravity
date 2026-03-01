@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Download } from "@/components/Icons";
-import { createClient } from "@/lib/supabase/client";
 
 export default function BuyerDashboard() {
     const router = useRouter();
@@ -12,79 +11,23 @@ export default function BuyerDashboard() {
     const [wishlist, setWishlist] = useState<any[]>([]);
     const [marketplaceItems, setMarketplaceItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const supabase = createClient();
-
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) {
+                const res = await fetch('/api/dashboard/buyer');
+
+                if (res.status === 401) {
                     router.push("/login");
                     return;
                 }
 
-                // 1. Fetch Purchases
-                const { data: purchaseData } = await supabase
-                    .from('purchases')
-                    .select(`
-                        id,
-                        itinerary_id,
-                        created_at,
-                        itineraries (
-                            id,
-                            title,
-                            location,
-                            description,
-                            creator_id,
-                            profiles:creator_id (
-                                full_name
-                            )
-                        )
-                    `)
-                    .eq('user_id', user.id);
+                if (!res.ok) throw new Error("Failed to fetch dashboard data");
 
-                if (purchaseData) {
-                    const formatted = purchaseData.map((p: any) => ({
-                        id: p.id,
-                        itinerary_id: p.itinerary_id,
-                        title: p.itineraries?.title,
-                        creator: p.itineraries?.profiles?.full_name || "@Influencer",
-                        location: p.itineraries?.location,
-                        date: new Date(p.created_at).toLocaleDateString(),
-                        image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=600",
-                        description: p.itineraries?.description || ""
-                    }));
-                    setPurchases(formatted);
-                }
+                const data = await res.json();
 
-                // 2. Fetch Wishlist
-                const { data: wishlistData } = await supabase
-                    .from('wishlists')
-                    .select(`
-                        id,
-                        itinerary_id,
-                        itineraries (*)
-                    `)
-                    .eq('user_id', user.id);
-
-                if (wishlistData) {
-                    setWishlist(wishlistData.map((w: any) => w.itineraries));
-                }
-
-                // 3. Fetch Marketplace
-                const { data: marketData } = await supabase
-                    .from('itineraries')
-                    .select(`
-                        *,
-                        profiles:creator_id (full_name)
-                    `)
-                    .eq('is_published', true)
-                    .limit(6);
-
-                if (marketData) {
-                    setMarketplaceItems(marketData);
-                }
-
+                setPurchases(data.purchases || []);
+                setWishlist(data.wishlist || []);
+                setMarketplaceItems(data.marketplaceItems || []);
             } catch (err) {
                 console.error("Error fetching dashboard data:", err);
             } finally {
@@ -93,7 +36,7 @@ export default function BuyerDashboard() {
         };
 
         fetchDashboardData();
-    }, []);
+    }, [router]);
 
     if (loading) {
         return (

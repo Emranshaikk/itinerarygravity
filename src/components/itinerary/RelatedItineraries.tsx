@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Star, MapPin, ArrowRight } from "@/components/Icons";
-import { createClient } from "@/lib/supabase/client";
 
 interface RelatedItinerariesProps {
     itineraryId: string;
@@ -15,32 +14,22 @@ interface RelatedItinerariesProps {
 export default function RelatedItineraries({ itineraryId, location, creatorId }: RelatedItinerariesProps) {
     const [related, setRelated] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const supabase = createClient();
-
     useEffect(() => {
         async function fetchRelated() {
             try {
-                // Fetch itineraries in the same location or from same creator
-                const { data, error } = await supabase
-                    .from('itineraries')
-                    .select(`
-                        id,
-                        title,
-                        slug,
-                        location,
-                        price,
-                        average_rating,
-                        review_count,
-                        profiles:creator_id (
-                            full_name
-                        )
-                    `)
-                    .neq('id', itineraryId)
-                    .eq('is_approved', true) // Only approved ones
-                    .or(`location.ilike.%${location}%,creator_id.eq.${creatorId}`)
-                    .limit(3);
+                const params = new URLSearchParams({
+                    itineraryId,
+                    ...(location && { location }),
+                    ...(creatorId && { creatorId })
+                });
 
-                if (data) setRelated(data);
+                const res = await fetch(`/api/itineraries/related?${params.toString()}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.length > 0) {
+                        setRelated(data);
+                    }
+                }
             } catch (error) {
                 console.error("Error fetching related itineraries:", error);
             } finally {

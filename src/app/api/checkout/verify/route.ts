@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import crypto from 'crypto';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import connectToDatabase from "@/lib/mongodb";
+import { Purchase } from "@/models/Purchase";
 
 export async function POST(req: Request) {
     try {
@@ -23,10 +26,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
         }
 
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const session = await getServerSession(authOptions);
 
-        if (!user) {
+        if (!session?.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -35,22 +37,19 @@ export async function POST(req: Request) {
         const platformFee = totalAmount * 0.30;
         const creatorEarnings = totalAmount * 0.70;
 
-        // 3. Record purchase
-        const { error } = await supabase
-            .from('purchases')
-            .insert({
-                user_id: user.id,
-                itinerary_id: itineraryId,
-                amount: totalAmount,
-                platform_fee: platformFee,
-                creator_earnings: creatorEarnings,
-                stripe_session_id: razorpay_payment_id // Reusing this field for payment ID
-            });
+        await connectToDatabase();
 
-        if (error) {
-            console.error("[PURCHASE_RECORD_ERROR]", error);
-            return NextResponse.json({ error: "Failed to record purchase" }, { status: 500 });
-        }
+        // 3. Record purchase
+        await Purchase.create({
+            user_id: (session.user as any).id,
+            itinerary_id: itineraryId,
+            amount_paid: totalAmount,
+            currency: 'INR',
+            status: 'completed',
+            platform_fee: platformFee,
+            creator_earnings: creatorEarnings,
+            stripe_session_id: razorpay_payment_id // Reusing this field for payment ID
+        });
 
         return NextResponse.json({ success: true });
     } catch (error: any) {

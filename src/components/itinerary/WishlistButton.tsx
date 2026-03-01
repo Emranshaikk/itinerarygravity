@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Heart } from "@/components/Icons";
-import { createClient } from "@/lib/supabase/client";
+import { useSession } from "next-auth/react";
 
 interface WishlistButtonProps {
     itineraryId: string;
@@ -11,53 +11,48 @@ interface WishlistButtonProps {
 }
 
 export default function WishlistButton({ itineraryId, initialStatus = false, size = 20 }: WishlistButtonProps) {
+    const { data: session } = useSession();
     const [isWishlisted, setIsWishlisted] = useState(initialStatus);
     const [isLoading, setIsLoading] = useState(false);
-    const [user, setUser] = useState<any>(null);
-    const supabase = createClient();
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            setUser(user);
+        const checkWishlistStatus = async () => {
+            if (!session?.user) return;
 
-            if (user) {
-                const { data } = await supabase
-                    .from('wishlists')
-                    .select('id')
-                    .eq('user_id', user.id)
-                    .eq('itinerary_id', itineraryId)
-                    .single();
-
-                if (data) setIsWishlisted(true);
+            try {
+                const res = await fetch(`/api/wishlists?itinerary_id=${itineraryId}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setIsWishlisted(data.inWishlist);
+                }
+            } catch (error) {
+                console.error("Error checking wishlist status:", error);
             }
         };
-        fetchUser();
-    }, [itineraryId]);
+
+        checkWishlistStatus();
+    }, [itineraryId, session]);
 
     const toggleWishlist = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (!user) {
+        if (!session?.user) {
             // alert("Please login to save to wishlist!");
             return;
         }
 
         setIsLoading(true);
         try {
-            if (isWishlisted) {
-                await fetch('/api/wishlist', {
-                    method: 'DELETE',
-                    body: JSON.stringify({ itinerary_id: itineraryId })
-                });
-                setIsWishlisted(false);
-            } else {
-                await fetch('/api/wishlist', {
-                    method: 'POST',
-                    body: JSON.stringify({ itinerary_id: itineraryId })
-                });
-                setIsWishlisted(true);
+            const res = await fetch('/api/wishlists', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ itinerary_id: itineraryId })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setIsWishlisted(data.inWishlist);
             }
         } catch (error) {
             console.error("Wishlist error:", error);
@@ -66,7 +61,7 @@ export default function WishlistButton({ itineraryId, initialStatus = false, siz
         }
     };
 
-    if (!user) return null;
+    if (!session?.user) return null;
 
     return (
         <button

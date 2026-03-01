@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { TrendingUp, Eye, DollarSign, Star, MapPin, Calendar } from "@/components/Icons";
 
 interface ItineraryAnalytics {
@@ -31,7 +30,6 @@ export default function CreatorAnalytics() {
     const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
     const [loading, setLoading] = useState(true);
     const [timeRange, setTimeRange] = useState<"7d" | "30d" | "all">("30d");
-    const supabase = createClient();
 
     useEffect(() => {
         fetchAnalytics();

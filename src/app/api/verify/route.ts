@@ -1,17 +1,32 @@
 import { NextResponse } from 'next/server';
 import { razorpay } from '@/lib/razorpay';
-import { createClient } from '@/lib/supabase/server';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import connectToDatabase from "@/lib/mongodb";
+import { User } from "@/models/User";
 
-export async function POST() {
+export async function POST(req: Request) {
     try {
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
+        const session = await getServerSession(authOptions);
+        if (!session?.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const userId = user.id;
+        const body = await req.json();
+        const { proof } = body;
+
+        if (!proof) {
+            return NextResponse.json({ error: "Identity proof required" }, { status: 400 });
+        }
+
+        const sessionUser = session.user as any;
+        const userId = sessionUser.id;
+
+        await connectToDatabase();
+        await User.findByIdAndUpdate(userId, {
+            identity_proof: proof,
+            verification_status: 'pending'
+        });
 
         const options = {
             amount: 80000, // Fixed 800 INR for verification

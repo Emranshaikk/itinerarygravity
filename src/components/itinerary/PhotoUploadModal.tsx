@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { X, Camera, Upload, CheckCircle } from "@/components/Icons";
 
 interface PhotoUploadModalProps {
@@ -17,7 +16,6 @@ export default function PhotoUploadModal({ itineraryId, onClose, onSuccess }: Ph
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const supabase = createClient();
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
@@ -35,21 +33,22 @@ export default function PhotoUploadModal({ itineraryId, onClose, onSuccess }: Ph
         setError("");
 
         try {
-            // 1. Upload to Supabase Storage
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-            const filePath = `${itineraryId}/${fileName}`;
+            // 1. Upload to Local API
+            const formData = new FormData();
+            formData.append('file', file);
 
-            const { data: uploadData, error: uploadError } = await supabase.storage
-                .from('traveler-photos')
-                .upload(filePath, file);
+            const uploadRes = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
 
-            if (uploadError) throw new Error("Failed to upload image to storage");
+            const uploadData = await uploadRes.json();
 
-            // 2. Get Public URL
-            const { data: { publicUrl } } = supabase.storage
-                .from('traveler-photos')
-                .getPublicUrl(filePath);
+            if (!uploadRes.ok || !uploadData.url) {
+                throw new Error(uploadData.error || "Failed to upload image");
+            }
+
+            const publicUrl = uploadData.url;
 
             // 3. Save to database via API
             const response = await fetch('/api/photos', {

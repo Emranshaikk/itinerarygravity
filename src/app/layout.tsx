@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Providers } from "@/components/Providers";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import BackgroundAnimation from "@/components/BackgroundAnimation";
 import "./globals.css";
@@ -26,19 +27,19 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
-        <link rel="preconnect" href="https://**.supabase.co" />
-        <link rel="dns-prefetch" href="https://**.supabase.co" />
         <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
       </head>
       <body suppressHydrationWarning>
-        <ThemeProvider>
-          <BackgroundAnimation />
-          <Navbar />
-          <main style={{ paddingTop: '80px', minHeight: '100vh' }}>
-            {children}
-          </main>
-          <Footer />
-        </ThemeProvider>
+        <Providers>
+          <ThemeProvider>
+            <BackgroundAnimation />
+            <Navbar />
+            <main style={{ paddingTop: '80px', minHeight: '100vh' }}>
+              {children}
+            </main>
+            <Footer />
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

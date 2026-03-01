@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Users, DollarSign, MapPin, TrendingUp, Eye, Trash2, XCircle } from "@/components/Icons";
 
 interface Stats {
@@ -26,7 +25,6 @@ export default function AdminDashboard() {
         pendingVerifications: 0
     });
     const [loading, setLoading] = useState(true);
-    const supabase = createClient();
 
     useEffect(() => {
         fetchAllData();
@@ -44,88 +42,57 @@ export default function AdminDashboard() {
 
     async function fetchStats() {
         try {
-            // Fetch user counts
-            const { count: totalUsers } = await supabase
-                .from('profiles')
-                .select('*', { count: 'exact', head: true });
-
-            const { count: totalCreators } = await supabase
-                .from('profiles')
-                .select('*', { count: 'exact', head: true })
-                .eq('role', 'influencer');
-
-            const { count: pendingVerifications } = await supabase
-                .from('profiles')
-                .select('*', { count: 'exact', head: true })
-                .eq('verification_status', 'pending');
-
-            // Fetch itinerary counts
-            const { count: totalItineraries } = await supabase
-                .from('itineraries')
-                .select('*', { count: 'exact', head: true });
-
-            const { count: publishedItineraries } = await supabase
-                .from('itineraries')
-                .select('*', { count: 'exact', head: true })
-                .eq('is_published', true);
-
-            // Fetch revenue
-            const { data: purchases } = await supabase
-                .from('purchases')
-                .select('amount');
-
-            const totalRevenue = purchases?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
-
-            setStats({
-                totalUsers: totalUsers || 0,
-                totalCreators: totalCreators || 0,
-                totalItineraries: totalItineraries || 0,
-                publishedItineraries: publishedItineraries || 0,
-                totalRevenue,
-                pendingVerifications: pendingVerifications || 0
-            });
+            const res = await fetch('/api/admin/stats');
+            if (res.ok) {
+                const data = await res.json();
+                setStats({
+                    totalUsers: data.totalUsers || 0,
+                    totalCreators: data.totalCreators || 0,
+                    totalItineraries: data.totalItineraries || 0,
+                    publishedItineraries: data.publishedItineraries || 0,
+                    totalRevenue: data.totalRevenue || 0,
+                    pendingVerifications: data.pendingVerifications || 0
+                });
+            }
         } catch (error) {
             console.error('Error fetching stats:', error);
         }
     }
 
     async function fetchVerifications() {
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('verification_status', 'pending')
-            .order('created_at', { ascending: false });
-
-        if (data) setVerifications(data);
+        try {
+            const res = await fetch('/api/admin/verifications');
+            if (res.ok) {
+                const data = await res.json();
+                setVerifications(data);
+            }
+        } catch (error) {
+            console.error('Error fetching verifs:', error);
+        }
     }
 
     async function fetchItineraries() {
-        const { data, error } = await supabase
-            .from('itineraries')
-            .select(`
-                *,
-                profiles!creator_id (
-                    full_name,
-                    email
-                )
-            `)
-            .order('created_at', { ascending: false });
-
-        if (data) setItineraries(data);
+        try {
+            const res = await fetch('/api/admin/itineraries');
+            if (res.ok) {
+                const data = await res.json();
+                setItineraries(data);
+            }
+        } catch (error) {
+            console.error('Error fetching itineraries:', error);
+        }
     }
 
     const handleVerificationAction = async (userId: string, action: 'Approve' | 'Deny') => {
         try {
             const isApproved = action === 'Approve';
-            const { error } = await supabase
-                .from('profiles')
-                .update({
-                    is_verified: isApproved,
-                    verification_status: isApproved ? 'verified' : 'none'
-                })
-                .eq('id', userId);
+            const response = await fetch('/api/admin/verifications', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, isApproved })
+            });
 
-            if (error) throw error;
+            if (!response.ok) throw new Error("Update failed");
 
             alert(`Successfully ${action}d verification`);
             fetchAllData();
@@ -139,12 +106,13 @@ export default function AdminDashboard() {
         if (!confirm("Unpublish this itinerary? It will be hidden from the marketplace.")) return;
 
         try {
-            const { error } = await supabase
-                .from('itineraries')
-                .update({ is_published: false })
-                .eq('id', itineraryId);
+            const response = await fetch('/api/admin/itineraries', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ itineraryId, unpublish: true })
+            });
 
-            if (error) throw error;
+            if (!response.ok) throw new Error("Update failed");
             alert("Itinerary unpublished successfully");
             fetchAllData();
         } catch (err) {
@@ -157,12 +125,11 @@ export default function AdminDashboard() {
         if (!confirm("⚠️ DELETE this itinerary permanently? This cannot be undone!")) return;
 
         try {
-            const { error } = await supabase
-                .from('itineraries')
-                .delete()
-                .eq('id', itineraryId);
+            const response = await fetch(`/api/admin/itineraries?id=${itineraryId}`, {
+                method: 'DELETE'
+            });
 
-            if (error) throw error;
+            if (!response.ok) throw new Error("Delete failed");
             alert("Itinerary deleted successfully");
             fetchAllData();
         } catch (err) {
