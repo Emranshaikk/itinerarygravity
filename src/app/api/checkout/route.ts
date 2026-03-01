@@ -18,10 +18,22 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing data" }, { status: 400 });
         }
 
+        // Fetch itinerary to find creator
+        const { Itinerary } = await import('@/models/Itinerary');
+        const { User } = await import('@/models/User');
+        await import('@/lib/mongodb').then(m => m.default());
+
+        const itinerary = await Itinerary.findById(itineraryId);
+        if (!itinerary) {
+            return NextResponse.json({ error: "Itinerary not found" }, { status: 404 });
+        }
+
+        const creator = await User.findById(itinerary.creator_id);
+
         // Razorpay expects amount in paise (cents counterpart)
         const amount = Math.round(price * 100);
 
-        const options = {
+        const options: any = {
             amount: amount,
             currency: "INR",
             receipt: `rcpt_${itineraryId.substring(0, 10)}`,
@@ -31,6 +43,24 @@ export async function POST(req: Request) {
                 title
             }
         };
+
+        // If creator has a connected Razorpay Account, split the payment
+        if (creator?.razorpay_account_id) {
+            const transferAmount = Math.round(amount * 0.70); // 70% to creator
+            options.transfers = [
+                {
+                    account: creator.razorpay_account_id,
+                    amount: transferAmount,
+                    currency: "INR",
+                    notes: {
+                        name: "Creator Earnings",
+                        roll: "creator",
+                    },
+                    linked_account_notes: ["roll"],
+                    on_hold: 0 // Process immediately or hold based on your business logic
+                }
+            ];
+        }
 
         const order = await razorpay.orders.create(options);
 

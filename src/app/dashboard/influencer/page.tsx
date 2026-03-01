@@ -111,6 +111,12 @@ export default function InfluencerDashboard() {
                     </Link>
                     <button
                         className="btn btn-outline"
+                        onClick={() => router.push("/dashboard/influencer/analytics")}
+                    >
+                        Analytics
+                    </button>
+                    <button
+                        className="btn btn-outline"
                         onClick={() => router.push("/dashboard/influencer/settings")}
                     >
                         Settings
@@ -240,12 +246,16 @@ export default function InfluencerDashboard() {
                 </div>
 
                 <div style={{ display: 'grid', gap: '24px' }}>
-                    <div className="glass card" style={{ padding: '24px' }}>
+                    <div
+                        className="glass card card-hover"
+                        style={{ padding: '24px', cursor: 'pointer' }}
+                        onClick={() => router.push('/dashboard/influencer/analytics')}
+                    >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                             <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 ₹
                             </div>
-                            <span style={{ color: 'var(--gray-400)', fontSize: '0.9rem' }}>Estimated Balance</span>
+                            <span style={{ color: 'var(--gray-400)', fontSize: '0.9rem' }}>Estimated Balance (Click for Analytics)</span>
                         </div>
                         <p style={{ fontSize: '1.8rem', fontWeight: 700 }}>₹{totalEarnings.toFixed(2)}</p>
                         <p style={{ fontSize: '0.75rem', color: '#10b981', marginTop: '4px' }}>↑ 0% from last month</p>

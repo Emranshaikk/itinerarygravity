@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
-import { join } from 'path';
+import cloudinary from '@/lib/cloudinary';
 
 export async function POST(req: Request) {
     try {
@@ -14,21 +13,24 @@ export async function POST(req: Request) {
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        // Generate a unique filename
-        const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
-        const uploadDir = join(process.cwd(), 'public', 'uploads');
+        // Upload to Cloudinary using upload_stream
+        const result = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                {
+                    folder: 'itinerarygravity',
+                    resource_type: 'auto'
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            );
 
-        // Ensure directory exists
-        const fs = require('fs');
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
+            // Write buffer to stream
+            uploadStream.end(buffer);
+        });
 
-        const path = join(uploadDir, filename);
-        await writeFile(path, buffer);
-
-        // Files in /public/uploads are served at /uploads/...
-        const url = `/uploads/${filename}`;
+        const url = (result as any).secure_url;
 
         return NextResponse.json({ success: true, url, publicUrl: url });
     } catch (error: any) {

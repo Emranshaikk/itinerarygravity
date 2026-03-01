@@ -5,223 +5,104 @@ import connectToDatabase from "@/lib/mongodb";
 import { Review } from "@/models/Review";
 import { Purchase } from "@/models/Purchase";
 import { Itinerary } from "@/models/Itinerary";
+import mongoose from 'mongoose';
 
-// GET - Fetch reviews for an itinerary
-export async function GET(request: Request) {
-    const { searchParams } = new URL(request.url);
-    const idOrSlug = searchParams.get('itinerary_id');
-
-    if (!idOrSlug) {
-        return NextResponse.json({ error: 'Itinerary ID or Slug required' }, { status: 400 });
-    }
-
+export async function GET(req: Request) {
     try {
-        await connectToDatabase();
-        let finalItineraryId = idOrSlug;
+        const { searchParams } = new URL(req.url);
+        const itineraryId = searchParams.get('itinerary_id');
 
-        // Check if idOrSlug is a MongoDB ObjectId
-        const isObjectId = /^[0-9a-fA-F]{24}$/.test(idOrSlug);
-
-        if (!isObjectId) {
-            // Try to resolve slug to ID
-            const itinerary = await Itinerary.findOne({ slug: idOrSlug }).select('_id').lean();
-            if (itinerary) {
-                finalItineraryId = itinerary._id.toString();
-            } else {
-                return NextResponse.json([]);
-            }
+        if (!itineraryId) {
+            return NextResponse.json({ error: "Missing itinerary_id" }, { status: 400 });
         }
 
-        const reviews = await Review.find({ itinerary_id: finalItineraryId })
-            .populate('user_id', 'full_name email avatar_url')
+        await connectToDatabase();
+
+        const reviews = await Review.find({ itinerary_id: itineraryId })
+            .populate('user_id', 'full_name avatar_url')
             .sort({ createdAt: -1 })
             .lean();
 
-        // Map to expected frontend structure
-        const mappedReviews = reviews.map((r: any) => ({
+        // Map to expected frontend format
+        const data = reviews.map((r: any) => ({
             ...r,
             id: r._id.toString(),
-            profiles: r.user_id ? {
-                full_name: r.user_id.full_name,
-                email: r.user_id.email,
-                avatar_url: r.user_id.avatar_url
-            } : { full_name: 'Unknown', email: '' }
+            profiles: {
+                full_name: r.user_id?.full_name || "Anonymous Traveler",
+                avatar_url: r.user_id?.avatar_url
+            },
+            created_at: r.createdAt
         }));
 
-        return NextResponse.json(mappedReviews);
+        return NextResponse.json(data);
     } catch (error: any) {
-        console.error('[REVIEWS_FETCH_ERROR]', error);
-        return NextResponse.json([], { status: 500 });
+        console.error("[API_REVIEWS_GET]", error);
+        // Important: Always return an array to prevent frontend crashes mapped over undefined
+        return NextResponse.json([]);
     }
 }
 
-// POST - Create a new review
-export async function POST(request: Request) {
+export async function POST(req: Request) {
     try {
         const session = await getServerSession(authOptions);
-        const user = session?.user as any;
-
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        if (!session?.user) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const body = await request.json();
+        const body = await req.json();
         const { itinerary_id, rating, comment } = body;
 
-        if (!itinerary_id || !rating) {
-            return NextResponse.json({ error: 'Itinerary ID and rating required' }, { status: 400 });
+        if (!itinerary_id || !rating || !comment) {
+            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
         if (rating < 1 || rating > 5) {
-            return NextResponse.json({ error: 'Rating must be between 1 and 5' }, { status: 400 });
+            return NextResponse.json({ error: "Rating must be between 1 and 5" }, { status: 400 });
         }
 
         await connectToDatabase();
+        const userId = (session.user as any).id;
 
-        // Check if user has purchased this itinerary
-        const purchase = await Purchase.findOne({
-            user_id: user.id,
-            itinerary_id: itinerary_id,
+        // 1. Verify user purchased this itinerary
+        const expectedPurchase = await Purchase.findOne({
+            user_id: userId,
+            itinerary_id,
             status: 'completed'
         }).lean();
 
-        if (!purchase) {
-            return NextResponse.json({ error: 'You must purchase this itinerary before reviewing' }, { status: 403 });
+        if (!expectedPurchase) {
+            return NextResponse.json({ error: "You can only review itineraries you have purchased." }, { status: 403 });
         }
 
-        // Check if user already reviewed
-        const existingReview = await Review.findOne({
-            user_id: user.id,
-            itinerary_id: itinerary_id
-        }).lean();
-
-        if (existingReview) {
-            return NextResponse.json({ error: 'You have already reviewed this itinerary' }, { status: 409 });
-        }
-
-        // Create review
-        const review = await Review.create({
-            itinerary_id,
-            user_id: user.id,
-            rating,
-            comment
-        });
-
-        // Update itinerary average rating and review count
-        const allReviews = await Review.find({ itinerary_id }).lean();
-        const totalRating = allReviews.reduce((sum, r) => sum + r.rating, 0);
-        const average_rating = totalRating / allReviews.length;
-        const review_count = allReviews.length;
-
-        await Itinerary.findByIdAndUpdate(itinerary_id, {
-            average_rating,
-            review_count
-        });
-
-        return NextResponse.json(review, { status: 201 });
-    } catch (error: any) {
-        console.error('[REVIEW_CREATE_ERROR]', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-}
-
-// PATCH - Update a review
-export async function PATCH(request: Request) {
-    try {
-        const session = await getServerSession(authOptions);
-        const user = session?.user as any;
-
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        const body = await request.json();
-        const { review_id, rating, comment } = body;
-
-        if (!review_id) {
-            return NextResponse.json({ error: 'Review ID required' }, { status: 400 });
-        }
-
-        const updateData: any = {};
-        if (rating !== undefined) {
-            if (rating < 1 || rating > 5) {
-                return NextResponse.json({ error: 'Rating must be between 1 and 5' }, { status: 400 });
-            }
-            updateData.rating = rating;
-        }
-        if (comment !== undefined) updateData.comment = comment;
-
-        await connectToDatabase();
-
+        // 2. Upsert the review (one review per user per itinerary)
         const review = await Review.findOneAndUpdate(
-            { _id: review_id, user_id: user.id },
-            updateData,
-            { new: true }
-        ).lean();
+            { user_id: userId, itinerary_id },
+            { rating, comment },
+            { upsert: true, new: true }
+        );
 
-        if (!review) {
-            return NextResponse.json({ error: 'Review not found or unauthorized' }, { status: 404 });
+        // 3. Recalculate average rating for the Itinerary
+        const stats = await Review.aggregate([
+            { $match: { itinerary_id: new mongoose.Types.ObjectId(itinerary_id) } },
+            {
+                $group: {
+                    _id: '$itinerary_id',
+                    average_rating: { $avg: '$rating' },
+                    review_count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        if (stats.length > 0) {
+            await Itinerary.findByIdAndUpdate(itinerary_id, {
+                average_rating: Math.round(stats[0].average_rating * 10) / 10, // Round to 1 decimal
+                review_count: stats[0].review_count
+            });
         }
-
-        // Update itinerary average rating
-        const allReviews = await Review.find({ itinerary_id: review.itinerary_id }).lean();
-        const totalRating = allReviews.reduce((sum, r) => sum + r.rating, 0);
-        const average_rating = totalRating / allReviews.length;
-
-        await Itinerary.findByIdAndUpdate(review.itinerary_id, {
-            average_rating
-        });
 
         return NextResponse.json(review);
     } catch (error: any) {
-        console.error('[REVIEW_UPDATE_ERROR]', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-}
-
-// DELETE - Delete a review
-export async function DELETE(request: Request) {
-    try {
-        const session = await getServerSession(authOptions);
-        const user = session?.user as any;
-
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        const { searchParams } = new URL(request.url);
-        const reviewId = searchParams.get('review_id');
-
-        if (!reviewId) {
-            return NextResponse.json({ error: 'Review ID required' }, { status: 400 });
-        }
-
-        await connectToDatabase();
-
-        const review = await Review.findOneAndDelete({
-            _id: reviewId,
-            user_id: user.id
-        });
-
-        if (!review) {
-            return NextResponse.json({ error: 'Review not found or unauthorized' }, { status: 404 });
-        }
-
-        // Update itinerary average rating and review count
-        const allReviews = await Review.find({ itinerary_id: review.itinerary_id }).lean();
-        const review_count = allReviews.length;
-        const average_rating = review_count > 0
-            ? allReviews.reduce((sum, r) => sum + r.rating, 0) / review_count
-            : 0;
-
-        await Itinerary.findByIdAndUpdate(review.itinerary_id, {
-            average_rating,
-            review_count
-        });
-
-        return NextResponse.json({ message: 'Review deleted successfully' });
-    } catch (error: any) {
-        console.error('[REVIEW_DELETE_ERROR]', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error("[API_REVIEWS_POST]", error);
+        return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
 }

@@ -50,6 +50,7 @@ export default function Navbar() {
 
                         {session?.user ? (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                <Link href="/dashboard/saved" style={{ fontWeight: 600, color: 'var(--foreground)' }}>Saved</Link>
                                 <Link href="/dashboard" style={{ fontWeight: 600, color: 'var(--primary)' }}>Dashboard</Link>
                                 <button
                                     onClick={handleSignOut}
@@ -99,6 +100,7 @@ export default function Navbar() {
 
                     {session?.user ? (
                         <>
+                            <Link href="/dashboard/saved" onClick={() => setIsMenuOpen(false)} style={{ fontWeight: 600, color: 'var(--foreground)' }}>Saved Itineraries</Link>
                             <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 600 }}>Dashboard</Link>
                             <button onClick={() => { handleSignOut(); setIsMenuOpen(false); }} style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--foreground)', padding: '10px', borderRadius: '8px', cursor: 'pointer' }}>Sign Out</button>
                         </>

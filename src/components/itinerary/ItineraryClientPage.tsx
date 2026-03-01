@@ -148,12 +148,36 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
     useEffect(() => {
         setMounted(true);
 
+        const trackView = async () => {
+            const viewedKey = `viewed_${id}`;
+            const lastViewed = localStorage.getItem(viewedKey);
+
+            // Only track view if never viewed before, or if it has been more than 1 hour
+            if (!lastViewed || (Date.now() - parseInt(lastViewed)) > 3600000) {
+                try {
+                    await fetch('/api/analytics', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ itinerary_id: id })
+                    });
+                    localStorage.setItem(viewedKey, Date.now().toString());
+                } catch (e) {
+                    console.error("Failed to track view", e);
+                }
+            }
+        };
+
+        if (id !== "kyoto-traditional" && id !== "bali-hidden") {
+            // Don't track views on the fallback / mock trips
+            trackView();
+        }
+
         const interval = setInterval(() => {
             setSocialProofIndex((prev) => (prev + 1) % socialProofs.length);
         }, 5000);
 
         return () => clearInterval(interval);
-    }, [socialProofs.length]);
+    }, [id, socialProofs.length]);
 
     const handlePurchase = () => {
         router.push(`/checkout/${id}`);

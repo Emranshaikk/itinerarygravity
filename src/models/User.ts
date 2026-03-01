@@ -10,6 +10,8 @@ export interface IUser extends Document {
     role: 'buyer' | 'influencer' | 'admin';
     is_verified: boolean;
     verification_status: 'none' | 'pending' | 'verified' | 'rejected';
+    razorpay_account_id?: string;
+    saved_itineraries?: mongoose.Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -64,6 +66,14 @@ const UserSchema: Schema<IUser> = new Schema(
             enum: ['none', 'pending', 'verified', 'rejected'],
             default: 'none',
         },
+        razorpay_account_id: {
+            type: String,
+            trim: true
+        },
+        saved_itineraries: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Itinerary'
+        }]
     },
     {
         timestamps: true,

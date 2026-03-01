@@ -22,6 +22,7 @@ export default function CreatorSettingsPage() {
 
     const [payment, setPayment] = useState({
         stripeConnected: false,
+        razorpayAccount: "",
         paypalEmail: "",
         upiId: "",
         bankAccount: "",
@@ -53,6 +54,9 @@ export default function CreatorSettingsPage() {
                     if (data.payment_info) {
                         setPayment(prev => ({ ...prev, ...data.payment_info }));
                     }
+                    if (data.razorpay_account_id) {
+                        setPayment(prev => ({ ...prev, razorpayAccount: data.razorpay_account_id, stripeConnected: true }));
+                    }
                 }
             } catch (err) {
                 console.error("Error fetching profile", err);
@@ -78,6 +82,7 @@ export default function CreatorSettingsPage() {
                     tiktok: profile.tiktok
                 },
                 payment_info: payment,
+                razorpay_account_id: payment.razorpayAccount
             };
 
             const res = await fetch('/api/profile/settings', {
@@ -172,16 +177,25 @@ export default function CreatorSettingsPage() {
                                 <div style={{ width: '40px', height: '40px', background: '#10b981', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700 }}>R</div>
                                 <div>
                                     <p style={{ fontWeight: 600 }}>Razorpay Connected</p>
-                                    <p style={{ fontSize: '0.8rem', color: '#10b981', opacity: 0.8 }}>Verified to receive payouts via Razorpay.</p>
+                                    <p style={{ fontSize: '0.8rem', color: '#10b981', opacity: 0.8 }}>Verified to receive payouts via Razorpay ({payment.razorpayAccount}).</p>
                                 </div>
                             </div>
-                            <button className="btn btn-outline" style={{ fontSize: '0.8rem', padding: '6px 12px' }}>Manage</button>
+                            <button className="btn btn-outline" style={{ fontSize: '0.8rem', padding: '6px 12px' }} onClick={() => setPayment({ ...payment, stripeConnected: false })}>Edit</button>
                         </div>
                     ) : (
                         <div style={{ padding: '24px', background: 'rgba(139, 92, 246, 0.1)', border: '1px solid var(--primary)', borderRadius: '12px', marginBottom: '24px', textAlign: 'center' }}>
                             <h4 style={{ marginBottom: '8px' }}>Connect Razorpay</h4>
-                            <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem', marginBottom: '16px' }}>We use Razorpay for secure payments to our creators.</p>
-                            <button className="btn btn-primary">Setup Razorpay</button>
+                            <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem', marginBottom: '16px' }}>Enter your Razorpay Route connected account ID to receive automated payouts.</p>
+
+                            <div className="form-group" style={{ maxWidth: '400px', margin: '0 auto 16px auto', textAlign: 'left' }}>
+                                <label className="form-label">Razorpay Account ID (acc_...)</label>
+                                <input
+                                    className="form-input"
+                                    placeholder="e.g. acc_XXXXX"
+                                    value={payment.razorpayAccount}
+                                    onChange={(e) => setPayment({ ...payment, razorpayAccount: e.target.value })}
+                                />
+                            </div>
                         </div>
                     )}
 

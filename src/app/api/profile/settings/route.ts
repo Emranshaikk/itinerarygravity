@@ -53,6 +53,10 @@ export async function PUT(req: Request) {
             updates.payment_info = body.payment_info;
         }
 
+        if (body.razorpay_account_id !== undefined) {
+            updates.razorpay_account_id = body.razorpay_account_id;
+        }
+
         const user = await User.findByIdAndUpdate(
             sessionUser.id,
             { $set: updates },
