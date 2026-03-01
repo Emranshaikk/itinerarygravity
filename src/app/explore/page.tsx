@@ -39,6 +39,9 @@ function ExploreContent() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
+    const [durationRange, setDurationRange] = useState<[number, number]>([1, 30]);
+    const [verifiedOnly, setVerifiedOnly] = useState(false);
+    const [minRating, setMinRating] = useState(0);
     const [sortBy, setSortBy] = useState<"newest" | "price-low" | "price-high" | "rating">("rating");
     const [showFilters, setShowFilters] = useState(false);
     const searchParams = useSearchParams();
@@ -56,7 +59,7 @@ function ExploreContent() {
 
     useEffect(() => {
         filterAndSortItineraries();
-    }, [itineraries, searchQuery, selectedTags, priceRange, sortBy]);
+    }, [itineraries, searchQuery, selectedTags, priceRange, sortBy, durationRange, verifiedOnly, minRating]);
 
     async function fetchItineraries() {
         try {
@@ -115,6 +118,22 @@ function ExploreContent() {
         filtered = filtered.filter(item =>
             item.price >= priceRange[0] && item.price <= priceRange[1]
         );
+
+        // Duration filter
+        filtered = filtered.filter(item => {
+            const duration = item.duration_days || 1; // Default to 1 if not set
+            return duration >= durationRange[0] && duration <= durationRange[1];
+        });
+
+        // Verified filter
+        if (verifiedOnly) {
+            filtered = filtered.filter(item => item.is_verified);
+        }
+
+        // Min Rating filter
+        if (minRating > 0) {
+            filtered = filtered.filter(item => item.average_rating >= minRating);
+        }
 
         // Sort
         filtered.sort((a, b) => {
@@ -215,7 +234,7 @@ function ExploreContent() {
                     >
                         <Filter size={18} />
                         Filters
-                        {(selectedTags.length > 0 || priceRange[0] > 0 || priceRange[1] < 50000) && (
+                        {(selectedTags.length > 0 || priceRange[0] > 0 || priceRange[1] < 50000 || durationRange[0] > 1 || durationRange[1] < 30 || verifiedOnly || minRating > 0) && (
                             <span style={{
                                 background: 'var(--primary)',
                                 color: 'var(--background)',
@@ -228,7 +247,7 @@ function ExploreContent() {
                                 fontSize: '0.7rem',
                                 fontWeight: 700
                             }}>
-                                {selectedTags.length + (priceRange[0] > 0 || priceRange[1] < 1000 ? 1 : 0)}
+                                {selectedTags.length + (priceRange[0] > 0 || priceRange[1] < 50000 ? 1 : 0) + (durationRange[0] > 1 || durationRange[1] < 30 ? 1 : 0) + (verifiedOnly ? 1 : 0) + (minRating > 0 ? 1 : 0)}
                             </span>
                         )}
                     </button>
@@ -288,14 +307,86 @@ function ExploreContent() {
                                     />
                                 </div>
                             </div>
+
+                            {/* Duration Range */}
+                            <div>
+                                <h4 style={{ marginBottom: '12px', fontSize: '0.9rem', color: 'var(--gray-400)' }}>
+                                    Duration: {durationRange[0]} - {durationRange[1]} Days
+                                </h4>
+                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                    <input
+                                        type="range"
+                                        min="1"
+                                        max="30"
+                                        step="1"
+                                        value={durationRange[0]}
+                                        onChange={(e) => setDurationRange([Number(e.target.value), durationRange[1]])}
+                                        style={{ flex: 1 }}
+                                    />
+                                    <input
+                                        type="range"
+                                        min="1"
+                                        max="30"
+                                        step="1"
+                                        value={durationRange[1]}
+                                        onChange={(e) => setDurationRange([durationRange[0], Number(e.target.value)])}
+                                        style={{ flex: 1 }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Minimum Rating */}
+                            <div>
+                                <h4 style={{ marginBottom: '12px', fontSize: '0.9rem', color: 'var(--gray-400)' }}>Minimum Rating</h4>
+                                <select
+                                    value={minRating}
+                                    onChange={(e) => setMinRating(Number(e.target.value))}
+                                    style={{
+                                        padding: '10px 14px',
+                                        borderRadius: '8px',
+                                        background: 'var(--surface)',
+                                        border: '1px solid var(--border)',
+                                        color: 'var(--foreground)',
+                                        width: '100%',
+                                        outline: 'none'
+                                    }}
+                                >
+                                    <option value={0}>Any Rating</option>
+                                    <option value={3}>3+ Stars</option>
+                                    <option value={4}>4+ Stars</option>
+                                    <option value={4.5}>4.5+ Stars</option>
+                                </select>
+                            </div>
+
+                            {/* Verified Creators Only */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--foreground)', fontSize: '0.9rem' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={verifiedOnly}
+                                        onChange={(e) => setVerifiedOnly(e.target.checked)}
+                                        style={{
+                                            width: '18px',
+                                            height: '18px',
+                                            cursor: 'pointer',
+                                            accentColor: 'var(--primary)'
+                                        }}
+                                    />
+                                    Verified Creators Only
+                                    <VerifiedBadge size={16} />
+                                </label>
+                            </div>
                         </div>
 
                         {/* Clear Filters */}
-                        {(selectedTags.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000) && (
+                        {(selectedTags.length > 0 || priceRange[0] > 0 || priceRange[1] < 50000 || durationRange[0] > 1 || durationRange[1] < 30 || verifiedOnly || minRating > 0) && (
                             <button
                                 onClick={() => {
                                     setSelectedTags([]);
                                     setPriceRange([0, 50000]);
+                                    setDurationRange([1, 30]);
+                                    setVerifiedOnly(false);
+                                    setMinRating(0);
                                 }}
                                 className="btn btn-outline"
                                 style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}

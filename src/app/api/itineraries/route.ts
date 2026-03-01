@@ -66,7 +66,7 @@ export async function GET() {
         const data = await Itinerary.find({
             is_published: true
         })
-            .populate('creator_id', 'full_name avatar_url')
+            .populate('creator_id', 'full_name avatar_url is_verified')
             .sort({ createdAt: -1 })
             .lean();
 
@@ -76,7 +76,8 @@ export async function GET() {
             id: it._id.toString(), // Normalize to 'id'
             profiles: it.creator_id ? {
                 full_name: it.creator_id.full_name,
-                avatar_url: it.creator_id.avatar_url
+                avatar_url: it.creator_id.avatar_url,
+                is_verified: it.creator_id.is_verified || false
             } : null,
             purchases: [] // Return empty or mock for now, until we aggregate
         }));
