@@ -95,7 +95,7 @@ export async function POST(req: Request) {
 
             // Send automated receipt!
             if (buyer && buyer.email && updatedItinerary) {
-                const url = `${process.env.NEXTAUTH_URL || 'https://itinerarygravity.com'}/itinerary/${updatedItinerary.slug || updatedItinerary._id}`;
+                const url = `${process.env.NEXTAUTH_URL || 'https://itinerarygravity.com'}/itinerary/${(updatedItinerary as any).slug || updatedItinerary._id}`;
                 await sendPurchaseReceipt(
                     buyer.email,
                     buyer.full_name,
