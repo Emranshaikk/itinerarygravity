@@ -48,7 +48,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         };
     }
 
-    const title = itinerary.seo_title || `${itinerary.title} by @${itinerary.profiles?.full_name || 'Creator'}`;
+    const currencySymbol = itinerary.currency === 'INR' ? '₹' : itinerary.currency === 'EUR' ? '€' : '$';
+    const title = itinerary.seo_title || `${itinerary.title} by @${itinerary.profiles?.full_name || 'Creator'} | ${currencySymbol}${itinerary.price}`;
     const description = itinerary.seo_description || itinerary.description || `Explore this curated travel itinerary for ${itinerary.location}.`;
     const image = itinerary.image_url || 'https://itinerarygravity.com/og-default.jpg';
     const slug = itinerary.slug || itinerary.id;

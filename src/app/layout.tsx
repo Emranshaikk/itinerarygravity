@@ -9,8 +9,20 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "ItineraryGravity | Influencer Itinerary Marketplace",
-  description: "Buy and sell travel itineraries from your favorite creators.",
+  description: "Buy and sell premium travel itineraries crafted by verified creators and expert travelers.",
   manifest: "/manifest.json",
+  openGraph: {
+    title: "ItineraryGravity - Premium Travel Guides",
+    description: "Buy and sell premium travel itineraries crafted by verified creators and expert travelers.",
+    url: "https://itinerarygravity.com",
+    siteName: "ItineraryGravity",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ItineraryGravity",
+    description: "Premium travel itineraries by top creators.",
+  },
 };
 
 export const viewport = {

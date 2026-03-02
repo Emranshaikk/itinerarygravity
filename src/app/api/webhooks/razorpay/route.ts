@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import connectToDatabase from "@/lib/mongodb";
 import { Purchase } from "@/models/Purchase";
+import { User } from "@/models/User";
+import { sendPurchaseReceipt } from "@/lib/mail";
 
 export async function POST(req: Request) {
     try {
@@ -78,7 +80,7 @@ export async function POST(req: Request) {
 
             // Update Itinerary Analytics
             const { Itinerary } = await import('@/models/Itinerary');
-            await Itinerary.findByIdAndUpdate(
+            const updatedItinerary = await Itinerary.findByIdAndUpdate(
                 itineraryId,
                 {
                     $inc: {
@@ -88,7 +90,23 @@ export async function POST(req: Request) {
                 }
             );
 
-            console.log(`Payment successfully recorded: Order ${orderId}`);
+            // Fetch User details for email
+            const buyer = await User.findById(userId).lean();
+
+            // Send automated receipt!
+            if (buyer && buyer.email && updatedItinerary) {
+                const url = `${process.env.NEXTAUTH_URL || 'https://itinerarygravity.com'}/itinerary/${updatedItinerary.slug || updatedItinerary._id}`;
+                await sendPurchaseReceipt(
+                    buyer.email,
+                    buyer.full_name,
+                    updatedItinerary.title,
+                    totalAmount,
+                    payment.currency || 'INR',
+                    url
+                );
+            }
+
+            console.log(`Payment successfully recorded and receipt sent for Order ${orderId}`);
         }
 
         return NextResponse.json({ success: true });

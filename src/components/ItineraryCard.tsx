@@ -48,10 +48,13 @@ export default function ItineraryCard({ itinerary }: ItineraryCardProps) {
                 width: '100%',
                 overflow: 'hidden'
             }}>
-                <img
-                    src={itinerary.image || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800"}
+                <Image
+                    src={itinerary.image || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34"}
                     alt={itinerary.title}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    style={{ objectFit: 'cover' }}
+                    priority={false} // Only load when near viewport
                 />
                 <div style={{
                     position: 'absolute',

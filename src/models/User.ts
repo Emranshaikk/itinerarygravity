@@ -9,8 +9,15 @@ export interface IUser extends Document {
     bio?: string;
     role: 'buyer' | 'influencer' | 'admin';
     is_verified: boolean;
+    is_banned: boolean;
     verification_status: 'none' | 'pending' | 'verified' | 'rejected';
     razorpay_account_id?: string;
+    social_links?: {
+        instagram?: string;
+        tiktok?: string;
+        youtube?: string;
+        twitter?: string;
+    };
     saved_itineraries?: mongoose.Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
@@ -70,10 +77,20 @@ const UserSchema: Schema<IUser> = new Schema(
             type: String,
             trim: true
         },
+        is_banned: {
+            type: Boolean,
+            default: false,
+        },
         saved_itineraries: [{
             type: Schema.Types.ObjectId,
             ref: 'Itinerary'
-        }]
+        }],
+        social_links: {
+            instagram: { type: String, trim: true },
+            tiktok: { type: String, trim: true },
+            youtube: { type: String, trim: true },
+            twitter: { type: String, trim: true },
+        }
     },
     {
         timestamps: true,

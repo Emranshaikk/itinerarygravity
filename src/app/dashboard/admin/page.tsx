@@ -13,9 +13,10 @@ interface Stats {
 }
 
 export default function AdminDashboard() {
-    const [activeTab, setActiveTab] = useState<"overview" | "verifications" | "itineraries">("overview");
+    const [activeTab, setActiveTab] = useState<"overview" | "verifications" | "itineraries" | "users">("overview");
     const [verifications, setVerifications] = useState<any[]>([]);
     const [itineraries, setItineraries] = useState<any[]>([]);
+    const [users, setUsers] = useState<any[]>([]);
     const [stats, setStats] = useState<Stats>({
         totalUsers: 0,
         totalCreators: 0,
@@ -35,7 +36,8 @@ export default function AdminDashboard() {
         await Promise.all([
             fetchStats(),
             fetchVerifications(),
-            fetchItineraries()
+            fetchItineraries(),
+            fetchUsers()
         ]);
         setLoading(false);
     }
@@ -80,6 +82,18 @@ export default function AdminDashboard() {
             }
         } catch (error) {
             console.error('Error fetching itineraries:', error);
+        }
+    }
+
+    async function fetchUsers() {
+        try {
+            const res = await fetch('/api/admin/users');
+            if (res.ok) {
+                const data = await res.json();
+                setUsers(data);
+            }
+        } catch (error) {
+            console.error('Error fetching users:', error);
         }
     }
 
@@ -135,6 +149,29 @@ export default function AdminDashboard() {
         } catch (err) {
             console.error(err);
             alert("Failed to delete itinerary");
+        }
+    };
+
+    const handleBanUser = async (userId: string, isBanned: boolean) => {
+        const action = isBanned ? "BAN" : "UNBAN";
+        if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+
+        try {
+            const response = await fetch('/api/admin/users', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, isBanned })
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || "Update failed");
+            }
+            alert(`User successfully ${action.toLowerCase()}ned`);
+            fetchAllData();
+        } catch (err: any) {
+            console.error(err);
+            alert(`Action failed: ${err.message}`);
         }
     };
 
@@ -266,6 +303,21 @@ export default function AdminDashboard() {
                     }}
                 >
                     Itinerary Management
+                </button>
+                <button
+                    onClick={() => setActiveTab("users")}
+                    style={{
+                        padding: '12px 24px',
+                        background: 'none',
+                        border: 'none',
+                        borderBottom: activeTab === "users" ? '2px solid var(--primary)' : '2px solid transparent',
+                        color: activeTab === "users" ? 'var(--primary)' : 'var(--gray-400)',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                    }}
+                >
+                    User Management
                 </button>
             </div>
 
@@ -432,6 +484,74 @@ export default function AdminDashboard() {
                                                     <Trash2 size={14} /> Delete
                                                 </button>
                                             </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            )}
+
+            {activeTab === "users" && (
+                <div className="glass card">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 32px', borderBottom: '1px solid var(--border)' }}>
+                        <h3 style={{ fontSize: '1.4rem' }}>User Management</h3>
+                        <button className="btn btn-outline" onClick={fetchAllData}>Refresh</button>
+                    </div>
+
+                    {users.length === 0 ? (
+                        <div style={{ padding: '60px', textAlign: 'center', color: 'var(--gray-400)' }}>
+                            <p>No users found on the platform.</p>
+                        </div>
+                    ) : (
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid var(--border)', textAlign: 'left' }}>
+                                    <th style={{ padding: '16px 32px', color: 'var(--gray-400)', fontSize: '0.85rem' }}>Name</th>
+                                    <th style={{ padding: '16px 32px', color: 'var(--gray-400)', fontSize: '0.85rem' }}>Email</th>
+                                    <th style={{ padding: '16px 32px', color: 'var(--gray-400)', fontSize: '0.85rem' }}>Role</th>
+                                    <th style={{ padding: '16px 32px', color: 'var(--gray-400)', fontSize: '0.85rem' }}>Status</th>
+                                    <th style={{ padding: '16px 32px', color: 'var(--gray-400)', fontSize: '0.85rem' }}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.map((u) => (
+                                    <tr key={u.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                                        <td style={{ padding: '16px 32px', fontWeight: 500 }}>{u.full_name}</td>
+                                        <td style={{ padding: '16px 32px', color: 'var(--gray-400)' }}>{u.email}</td>
+                                        <td style={{ padding: '16px 32px' }}>
+                                            <span style={{
+                                                textTransform: 'capitalize',
+                                                fontSize: '0.85rem',
+                                                color: u.role === 'admin' ? '#3b82f6' : u.role === 'influencer' ? 'var(--primary)' : 'var(--foreground)'
+                                            }}>
+                                                {u.role}
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '16px 32px' }}>
+                                            <span className="badge" style={{
+                                                background: u.is_banned ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+                                                color: u.is_banned ? '#ef4444' : '#10b981'
+                                            }}>
+                                                {u.is_banned ? 'Banned' : 'Active'}
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '16px 32px' }}>
+                                            {u.role !== 'admin' && (
+                                                <button
+                                                    onClick={() => handleBanUser(u.id, !u.is_banned)}
+                                                    className="btn btn-outline"
+                                                    style={{
+                                                        padding: '6px 12px',
+                                                        fontSize: '0.8rem',
+                                                        color: u.is_banned ? '#10b981' : '#ef4444',
+                                                        borderColor: u.is_banned ? '#10b981' : 'rgba(239, 68, 68, 0.3)'
+                                                    }}
+                                                >
+                                                    {u.is_banned ? 'Unban User' : <><XCircle size={14} style={{ display: 'inline', marginRight: '4px' }} /> Ban User</>}
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))}

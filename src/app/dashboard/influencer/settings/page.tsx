@@ -17,7 +17,9 @@ export default function CreatorSettingsPage() {
         bio: "",
         email: "",
         instagram: "",
-        tiktok: ""
+        tiktok: "",
+        youtube: "",
+        twitter: ""
     });
 
     const [payment, setPayment] = useState({
@@ -48,7 +50,9 @@ export default function CreatorSettingsPage() {
                         bio: data.bio || "",
                         email: data.email || "",
                         instagram: data.social_links?.instagram || "",
-                        tiktok: data.social_links?.tiktok || ""
+                        tiktok: data.social_links?.tiktok || "",
+                        youtube: data.social_links?.youtube || "",
+                        twitter: data.social_links?.twitter || ""
                     });
                     setProfileImg(data.avatar_url);
                     if (data.payment_info) {
@@ -79,7 +83,9 @@ export default function CreatorSettingsPage() {
                 avatar_url: profileImg,
                 social_links: {
                     instagram: profile.instagram,
-                    tiktok: profile.tiktok
+                    tiktok: profile.tiktok,
+                    youtube: profile.youtube,
+                    twitter: profile.twitter
                 },
                 payment_info: payment,
                 razorpay_account_id: payment.razorpayAccount
@@ -156,12 +162,23 @@ export default function CreatorSettingsPage() {
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                             <div className="form-group">
-                                <label className="form-label">Instagram Link</label>
-                                <input className="form-input" value={profile.instagram} onChange={(e) => setProfile({ ...profile, instagram: e.target.value })} />
+                                <label className="form-label">Instagram Handle</label>
+                                <input className="form-input" placeholder="@yourname" value={profile.instagram} onChange={(e) => setProfile({ ...profile, instagram: e.target.value })} />
                             </div>
                             <div className="form-group">
-                                <label className="form-label">TikTok Link</label>
-                                <input className="form-input" value={profile.tiktok} onChange={(e) => setProfile({ ...profile, tiktok: e.target.value })} />
+                                <label className="form-label">TikTok Handle</label>
+                                <input className="form-input" placeholder="@yourname" value={profile.tiktok} onChange={(e) => setProfile({ ...profile, tiktok: e.target.value })} />
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                            <div className="form-group">
+                                <label className="form-label">YouTube Channel URL</label>
+                                <input className="form-input" placeholder="https://youtube.com/c/yourname" value={profile.youtube} onChange={(e) => setProfile({ ...profile, youtube: e.target.value })} />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Twitter Handle</label>
+                                <input className="form-input" placeholder="@yourname" value={profile.twitter} onChange={(e) => setProfile({ ...profile, twitter: e.target.value })} />
                             </div>
                         </div>
                     </div>

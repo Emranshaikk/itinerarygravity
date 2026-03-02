@@ -34,10 +34,10 @@ export async function GET() {
             User.countDocuments({ verification_status: 'pending' }),
             Itinerary.countDocuments({}),
             Itinerary.countDocuments({ is_published: true }),
-            Purchase.find({ status: 'completed' }).select('amount').lean()
+            Purchase.find({ status: 'completed' }).select('platform_fee').lean()
         ]);
 
-        const totalRevenue = purchases.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
+        const totalRevenue = purchases.reduce((sum, p) => sum + (p.platform_fee || 0), 0) || 0;
 
         return NextResponse.json({
             totalUsers,

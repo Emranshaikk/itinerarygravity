@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import connectToDatabase from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { handleApiError } from "@/lib/api-errorhandler";
+import { sendWelcomeEmail } from "@/lib/mail";
 
 export async function POST(req: Request) {
     try {
@@ -36,6 +37,9 @@ export async function POST(req: Request) {
             is_verified: false,
             verification_status: "none",
         });
+
+        // Fire and forget welcome email
+        sendWelcomeEmail(newUser.email, newUser.full_name).catch(console.error);
 
         return NextResponse.json(
             { message: "User registered successfully", userId: newUser._id },

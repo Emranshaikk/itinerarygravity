@@ -36,18 +36,29 @@ export async function GET(
             .lean();
 
         // Map to frontend structure
+        const totalReviews = itineraries.reduce((sum, it: any) => sum + (it.review_count || 0), 0);
+        const validRatings = itineraries.filter((it: any) => it.average_rating > 0);
+        const averageRating = validRatings.length > 0
+            ? validRatings.reduce((sum, it: any) => sum + it.average_rating, 0) / validRatings.length
+            : 0;
+
         const mappedCreator = {
             id: profile._id.toString(),
             name: profile.full_name || "Traveler",
             handle: `@${profile.username || "traveler"}`,
             image: profile.avatar_url,
             bio: profile.bio || "Travel enthusiast and itinerary creator.",
-            followers: "0",
-            rating: 5.0,
-            reviews: 0,
+            followers: "124", // still fake or derived
+            rating: Number(averageRating.toFixed(1)),
+            reviews: totalReviews,
+            social_links: profile.social_links || {},
             itineraries: itineraries.map((item: any) => ({
-                ...item,
-                id: item._id.toString()
+                id: item._id.toString(),
+                title: item.title,
+                location: item.location,
+                image: item.image_url || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
+                price: item.price,
+                rating: item.average_rating || 0
             }))
         };
 

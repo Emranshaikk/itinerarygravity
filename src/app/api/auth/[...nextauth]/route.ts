@@ -6,6 +6,7 @@ import { MongoClient } from "mongodb";
 import bcrypt from "bcryptjs";
 import connectToDatabase from "@/lib/mongodb";
 import { User } from "@/models/User";
+import { sendWelcomeEmail } from "@/lib/mail";
 
 // Global MongoDB Client Promise for the adapter
 if (!process.env.MONGODB_URI) {
@@ -55,6 +56,10 @@ export const authOptions: NextAuthOptions = {
                     throw new Error("Invalid credentials");
                 }
 
+                if (user.is_banned) {
+                    throw new Error("Your account has been suspended. Please contact support.");
+                }
+
                 const isCorrectPassword = await bcrypt.compare(
                     credentials.password,
                     user.password
@@ -99,9 +104,12 @@ export const authOptions: NextAuthOptions = {
             }
 
             // Fetch latest role for token refresh
-            if (token.email && !token.role) {
+            if (token.email) {
                 const dbUser = await User.findOne({ email: token.email });
                 if (dbUser) {
+                    if (dbUser.is_banned) {
+                        throw new Error("Your account has been suspended.");
+                    }
                     token.role = dbUser.role;
                     token.id = dbUser._id.toString();
                 }
@@ -115,6 +123,17 @@ export const authOptions: NextAuthOptions = {
                 (session.user as any).role = token.role || 'buyer';
             }
             return session;
+        }
+    },
+    events: {
+        async createUser({ user }) {
+            try {
+                if (user.email && user.name) {
+                    await sendWelcomeEmail(user.email, user.name);
+                }
+            } catch (err) {
+                console.error("Welcome email failed", err);
+            }
         }
     },
     secret: process.env.NEXTAUTH_SECRET,
