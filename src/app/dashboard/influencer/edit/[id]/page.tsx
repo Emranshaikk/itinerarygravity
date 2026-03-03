@@ -25,6 +25,7 @@ const PostTripSection = lazy(() => import("@/components/itinerary-builder/PostTr
 const ProofSection = lazy(() => import("@/components/itinerary-builder/ProofSection"));
 const AffiliateSection = lazy(() => import("@/components/itinerary-builder/AffiliateSection"));
 const CreatorStoreSection = lazy(() => import("@/components/itinerary-builder/CreatorStoreSection"));
+const AccommodationSection = lazy(() => import("@/components/itinerary-builder/AccommodationSection"));
 
 const SectionLoader = () => <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--gray-400)' }}>Loading section...</div>;
 
@@ -48,6 +49,7 @@ const checkSectionCompletion = (step: number, content: ItineraryContent) => {
         case 16: return content.proofOfVisit.images.length > 0;
         case 17: return (content.affiliateProducts?.length ?? 0) > 0;
         case 18: return (content.creatorProducts?.length ?? 0) > 0;
+        case 19: return (content.accommodation?.bestNeighborhoods?.length ?? 0) > 0 || (content.accommodation?.hotelRecommendations?.length ?? 0) > 0;
         default: return false;
     }
 };
@@ -88,7 +90,7 @@ export default function EditItineraryPage() {
 
     const getCompletedSteps = () => {
         const steps: number[] = [];
-        for (let i = 1; i <= 18; i++) {
+        for (let i = 1; i <= 19; i++) {
             if (checkSectionCompletion(i, content)) steps.push(i);
         }
         return steps;
@@ -153,8 +155,12 @@ export default function EditItineraryPage() {
             case 14: return <PostTripSection data={content.postTrip} onChange={(d) => setContent({ ...content, postTrip: d })} />;
             case 15: return <BonusSection data={content.bonus} onChange={(d) => setContent({ ...content, bonus: d })} />;
             case 16: return <ProofSection data={content.proofOfVisit} onChange={(d) => setContent({ ...content, proofOfVisit: d })} />;
-            case 17: return <AffiliateSection data={content.affiliateProducts || []} onChange={(d: any[]) => setContent({ ...content, affiliateProducts: d })} />;
-            case 18: return <CreatorStoreSection data={content.creatorProducts || []} onChange={(d: any[]) => setContent({ ...content, creatorProducts: d })} />;
+            case 17:
+                return <AffiliateSection data={content.affiliateProducts || []} onChange={(d: any[]) => setContent({ ...content, affiliateProducts: d })} />;
+            case 18:
+                return <CreatorStoreSection data={content.creatorProducts || []} onChange={(d: any[]) => setContent({ ...content, creatorProducts: d })} />;
+            case 19:
+                return <AccommodationSection data={content.accommodation!} onChange={(d) => setContent({ ...content, accommodation: d })} />;
             default: return <ItineraryCover data={content.cover} onChange={(d) => setContent({ ...content, cover: d })} />;
         }
     };

@@ -43,7 +43,14 @@ export interface ItineraryContent {
         luxuryAddons?: string[];
     };
 
-    // 3. Money, Connectivity & Local Setup
+    // 3. Accommodation & Neighborhoods
+    accommodation?: {
+        bestNeighborhoods: { name: string; vibe: string; whyStayHere: string }[];
+        hotelRecommendations: { name: string; priceRange: string; neighborhood: string; whyWeLoveIt: string; bookingLink?: string }[];
+        bookingTips: string;
+    };
+
+    // 4. Money, Connectivity & Local Setup
     logistics: {
         currency: {
             code: string;
@@ -230,6 +237,11 @@ export const initialItineraryContent: ItineraryContent = {
         flightGuide: { bestAirports: [], arrivalDepartureStats: "" },
         packingList: [],
         essentials: { documents: [], insurance: "", health: [] },
+    },
+    accommodation: {
+        bestNeighborhoods: [],
+        hotelRecommendations: [],
+        bookingTips: ""
     },
     logistics: {
         currency: { code: "USD", exchangeTips: "", cashVsCard: "", dailyBudgetEstimate: "" },

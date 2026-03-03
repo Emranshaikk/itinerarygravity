@@ -1,7 +1,7 @@
 import {
     Book, Plane, CreditCard, MapPin, Calendar, Utensils,
     Bus, Star, Shield, Sliders, AlertTriangle, ShoppingBag,
-    LogOut, Image as ImageIcon, Gift, CheckCircle2, ChevronRight, Circle, Camera, Link, ShoppingCart
+    LogOut, Image as ImageIcon, Gift, CheckCircle2, ChevronRight, Circle, Camera, Link, ShoppingCart, Home
 } from "lucide-react";
 
 export interface ItinerarySection {
@@ -47,6 +47,13 @@ export const ITINERARY_PHASES: ItineraryPhase[] = [
         ]
     },
     {
+        title: "Where to Stay",
+        description: "Neighborhoods & Handpicked Hotels.",
+        sections: [
+            { id: 19, label: "Accommodation Setup", icon: Home, desc: "Hotels & advice" },
+        ]
+    },
+    {
         title: "Extras & Safety",
         description: "Tips, safety, and money matters.",
         sections: [
@@ -70,7 +77,7 @@ export const ITINERARY_PHASES: ItineraryPhase[] = [
 
 export const ALL_SECTIONS: ItinerarySection[] = ITINERARY_PHASES.flatMap(phase => phase.sections);
 
-// Ensure we have exactly 18 sections
-if (ALL_SECTIONS.length !== 18) {
-    console.warn(`ITINERARY_PHASES configured with ${ALL_SECTIONS.length} sections instead of 18.`);
+// Ensure we have exactly 19 sections
+if (ALL_SECTIONS.length !== 19) {
+    console.warn(`ITINERARY_PHASES configured with ${ALL_SECTIONS.length} sections instead of 19.`);
 }

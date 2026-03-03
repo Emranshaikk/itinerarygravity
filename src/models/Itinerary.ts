@@ -22,6 +22,7 @@ export interface IItinerary extends Document {
     price: number;
     currency: string;
     description?: string;
+    slug?: string;
     image_url?: string;
     is_published: boolean;
     is_approved: boolean;
@@ -94,6 +95,10 @@ const ItinerarySchema: Schema<IItinerary> = new Schema(
         description: {
             type: String,
             maxlength: [5000, "Description cannot exceed 5000 characters"]
+        },
+        slug: {
+            type: String,
+            trim: true
         },
         image_url: {
             type: String,

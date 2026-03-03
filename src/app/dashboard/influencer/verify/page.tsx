@@ -45,8 +45,8 @@ export default function VerificationPage() {
                         setStatus('success');
                     },
                     prefill: {
-                        name: user?.user_metadata?.full_name || "",
-                        email: user?.email || "",
+                        name: session?.user?.name || "",
+                        email: session?.user?.email || "",
                     },
                     theme: {
                         color: "#ff00e5",
