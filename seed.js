@@ -98,7 +98,7 @@ async function seedDatabase() {
             price: 19.99,
             currency: "USD",
             description: "A complete guide to seeing the best of Paris in a weekend.",
-            image_url: "https://images.unsplash.com/photo-1502602898657-3e907fa0a586?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80",
+            image_url: "https://images.unsplash.com/photo-1431274172761-fca41d930114?auto=format&fit=crop&w=1000&q=80",
             is_published: true,
             duration_days: 3,
             tags: ["city", "romantic", "food"],
