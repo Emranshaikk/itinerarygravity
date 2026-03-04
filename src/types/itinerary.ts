@@ -45,8 +45,8 @@ export interface ItineraryContent {
 
     // 3. Accommodation & Neighborhoods
     accommodation?: {
-        bestNeighborhoods: { name: string; vibe: string; whyStayHere: string }[];
-        hotelRecommendations: { name: string; priceRange: string; neighborhood: string; whyWeLoveIt: string; bookingLink?: string }[];
+        bestNeighborhoods: { name: string; vibe: string; whyStayHere: string; locationCoordinates?: [number, number] }[];
+        hotelRecommendations: { name: string; priceRange: string; neighborhood: string; whyWeLoveIt: string; bookingLink?: string; locationCoordinates?: [number, number] }[];
         bookingTips: string;
     };
 
@@ -90,6 +90,7 @@ export interface ItineraryContent {
             time: string;
             activity: string;
             location?: string;
+            locationCoordinates?: [number, number];
             travelTime?: string;
             food?: string; // Breakfast spot
             tips?: string;
@@ -98,6 +99,7 @@ export interface ItineraryContent {
             time: string;
             activity: string; // Main attraction or secondary
             location?: string;
+            locationCoordinates?: [number, number];
             travelTime?: string;
             food?: string; // Lunch spot
             foodType?: string; // Cuisine
@@ -107,6 +109,7 @@ export interface ItineraryContent {
             time: string;
             activity: string;
             location?: string;
+            locationCoordinates?: [number, number];
             travelTime?: string;
             food?: string; // Dinner
             foodBudget?: string;

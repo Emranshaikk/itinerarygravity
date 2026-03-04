@@ -47,6 +47,29 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
         onChange(newData);
     };
 
+    const handleGeocode = async (dayIndex: number, timeOfDay: 'morning' | 'afternoon' | 'evening', query: string) => {
+        if (!query.trim()) return;
+
+        try {
+            const res = await fetch('/api/geocode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ location: query })
+            });
+            const geoData = await res.json();
+
+            if (geoData.success && geoData.coordinates) {
+                const newData = [...data];
+                if (!newData[dayIndex][timeOfDay]) return;
+
+                newData[dayIndex][timeOfDay].locationCoordinates = geoData.coordinates;
+                onChange(newData);
+            }
+        } catch (error) {
+            console.error("Failed to geocode day location:", error);
+        }
+    };
+
     const autoFillDay = (index: number) => {
         setGeneratingDay(index);
         setTimeout(() => {

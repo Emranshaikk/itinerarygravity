@@ -23,6 +23,33 @@ export default function AccommodationSection({ data, onChange }: AccommodationSe
         onChange({ ...safeData, [field]: value } as NonNullable<ItineraryContent["accommodation"]>);
     };
 
+    const handleGeocode = async (index: number, query: string, type: 'neighborhood' | 'hotel') => {
+        if (!query.trim()) return;
+
+        try {
+            const res = await fetch('/api/geocode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ location: query })
+            });
+            const data = await res.json();
+
+            if (data.success && data.coordinates) {
+                if (type === 'neighborhood') {
+                    const newHoods = [...safeData.bestNeighborhoods];
+                    newHoods[index].locationCoordinates = data.coordinates;
+                    updateField("bestNeighborhoods", newHoods);
+                } else if (type === 'hotel') {
+                    const newHotels = [...safeData.hotelRecommendations];
+                    newHotels[index].locationCoordinates = data.coordinates;
+                    updateField("hotelRecommendations", newHotels);
+                }
+            }
+        } catch (error) {
+            console.error("Failed to geocode:", error);
+        }
+    };
+
     const addNeighborhood = () => {
         updateField("bestNeighborhoods", [...safeData.bestNeighborhoods, { name: "", vibe: "", whyStayHere: "" }]);
     };
@@ -110,6 +137,7 @@ export default function AccommodationSection({ data, onChange }: AccommodationSe
                                             newHoods[i].name = e.target.value;
                                             updateField("bestNeighborhoods", newHoods);
                                         }}
+                                        onBlur={(e) => handleGeocode(i, e.target.value, 'neighborhood')}
                                     />
                                     <input
                                         className="form-input"
@@ -175,6 +203,7 @@ export default function AccommodationSection({ data, onChange }: AccommodationSe
                                                 newHotels[i].name = e.target.value;
                                                 updateField("hotelRecommendations", newHotels);
                                             }}
+                                            onBlur={(e) => handleGeocode(i, e.target.value, 'hotel')}
                                         />
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>

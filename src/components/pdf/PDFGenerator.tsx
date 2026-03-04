@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import jsPDF from "jspdf";
+import { jsPDF } from "jspdf";
 import { Download, Printer } from "@/components/Icons";
+import { generateStaticMapUrl } from "@/lib/map-utils";
 
 interface ItineraryData {
     title: string;
@@ -36,7 +37,7 @@ interface PDFGeneratorProps {
 export default function PDFGenerator({ itineraryData, isPurchased, iconOnly = false }: PDFGeneratorProps) {
     const [generating, setGenerating] = useState(false);
 
-    const generatePDF = (isPreview: boolean) => {
+    const generatePDF = async (isPreview: boolean) => {
         setGenerating(true);
 
         try {
@@ -243,7 +244,7 @@ export default function PDFGenerator({ itineraryData, isPurchased, iconOnly = fa
                 }
             }
 
-            // --- FINAL PAGE: POLICIES ---
+            // --- FINAL PAGE: POLICIES & MAP ---
             if (!isPreview) {
                 doc.addPage();
                 yPosition = 30;
@@ -256,6 +257,55 @@ export default function PDFGenerator({ itineraryData, isPurchased, iconOnly = fa
 
                 addWrappedText("CANCELLATION TERMS", 12, 'bold', colorPrimary);
                 addWrappedText(itineraryData.cancellationPolicy || "Final sale once accessed.", 10, 'normal', [100, 100, 100]);
+                yPosition += 20;
+
+                // --- MAP INTEGRATION ---
+                doc.addPage();
+                addPageHeader("Interactive Route Map");
+                yPosition = 30;
+
+                try {
+                    // Collect coordinates
+                    const coords: [number, number][] = [];
+                    if (itineraryData.content?.accommodation?.hotelRecommendations) {
+                        itineraryData.content.accommodation.hotelRecommendations.forEach((hotel: any) => {
+                            if (hotel.locationCoordinates) coords.push(hotel.locationCoordinates);
+                        });
+                    }
+                    if (itineraryData.content?.dailyItinerary) {
+                        itineraryData.content.dailyItinerary.forEach((day: any) => {
+                            if (day.morning?.locationCoordinates) coords.push(day.morning.locationCoordinates);
+                            if (day.afternoon?.locationCoordinates) coords.push(day.afternoon.locationCoordinates);
+                            if (day.evening?.locationCoordinates) coords.push(day.evening.locationCoordinates);
+                        });
+                    }
+
+                    if (coords.length > 0) {
+                        const staticMapUrl = generateStaticMapUrl(coords);
+                        if (!staticMapUrl) throw new Error("Could not generate map URL");
+                        const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(staticMapUrl)}`;
+
+                        const res = await fetch(proxyUrl);
+                        if (res.ok) {
+                            const blob = await res.blob();
+                            const base64Data = await new Promise((resolve) => {
+                                const reader = new FileReader();
+                                reader.onloadend = () => resolve(reader.result);
+                                reader.readAsDataURL(blob);
+                            });
+
+                            doc.addImage(base64Data as string, 'PNG', margin, yPosition, contentWidth, 120);
+                            yPosition += 130;
+                        } else {
+                            addWrappedText("Map rendering temporarily unavailable.", 12, 'italic', [150, 150, 150]);
+                        }
+
+                    } else {
+                        addWrappedText("No locations pinned yet.", 12, 'italic', [150, 150, 150]);
+                    }
+                } catch (error) {
+                    addWrappedText("Map integration failed.", 12, 'italic', [150, 150, 150]);
+                }
             }
 
             // Save PDF

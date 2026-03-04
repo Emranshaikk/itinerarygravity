@@ -1,0 +1,176 @@
+﻿
+> itinerarygravity@0.1.0 build
+> next build
+
+Ôû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+- Experiments (use with caution):
+  Ô£ô externalDir
+
+node.exe : ÔÜá The 
+"middleware" file 
+convention is deprecated. 
+Please use "proxy" 
+instead. Learn more: https:
+//nextjs.org/docs/messages/
+middleware-to-proxy
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" "C:\
+Users\imran\AppData\Roaming
+\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (ÔÜá  
+   The "middle...leware-   
+ to-proxy:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build 
+failed with 1 errors:
+./src/components/itinerary/
+ItineraryMap.tsx:4:1
+Module not found: Can't 
+resolve 'react-map-gl'
+[0m [90m 2 |[39m
+ [90m 3 |[39m 
+[36mimport[39m 
+[33mReact[39m[33m,[39m 
+{ useRef[33m,[39m 
+useState[33m,[39m 
+useEffect } [36mfrom[39m 
+[32m'react'[39m[33m;[39
+m
+[31m[1m>[22m[39m[90m 
+4 |[39m [36mimport[39m 
+[33mMap[39m[33m,[39m { 
+[33mSource[39m[33m,[39m
+ 
+[33mLayer[39m[33m,[39m 
+[33mMarker[39m[33m,[39m
+ [33mNavigationControl[39
+m } [36mfrom[39m [32m're
+act-map-gl'[39m[33m;[39m
+ [90m   |[39m [31m[1m^
+[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m
+ [90m 5 |[39m 
+[36mimport[39m [32m'mapb
+ox-gl/dist/mapbox-gl.css'[
+39m[33m;[39m
+ [90m 6 |[39m 
+[36mimport[39m { 
+[33mItineraryContent[39m 
+} [36mfrom[39m [32m'@/ty
+pes/itinerary'[39m[33m;[
+39m
+ [90m 7 |[39m 
+[36mimport[39m { 
+[33mMapPin[39m } 
+[36mfrom[39m [32m'@/comp
+onents/Icons'[39m[33m;[3
+9m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/components/itiner
+ary/ItineraryMap.tsx 
+[Client Component Browser]
+    ./src/components/itiner
+ary/ItineraryClientPage.tsx
+ [Client Component Browser]
+    ./src/components/itiner
+ary/ItineraryClientPage.tsx
+ [Server Component]
+    ./src/app/itinerary/[id
+]/page.tsx [Server 
+Component]
+
+  Client Component SSR:
+    ./src/components/itiner
+ary/ItineraryMap.tsx 
+[Client Component SSR]
+    ./src/components/itiner
+ary/ItineraryClientPage.tsx
+ [Client Component SSR]
+    ./src/components/itiner
+ary/ItineraryClientPage.tsx
+ [Server Component]
+    ./src/app/itinerary/[id
+]/page.tsx [Server 
+Component]
+
+https://nextjs.org/docs/mes
+sages/module-not-found
+
+
+    at <unknown> (./src/com
+ponents/itinerary/Itinerary
+Map.tsx:4:1)
+    at <unknown> (https://n
+extjs.org/docs/messages/mod
+ule-not-found)

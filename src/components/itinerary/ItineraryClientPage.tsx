@@ -14,7 +14,7 @@ import AffiliateShowcase from "@/components/itinerary/AffiliateShowcase";
 import Breadcrumbs from "@/components/itinerary/Breadcrumbs";
 import RelatedItineraries from "@/components/itinerary/RelatedItineraries";
 import ShareModal from "@/components/itinerary/ShareModal";
-import JourneyMap from "@/components/itinerary/JourneyMap";
+import ItineraryMap from "@/components/itinerary/ItineraryMap";
 import CreatorStore from "@/components/itinerary/CreatorStore";
 import SocialHub from "@/components/itinerary/SocialHub";
 
@@ -507,7 +507,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                             </div>
 
                             <div style={{ marginTop: '24px' }}>
-                                <JourneyMap days={itinerary.days} location={itinerary.location} />
+                                <ItineraryMap content={liveData?.content || itinerary.content || itinerary} />
                             </div>
                         </div>
                     </div>

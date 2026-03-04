@@ -13,6 +13,10 @@ export interface IDay {
         lunch?: boolean;
         dinner?: boolean;
     };
+    locationCoordinates?: {
+        longitude: number;
+        latitude: number;
+    }[];
 }
 
 export interface IItinerary extends Document {
@@ -59,6 +63,10 @@ const DaySchema = new Schema({
         lunch: { type: Boolean, default: false },
         dinner: { type: Boolean, default: false },
     },
+    locationCoordinates: [{
+        longitude: { type: Number, required: true },
+        latitude: { type: Number, required: true }
+    }]
 });
 
 const ItinerarySchema: Schema<IItinerary> = new Schema(
