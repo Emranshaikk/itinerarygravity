@@ -119,41 +119,96 @@ export default async function Home() {
       </section>
 
       {/* How it Works Section */}
-      <section id="how-it-works" style={{ padding: '100px 0', position: 'relative' }}>
+      <section id="how-it-works" style={{ padding: '120px 0', position: 'relative', overflow: 'hidden' }}>
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <h2 style={{ fontSize: '3rem', marginBottom: '16px' }}>How It Works</h2>
-            <p style={{ color: 'var(--gray-400)', maxWidth: '600px', margin: '0 auto' }}>Getting your next perfect trip plan is as easy as 1-2-3.</p>
+          <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+            <h2 className="text-gradient" style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', marginBottom: '16px', fontWeight: 900 }}>How It Works</h2>
+            <p style={{ color: 'var(--gray-400)', maxWidth: '600px', margin: '0 auto', fontSize: '1.1rem' }}>Your journey from inspiration to adventure in three simple, verified steps.</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '48px', position: 'relative' }}>
-            {[
-              {
-                step: "01",
-                title: "Find Inspiration",
-                desc: "Browse premium itineraries from verified world-travelers and influencers you trust."
-              },
-              {
-                step: "02",
-                title: "Unlock Access",
-                desc: "Purchase the guide for a small fee. 70% goes directly to the creator, supporting their journey."
-              },
-              {
-                step: "03",
-                title: "Travel Smart",
-                desc: "Get instant access to hidden locations, booking tips, and daily schedules via PDF or interactive map."
-              }
-            ].map((item, i) => (
-              <div key={i} style={{ position: 'relative', padding: '40px', background: 'var(--surface)', borderRadius: '24px', border: '1px solid var(--border)' }}>
-                <div style={{ fontSize: '4rem', fontWeight: 900, color: 'var(--primary)', opacity: 0.2, position: 'absolute', top: '20px', right: '30px' }}>
-                  {item.step}
+          <div style={{ position: 'relative' }}>
+            {/* Desktop Connector Line (SVG) */}
+            <div className="desktop-only" style={{ position: 'absolute', top: '50px', left: '15%', right: '15%', height: '2px', zIndex: 0 }}>
+              <svg width="100%" height="20" style={{ overflow: 'visible' }}>
+                <path
+                  d="M 0,10 Q 250,10 500,10 T 1000,10"
+                  fill="none"
+                  stroke="url(#lineGradient)"
+                  strokeWidth="3"
+                  strokeDasharray="10,10"
+                  className="connector-path"
+                />
+                <defs>
+                  <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="var(--primary)" stopOpacity="0" />
+                    <stop offset="50%" stopColor="var(--primary)" stopOpacity="1" />
+                    <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '40px', position: 'relative', zIndex: 1 }}>
+              {[
+                {
+                  step: "01",
+                  title: "Find Inspiration",
+                  desc: "Browse premium itineraries from verified world-travelers and influencers you trust."
+                },
+                {
+                  step: "02",
+                  title: "Unlock Access",
+                  desc: "Purchase the guide for a small fee. 70% goes directly to the creator, supporting their journey."
+                },
+                {
+                  step: "03",
+                  title: "Travel Smart",
+                  desc: "Get instant access to hidden locations, booking tips, and daily schedules via PDF or interactive map."
+                }
+              ].map((item, i) => (
+                <div key={i} className="how-it-works-card glass" style={{
+                  position: 'relative',
+                  padding: '48px 32px',
+                  background: 'rgba(255,255,255,0.03)',
+                  borderRadius: '24px',
+                  border: '1px solid var(--border)',
+                  transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  textAlign: 'center'
+                }}>
+                  <div style={{
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: '20px',
+                    background: 'linear-gradient(45deg, var(--primary), var(--secondary))',
+                    color: 'white',
+                    fontSize: '1.5rem',
+                    fontWeight: 900,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '32px',
+                    boxShadow: '0 10px 20px rgba(255, 133, 162, 0.3)'
+                  }}>
+                    {item.step}
+                  </div>
+                  <h3 style={{ fontSize: '1.6rem', marginBottom: '16px', fontWeight: 800 }}>{item.title}</h3>
+                  <p style={{ color: 'var(--gray-400)', lineHeight: '1.8', fontSize: '1.05rem' }}>{item.desc}</p>
                 </div>
-                <h3 style={{ fontSize: '1.5rem', marginBottom: '16px', position: 'relative' }}>{item.title}</h3>
-                <p style={{ color: 'var(--gray-400)', position: 'relative', lineHeight: '1.7' }}>{item.desc}</p>
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: '80px' }}>
+            <Link href="/explore" className="btn btn-primary" style={{ padding: '16px 48px', fontSize: '1.2rem', borderRadius: '100px' }}>
+              Start Your Journey
+            </Link>
           </div>
         </div>
+
+
       </section>
 
       {/* Trending Section */}

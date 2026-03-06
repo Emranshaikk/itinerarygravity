@@ -47,15 +47,43 @@ export default function ItineraryCard({ itinerary }: ItineraryCardProps) {
                 height: '240px',
                 width: '100%',
                 overflow: 'hidden'
-            }}>
+            }} className="card-image-container">
                 <Image
                     src={itinerary.image || "https://images.unsplash.com/photo-1502602898657-3e91760cbb34"}
                     alt={itinerary.title}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    style={{ objectFit: 'cover' }}
+                    style={{ objectFit: 'cover', transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                    className="card-image"
                     priority={false} // Only load when near viewport
                 />
+
+                {/* Premium Overlay on Hover */}
+                <div className="card-overlay" style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: 0,
+                    transition: 'opacity 0.3s ease',
+                    zIndex: 5
+                }}>
+                    <span style={{
+                        color: 'white',
+                        fontWeight: 700,
+                        fontSize: '0.9rem',
+                        padding: '10px 20px',
+                        borderRadius: '99px',
+                        background: 'var(--primary)',
+                        transform: 'translateY(20px)',
+                        transition: 'transform 0.3s ease'
+                    }} className="overlay-text">
+                        View Details →
+                    </span>
+                </div>
+
                 <div style={{
                     position: 'absolute',
                     top: '16px',
@@ -98,6 +126,24 @@ export default function ItineraryCard({ itinerary }: ItineraryCardProps) {
                 )}
             </div>
             <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <style jsx>{`
+                    .card-hover:hover .card-image {
+                        transform: scale(1.1);
+                    }
+                    .card-hover:hover .card-overlay {
+                        opacity: 1;
+                    }
+                    .card-hover:hover .overlay-text {
+                        transform: translateY(0);
+                    }
+                    .card-hover {
+                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    }
+                    .card-hover:hover {
+                        box-shadow: 0 0 25px rgba(255, 133, 162, 0.3);
+                        border-color: var(--primary) !important;
+                    }
+                `}</style>
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
                     {itinerary.tags?.slice(0, 3).map((tag: string) => (
                         <span

@@ -836,7 +836,47 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                     from { transform: translateY(10px); opacity: 0; }
                     to { transform: translateY(0); opacity: 1; }
                 }
+                @media (max-width: 768px) {
+                    .mobile-buy-bar {
+                        display: flex !important;
+                    }
+                }
             `}</style>
+
+            {/* Sticky Mobile Buy Bar */}
+            {!isPurchased && (
+                <div className="mobile-buy-bar" style={{
+                    position: 'fixed',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    background: 'rgba(15, 23, 42, 0.9)',
+                    backdropFilter: 'blur(12px)',
+                    borderTop: '1px solid var(--border)',
+                    padding: '16px 20px',
+                    display: 'none',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    zIndex: 1000,
+                    boxShadow: '0 -10px 25px rgba(0,0,0,0.3)',
+                    animation: 'slideUp 0.5s ease'
+                }}>
+                    <div>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', fontWeight: 700 }}>Total Price</p>
+                        <p style={{ fontSize: '1.2rem', fontWeight: 800, color: 'white' }}>
+                            {itinerary.currency === 'INR' ? '₹' : itinerary.currency === 'USD' ? '$' : '₹'}
+                            {itinerary.price}
+                        </p>
+                    </div>
+                    <button
+                        onClick={handlePurchase}
+                        className="btn btn-primary"
+                        style={{ padding: '12px 24px', borderRadius: '12px', fontWeight: 700, boxShadow: '0 4px 15px rgba(255, 133, 162, 0.4)' }}
+                    >
+                        Unlock Guide
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

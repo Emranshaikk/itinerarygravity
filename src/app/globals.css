@@ -122,6 +122,34 @@ button {
   border: 1px solid var(--glass-border);
 }
 
+
+/* How It Works Animations */
+.how-it-works-card:hover {
+    transform: translateY(-15px) rotateX(5deg) rotateY(2deg);
+    border-color: var(--primary) !important;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 20px rgba(255, 133, 162, 0.1) !important;
+    background: rgba(255,255,255,0.05) !important;
+}
+
+.connector-path {
+    animation: drawPath 5s linear infinite;
+}
+
+@keyframes drawPath {
+    0% { stroke-dashoffset: 100; }
+    100% { stroke-dashoffset: 0; }
+}
+
+/* Mesh Gradient Animation */
+@keyframes meshFlow {
+    0% { transform: scale(1) translate(0, 0); }
+    50% { transform: scale(1.1) translate(2%, 2%); }
+    100% { transform: scale(1) translate(-1%, -1%); }
+}
+
+.mesh-gradient-animate {
+    animation: meshFlow 25s ease infinite alternate;
+}
 /* Form Styles */
 .form-group {
   margin-bottom: 20px;
