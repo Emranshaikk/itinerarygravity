@@ -15,10 +15,27 @@ export default function CreatorsPage() {
         <div>
             {/* Hero Section */}
             <section style={{
-                padding: '100px 0',
-                background: 'radial-gradient(circle at top right, var(--border), transparent)',
+                padding: '120px 0',
+                position: 'relative',
+                overflow: 'hidden',
                 textAlign: 'center'
             }}>
+                {/* Animated Mesh Gradient Background (Matches Explore Page) */}
+                <div className="mesh-gradient-animate" style={{
+                    position: 'absolute',
+                    top: '-10%',
+                    left: '-10%',
+                    width: '120%',
+                    height: '100%',
+                    zIndex: -1,
+                    opacity: 0.3,
+                    filter: 'blur(80px)',
+                    background: `
+                        radial-gradient(at 0% 0%, rgba(255, 133, 162, 0.4) 0px, transparent 50%),
+                        radial-gradient(at 50% 0%, rgba(139, 92, 246, 0.4) 0px, transparent 50%),
+                        radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.4) 0px, transparent 50%)
+                    `
+                }}></div>
                 <div className="container">
                     <span className="badge" style={{ background: 'var(--surface)', border: '1px solid var(--border)', marginBottom: '24px' }}>
                         Now Open for Beta

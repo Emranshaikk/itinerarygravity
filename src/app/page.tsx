@@ -32,7 +32,24 @@ export default async function Home() {
         padding: '80px 20px',
         width: '100%'
       }}>
-        {/* Abstract Background Elements */}
+        {/* Animated Mesh Gradient Background (Matches Explore Page) */}
+        <div className="mesh-gradient-animate" style={{
+          position: 'absolute',
+          top: '-10%',
+          left: '-10%',
+          width: '120%',
+          height: '100%',
+          zIndex: -1,
+          opacity: 0.3,
+          filter: 'blur(80px)',
+          background: `
+            radial-gradient(at 0% 0%, rgba(255, 133, 162, 0.4) 0px, transparent 50%),
+            radial-gradient(at 50% 0%, rgba(139, 92, 246, 0.4) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.4) 0px, transparent 50%)
+          `
+        }}></div>
+
+        {/* Abstract Background Elements (Existing) */}
         <div style={{
           position: 'absolute',
           top: '-20%',
@@ -170,8 +187,9 @@ export default async function Home() {
                   position: 'relative',
                   padding: '48px 32px',
                   background: 'rgba(255,255,255,0.03)',
+                  backdropFilter: 'blur(10px)',
                   borderRadius: '24px',
-                  border: '1px solid var(--border)',
+                  border: '1px solid rgba(255,255,255,0.1)',
                   transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                   display: 'flex',
                   flexDirection: 'column',

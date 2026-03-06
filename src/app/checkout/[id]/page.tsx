@@ -112,58 +112,77 @@ export default function CheckoutPage() {
     };
 
     return (
-        <div className="container" style={{ padding: '40px 0', maxWidth: '800px' }}>
-            <button
-                onClick={() => router.back()}
-                style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', color: 'var(--gray-400)', marginBottom: '40px' }}
-            >
-                <ArrowLeft size={16} /> Back to Itinerary
-            </button>
+        <div style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh', padding: '40px 0' }}>
+            {/* Animated Mesh Gradient Background (Matches Explore Page) */}
+            <div className="mesh-gradient-animate" style={{
+                position: 'absolute',
+                top: '-10%',
+                left: '-10%',
+                width: '120%',
+                height: '600px',
+                zIndex: -1,
+                opacity: 0.3,
+                filter: 'blur(100px)',
+                background: `
+                    radial-gradient(at 0% 0%, rgba(255, 133, 162, 0.4) 0px, transparent 50%),
+                    radial-gradient(at 50% 0%, rgba(139, 92, 246, 0.4) 0px, transparent 50%),
+                    radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.4) 0px, transparent 50%)
+                `
+            }}></div>
 
-            <div className="glass card" style={{ padding: '48px', textAlign: 'center' }}>
-                {isLoadingData ? (
-                    <h1 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>Loading...</h1>
-                ) : (
-                    <>
-                        <h1 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>Ready to Explore?</h1>
-                        <p style={{ color: 'var(--gray-400)', fontSize: '1.1rem', marginBottom: '40px' }}>
-                            You're about to purchase <strong>{item.title}</strong> by {item.creator}.
-                        </p>
-                    </>
-                )}
-
-                <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '16px', padding: '32px', marginBottom: '40px', maxWidth: '400px', margin: '0 auto 40px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                        <span style={{ color: 'var(--gray-400)' }}>Price</span>
-                        <span>₹{item.price.toFixed(2)}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '1.5rem', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
-                        <span>Total</span>
-                        <span className="text-gradient">₹{item.price.toFixed(2)}</span>
-                    </div>
-                </div>
-
+            <div className="container" style={{ maxWidth: '800px', position: 'relative' }}>
                 <button
-                    onClick={handleCheckout}
-                    className="btn btn-primary"
-                    style={{ padding: '20px 60px', fontSize: '1.2rem', display: 'inline-flex', alignItems: 'center', gap: '12px' }}
-                    disabled={isProcessing || isLoadingData}
+                    onClick={() => router.back()}
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', color: 'var(--gray-400)', marginBottom: '40px' }}
                 >
-                    {isProcessing ? (
-                        "Processing..."
-                    ) : (
-                        <>
-                            <CreditCard size={24} /> Pay with Razorpay
-                        </>
-                    )}
+                    <ArrowLeft size={16} /> Back to Itinerary
                 </button>
 
-                <div style={{ marginTop: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', color: 'var(--gray-400)', fontSize: '0.85rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Lock size={16} /> SSL Secured
+                <div className="glass card" style={{ padding: '48px', textAlign: 'center' }}>
+                    {isLoadingData ? (
+                        <h1 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>Loading...</h1>
+                    ) : (
+                        <>
+                            <h1 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>Ready to Explore?</h1>
+                            <p style={{ color: 'var(--gray-400)', fontSize: '1.1rem', marginBottom: '40px' }}>
+                                You're about to purchase <strong>{item.title}</strong> by {item.creator}.
+                            </p>
+                        </>
+                    )}
+
+                    <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '16px', padding: '32px', marginBottom: '40px', maxWidth: '400px', margin: '0 auto 40px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                            <span style={{ color: 'var(--gray-400)' }}>Price</span>
+                            <span>₹{item.price.toFixed(2)}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '1.5rem', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
+                            <span>Total</span>
+                            <span className="text-gradient">₹{item.price.toFixed(2)}</span>
+                        </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <ShieldCheck size={16} /> Instant Access
+
+                    <button
+                        onClick={handleCheckout}
+                        className="btn btn-primary"
+                        style={{ padding: '20px 60px', fontSize: '1.2rem', display: 'inline-flex', alignItems: 'center', gap: '12px' }}
+                        disabled={isProcessing || isLoadingData}
+                    >
+                        {isProcessing ? (
+                            "Processing..."
+                        ) : (
+                            <>
+                                <CreditCard size={24} /> Pay with Razorpay
+                            </>
+                        )}
+                    </button>
+
+                    <div style={{ marginTop: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', color: 'var(--gray-400)', fontSize: '0.85rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Lock size={16} /> SSL Secured
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <ShieldCheck size={16} /> Instant Access
+                        </div>
                     </div>
                 </div>
             </div>

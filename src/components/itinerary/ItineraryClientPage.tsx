@@ -266,9 +266,26 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
     };
 
     return (
-        <div style={{ paddingBottom: '100px' }}>
+        <div style={{ position: 'relative', overflow: 'hidden', paddingBottom: '100px' }}>
+            {/* Animated Mesh Gradient Background (Matches Explore Page) */}
+            <div className="mesh-gradient-animate" style={{
+                position: 'absolute',
+                top: '-10%',
+                left: '-10%',
+                width: '120%',
+                height: '800px',
+                zIndex: -1,
+                opacity: 0.2, // Slightly more subtle for the detail page
+                filter: 'blur(100px)',
+                background: `
+                    radial-gradient(at 0% 0%, rgba(255, 133, 162, 0.3) 0px, transparent 50%),
+                    radial-gradient(at 50% 0%, rgba(139, 92, 246, 0.3) 0px, transparent 50%),
+                    radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.3) 0px, transparent 50%)
+                `
+            }}></div>
+
             {/* Header Section */}
-            <div style={{ background: 'var(--background)', borderBottom: '1px solid var(--border)', padding: '40px 0' }}>
+            <div style={{ background: 'transparent', borderBottom: '1px solid var(--border)', padding: '40px 0' }}>
                 <div className="container">
                     <Breadcrumbs
                         items={[
