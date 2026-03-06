@@ -12,9 +12,9 @@ export async function POST(req: Request) {
         }
 
         const userId = (session.user as any).id;
-        const { itineraryId, price, title } = await req.json();
+        const { itineraryId } = await req.json();
 
-        if (!itineraryId || !price) {
+        if (!itineraryId) {
             return NextResponse.json({ error: "Missing data" }, { status: 400 });
         }
 
@@ -30,17 +30,18 @@ export async function POST(req: Request) {
 
         const creator = await User.findById(itinerary.creator_id);
 
+        // Use the price from the database to prevent client-side tampering
         // Razorpay expects amount in paise (cents counterpart)
-        const amount = Math.round(price * 100);
+        const amount = Math.round(itinerary.price * 100);
 
         const options: any = {
             amount: amount,
-            currency: "INR",
+            currency: "INR", // Or itinerary.currency if you want to support multiple currencies
             receipt: `rcpt_${itineraryId.substring(0, 10)}`,
             notes: {
                 userId,
                 itineraryId,
-                title
+                title: itinerary.title
             }
         };
 

@@ -1,23 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ShieldCheck, ArrowLeft, Lock, CreditCard } from "@/components/Icons";
 
 export default function CheckoutPage() {
     const router = useRouter();
     const params = useParams();
-    const [isProcessing, setIsProcessing] = useState(false);
-
     const id = params?.id as string || "";
-    const isKyoto = id === "kyoto-traditional";
-
-    const item = {
-        title: isKyoto ? "7 Days in Kyoto: The Ultimate Guide" : "Bali: Hidden Gems",
-        price: isKyoto ? 15.00 : 12.00,
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [isLoadingData, setIsLoadingData] = useState(true);
+    const [item, setItem] = useState({
+        title: "Loading...",
+        price: 0,
         currency: "USD",
-        creator: isKyoto ? "@SarahTravels" : "@BaliExplorer"
-    };
+        creator: "Loading..."
+    });
+
+    useEffect(() => {
+        if (!id) return;
+        const fetchItinerary = async () => {
+            try {
+                const response = await fetch(`/api/itineraries/${id}`);
+                const data = await response.json();
+                if (data) {
+                    setItem({
+                        title: data.title,
+                        price: data.price,
+                        currency: data.currency || "USD",
+                        creator: data.profiles?.full_name || "Creator"
+                    });
+                }
+            } catch (err) {
+                console.error("Error fetching itinerary:", err);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+        fetchItinerary();
+    }, [id]);
 
     const handleCheckout = async () => {
         setIsProcessing(true);
@@ -100,10 +121,16 @@ export default function CheckoutPage() {
             </button>
 
             <div className="glass card" style={{ padding: '48px', textAlign: 'center' }}>
-                <h1 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>Ready to Explore?</h1>
-                <p style={{ color: 'var(--gray-400)', fontSize: '1.1rem', marginBottom: '40px' }}>
-                    You're about to purchase <strong>{item.title}</strong> by {item.creator}.
-                </p>
+                {isLoadingData ? (
+                    <h1 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>Loading...</h1>
+                ) : (
+                    <>
+                        <h1 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>Ready to Explore?</h1>
+                        <p style={{ color: 'var(--gray-400)', fontSize: '1.1rem', marginBottom: '40px' }}>
+                            You're about to purchase <strong>{item.title}</strong> by {item.creator}.
+                        </p>
+                    </>
+                )}
 
                 <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '16px', padding: '32px', marginBottom: '40px', maxWidth: '400px', margin: '0 auto 40px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
@@ -120,7 +147,7 @@ export default function CheckoutPage() {
                     onClick={handleCheckout}
                     className="btn btn-primary"
                     style={{ padding: '20px 60px', fontSize: '1.2rem', display: 'inline-flex', alignItems: 'center', gap: '12px' }}
-                    disabled={isProcessing}
+                    disabled={isProcessing || isLoadingData}
                 >
                     {isProcessing ? (
                         "Processing..."
