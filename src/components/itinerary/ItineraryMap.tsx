@@ -29,29 +29,59 @@ export default function ItineraryMap({ content }: ItineraryMapProps) {
         if (content.accommodation?.hotelRecommendations) {
             content.accommodation.hotelRecommendations.forEach(hotel => {
                 if (hotel.locationCoordinates) {
-                    coords.push(hotel.locationCoordinates);
-                    mapMarkers.push({
-                        lng: hotel.locationCoordinates[0],
-                        lat: hotel.locationCoordinates[1],
-                        title: hotel.name,
-                        type: 'hotel'
-                    });
+                    const lng = Array.isArray(hotel.locationCoordinates) ? hotel.locationCoordinates[0] : (hotel.locationCoordinates as any).longitude;
+                    const lat = Array.isArray(hotel.locationCoordinates) ? hotel.locationCoordinates[1] : (hotel.locationCoordinates as any).latitude;
+
+                    if (typeof lng === 'number' && typeof lat === 'number') {
+                        coords.push([lng, lat]);
+                        mapMarkers.push({
+                            lng,
+                            lat,
+                            title: hotel.name,
+                            type: 'hotel'
+                        });
+                    }
                 }
             });
         }
 
         // 2. Get Daily Activities
-        if (content.dailyItinerary) {
-            content.dailyItinerary.forEach(day => {
+        const days = content.days || (content as any).dailyItinerary;
+        if (days && Array.isArray(days)) {
+            days.forEach(day => {
+                // Handle the array of coordinates on the day object (Schema v2)
+                if (day.locationCoordinates && Array.isArray(day.locationCoordinates)) {
+                    day.locationCoordinates.forEach((coord: any) => {
+                        const lng = typeof coord.longitude === 'number' ? coord.longitude : coord[0];
+                        const lat = typeof coord.latitude === 'number' ? coord.latitude : coord[1];
+
+                        if (typeof lng === 'number' && typeof lat === 'number') {
+                            coords.push([lng, lat]);
+                            mapMarkers.push({
+                                lng,
+                                lat,
+                                title: day.title || 'Stop',
+                                type: 'daily'
+                            });
+                        }
+                    });
+                }
+
+                // Fallback for older schema where coordinates were on specific activities
                 const addIfHasCoords = (activity: any) => {
                     if (activity && activity.locationCoordinates) {
-                        coords.push(activity.locationCoordinates);
-                        mapMarkers.push({
-                            lng: activity.locationCoordinates[0],
-                            lat: activity.locationCoordinates[1],
-                            title: activity.activity || activity.location || 'Stop',
-                            type: 'daily'
-                        });
+                        const lng = Array.isArray(activity.locationCoordinates) ? activity.locationCoordinates[0] : activity.locationCoordinates.longitude;
+                        const lat = Array.isArray(activity.locationCoordinates) ? activity.locationCoordinates[1] : activity.locationCoordinates.latitude;
+
+                        if (typeof lng === 'number' && typeof lat === 'number') {
+                            coords.push([lng, lat]);
+                            mapMarkers.push({
+                                lng,
+                                lat,
+                                title: activity.activity || activity.location || 'Stop',
+                                type: 'daily'
+                            });
+                        }
                     }
                 };
 

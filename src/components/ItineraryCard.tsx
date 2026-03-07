@@ -71,14 +71,15 @@ export default function ItineraryCard({ itinerary }: ItineraryCardProps) {
                     zIndex: 5
                 }}>
                     <span style={{
-                        color: 'white',
+                        color: 'var(--background)',
                         fontWeight: 700,
                         fontSize: '0.9rem',
-                        padding: '10px 20px',
+                        padding: '10px 24px',
                         borderRadius: '99px',
                         background: 'var(--primary)',
                         transform: 'translateY(20px)',
-                        transition: 'transform 0.3s ease'
+                        transition: 'transform 0.3s ease',
+                        boxShadow: '0 8px 16px rgba(0,0,0,0.4)'
                     }} className="overlay-text">
                         View Details →
                     </span>

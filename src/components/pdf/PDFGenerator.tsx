@@ -280,6 +280,21 @@ export default function PDFGenerator({ itineraryData, isPurchased, iconOnly = fa
                         });
                     }
 
+                    // Handle content.days (Schema v2)
+                    if (itineraryData.content?.days) {
+                        itineraryData.content.days.forEach((day: any) => {
+                            if (day.locationCoordinates && Array.isArray(day.locationCoordinates)) {
+                                day.locationCoordinates.forEach((coord: any) => {
+                                    const lng = typeof coord.longitude === 'number' ? coord.longitude : coord[0];
+                                    const lat = typeof coord.latitude === 'number' ? coord.latitude : coord[1];
+                                    if (typeof lng === 'number' && typeof lat === 'number') {
+                                        coords.push([lng, lat]);
+                                    }
+                                });
+                            }
+                        });
+                    }
+
                     if (coords.length > 0) {
                         const staticMapUrl = generateStaticMapUrl(coords);
                         if (!staticMapUrl) throw new Error("Could not generate map URL");

@@ -187,15 +187,21 @@ export default function BuyerDashboard() {
                                     position: 'absolute',
                                     top: '12px',
                                     right: '12px',
-                                    background: 'var(--primary)',
+                                    background: 'rgba(0, 0, 0, 0.75)',
+                                    backdropFilter: 'blur(8px)',
                                     color: 'white',
                                     padding: '6px 14px',
                                     borderRadius: '99px',
                                     fontSize: '0.85rem',
                                     fontWeight: 700,
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                                    zIndex: 2,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '2px'
                                 }}>
-                                    ₹{item.price}
+                                    <span>{item.currency === 'INR' || !item.currency ? '₹' : item.currency === 'USD' ? '$' : item.currency === 'EUR' ? '€' : item.currency}</span>
+                                    <span>{Number(item.price).toFixed(2)}</span>
                                 </div>
                             </div>
                             <div style={{ padding: '24px' }}>

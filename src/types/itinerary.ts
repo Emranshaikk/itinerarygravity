@@ -221,6 +221,7 @@ export interface ItineraryContent {
         description?: string;
         price?: string;
     }[];
+    days?: any[]; // Legacy/Migration support for content.days
 }
 
 export const initialItineraryContent: ItineraryContent = {

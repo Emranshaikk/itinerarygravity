@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ShieldCheck, ArrowLeft, Lock, CreditCard } from "@/components/Icons";
+import { formatCurrency, convertToINR } from "@/lib/currency";
 
 export default function CheckoutPage() {
     const router = useRouter();
@@ -153,11 +154,20 @@ export default function CheckoutPage() {
                     <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '16px', padding: '32px', marginBottom: '40px', maxWidth: '400px', margin: '0 auto 40px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
                             <span style={{ color: 'var(--gray-400)' }}>Price</span>
-                            <span>₹{item.price.toFixed(2)}</span>
+                            <span>{formatCurrency(item.price, item.currency)}</span>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '1.5rem', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '1.5rem', paddingTop: '12px', borderTop: '1px solid var(--border)', alignItems: 'center' }}>
                             <span>Total</span>
-                            <span className="text-gradient">₹{item.price.toFixed(2)}</span>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                <span className="text-gradient">
+                                    {item.currency === 'INR' ? formatCurrency(item.price, 'INR') : `≈ ₹${convertToINR(item.price, item.currency).toFixed(2)}`}
+                                </span>
+                                {item.currency !== 'INR' && (
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)', fontWeight: 400, marginTop: '4px' }}>
+                                        Original: {formatCurrency(item.price, item.currency)}
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     </div>
 

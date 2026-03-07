@@ -30,24 +30,27 @@ export async function POST(req: Request) {
 
         const creator = await User.findById(itinerary.creator_id);
 
-        // Use the price from the database to prevent client-side tampering
-        // Razorpay expects amount in paise (cents counterpart)
-        const amount = Math.round(itinerary.price * 100);
+        // Convert foreign currencies to INR for Razorpay (Razorpay expects amount in paise)
+        const { convertToINR } = await import('@/lib/currency');
+        const inrAmount = convertToINR(itinerary.price, itinerary.currency || 'USD');
+        const amountInPaise = Math.round(inrAmount * 100);
 
         const options: any = {
-            amount: amount,
-            currency: "INR", // Or itinerary.currency if you want to support multiple currencies
+            amount: amountInPaise,
+            currency: "INR", // Razorpay account is in INR
             receipt: `rcpt_${itineraryId.substring(0, 10)}`,
             notes: {
                 userId,
                 itineraryId,
-                title: itinerary.title
+                title: itinerary.title,
+                originalCurrency: itinerary.currency || 'USD',
+                originalPrice: itinerary.price
             }
         };
 
         // If creator has a connected Razorpay Account, split the payment
         if (creator?.razorpay_account_id) {
-            const transferAmount = Math.round(amount * 0.70); // 70% to creator
+            const transferAmount = Math.round(amountInPaise * 0.70); // 70% to creator
             options.transfers = [
                 {
                     account: creator.razorpay_account_id,

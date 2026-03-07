@@ -364,6 +364,7 @@ function ExploreContent() {
                                                     className="badge"
                                                     style={{
                                                         background: selectedTags.includes(tag) ? 'var(--primary)' : 'var(--surface)',
+                                                        color: selectedTags.includes(tag) ? 'var(--background)' : 'var(--foreground)',
                                                         border: selectedTags.includes(tag) ? '1px solid var(--primary)' : '1px solid var(--border)',
                                                         cursor: 'pointer',
                                                         transition: 'all 0.2s'
