@@ -135,98 +135,116 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* How it Works Section */}
+      {/* How it Works Section - Revamped */}
       <section id="how-it-works" style={{ padding: '120px 0', position: 'relative', overflow: 'hidden' }}>
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '100px' }}>
             <h2 className="text-gradient" style={{ fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', marginBottom: '16px', fontWeight: 900 }}>How It Works</h2>
             <p style={{ color: 'var(--gray-400)', maxWidth: '600px', margin: '0 auto', fontSize: '1.1rem' }}>Your journey from inspiration to adventure in three simple, verified steps.</p>
           </div>
 
-          <div style={{ position: 'relative' }}>
-            {/* Desktop Connector Line (SVG) */}
-            <div className="desktop-only" style={{ position: 'absolute', top: '50px', left: '15%', right: '15%', height: '2px', zIndex: 0 }}>
-              <svg width="100%" height="20" style={{ overflow: 'visible' }}>
-                <path
-                  d="M 0,10 Q 250,10 500,10 T 1000,10"
-                  fill="none"
-                  stroke="url(#lineGradient)"
-                  strokeWidth="3"
-                  strokeDasharray="10,10"
-                  className="connector-path"
-                />
-                <defs>
-                  <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="var(--primary)" stopOpacity="0" />
-                    <stop offset="50%" stopColor="var(--primary)" stopOpacity="1" />
-                    <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-              </svg>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '120px', position: 'relative' }}>
+
+            {/* Step 1 */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '60px' }}>
+              <div style={{ flex: '1 1 400px', position: 'relative' }}>
+                <div className="glass" style={{ padding: '40px', borderRadius: '32px', border: '1px solid rgba(139, 92, 246, 0.3)', background: 'linear-gradient(135deg, rgba(255,133,162,0.1), rgba(139,92,246,0.1))' }}>
+                  {/* Mock Search Bar UI */}
+                  <div style={{ background: 'var(--background)', borderRadius: '100px', padding: '16px 24px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid var(--gray-400)', position: 'relative' }}>
+                      <div style={{ width: '10px', height: '2px', background: 'var(--gray-400)', position: 'absolute', bottom: '-4px', right: '-6px', transform: 'rotate(45deg)' }} />
+                    </div>
+                    <span style={{ color: 'var(--gray-400)', fontSize: '1.1rem' }}>Kyoto Hidden Temp...</span>
+                  </div>
+                  {/* Floating Tags */}
+                  <div style={{ display: 'flex', gap: '12px', marginTop: '24px', flexWrap: 'wrap' }}>
+                    <span className="badge" style={{ background: 'var(--primary)', color: 'var(--background)', fontWeight: 600, padding: '8px 16px' }}>#HiddenGems</span>
+                    <span className="badge" style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--foreground)', padding: '8px 16px' }}>#LocalCoffee</span>
+                  </div>
+                </div>
+              </div>
+              <div style={{ flex: '1 1 400px' }}>
+                <div className="text-gradient" style={{ fontSize: '4rem', fontWeight: 900, opacity: 0.5, marginBottom: '-10px', lineHeight: 1 }}>01</div>
+                <h3 style={{ fontSize: '2rem', marginBottom: '20px', fontWeight: 800 }}>Discover Verified Magic</h3>
+                <p style={{ color: 'var(--gray-400)', fontSize: '1.15rem', lineHeight: '1.8' }}>
+                  Stop scrolling through endless, sponsored top-10 lists. Search by destination or vibe to find field-tested itineraries from verified creators who actually travel there.
+                </p>
+              </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '40px', position: 'relative', zIndex: 1 }}>
-              {[
-                {
-                  step: "01",
-                  title: "Find Inspiration",
-                  desc: "Browse premium itineraries from verified world-travelers and influencers you trust."
-                },
-                {
-                  step: "02",
-                  title: "Unlock Access",
-                  desc: "Purchase the guide for a small fee. 70% goes directly to the creator, supporting their journey."
-                },
-                {
-                  step: "03",
-                  title: "Travel Smart",
-                  desc: "Get instant access to hidden locations, booking tips, and daily schedules via PDF or interactive map."
-                }
-              ].map((item, i) => (
-                <div key={i} className="how-it-works-card glass" style={{
-                  position: 'relative',
-                  padding: '48px 32px',
-                  background: 'rgba(255,255,255,0.03)',
-                  backdropFilter: 'blur(10px)',
-                  borderRadius: '24px',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  textAlign: 'center'
-                }}>
-                  <div style={{
-                    width: '80px',
-                    height: '80px',
-                    borderRadius: '20px',
-                    background: 'linear-gradient(45deg, var(--primary), var(--secondary))',
-                    color: 'white',
-                    fontSize: '1.5rem',
-                    fontWeight: 900,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '32px',
-                    boxShadow: '0 10px 20px rgba(255, 133, 162, 0.3)'
-                  }}>
-                    {item.step}
+            {/* Step 2 (Reversed) */}
+            <div style={{ display: 'flex', flexWrap: 'wrap-reverse', alignItems: 'center', gap: '60px' }}>
+              <div style={{ flex: '1 1 400px' }}>
+                <div className="text-gradient" style={{ fontSize: '4rem', fontWeight: 900, opacity: 0.5, marginBottom: '-10px', lineHeight: 1 }}>02</div>
+                <h3 style={{ fontSize: '2rem', marginBottom: '20px', fontWeight: 800 }}>Instant, Lifetime Access</h3>
+                <p style={{ color: 'var(--gray-400)', fontSize: '1.15rem', lineHeight: '1.8' }}>
+                  Purchase once, own it forever. Skip the subscriptions. Get instant access to beautiful web guides and detailed offline PDF downloads the second you buy.
+                </p>
+              </div>
+              <div style={{ flex: '1 1 400px', position: 'relative' }}>
+                <div className="glass" style={{ padding: '40px', borderRadius: '32px', border: '1px solid rgba(59, 130, 246, 0.3)', background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(59,130,246,0.1))', display: 'flex', justifyContent: 'center' }}>
+                  {/* Mock PDF/Unlock UI */}
+                  <div style={{ background: 'var(--background)', borderRadius: '24px', padding: '24px', width: '250px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', textAlign: 'center', position: 'relative' }}>
+                    <div style={{ position: 'absolute', top: '-15px', right: '-15px', background: 'var(--primary)', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--background)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" /></svg>
+                    </div>
+                    <div style={{ height: '120px', background: 'var(--surface)', borderRadius: '12px', marginBottom: '16px' }} />
+                    <div style={{ height: '8px', width: '80%', background: 'var(--border)', borderRadius: '4px', margin: '0 auto 8px' }} />
+                    <div style={{ height: '8px', width: '60%', background: 'var(--border)', borderRadius: '4px', margin: '0 auto' }} />
+                    <div style={{ marginTop: '20px', color: 'var(--primary)', fontWeight: 800 }}>$10.00</div>
                   </div>
-                  <h3 style={{ fontSize: '1.6rem', marginBottom: '16px', fontWeight: 800 }}>{item.title}</h3>
-                  <p style={{ color: 'var(--gray-400)', lineHeight: '1.8', fontSize: '1.05rem' }}>{item.desc}</p>
                 </div>
-              ))}
+              </div>
             </div>
+
+            {/* Step 3 */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '60px' }}>
+              <div style={{ flex: '1 1 400px', position: 'relative' }}>
+                <div className="glass" style={{ padding: '40px', borderRadius: '32px', border: '1px solid rgba(255, 133, 162, 0.3)', background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(255,133,162,0.1))' }}>
+                  {/* Mock Map UI */}
+                  <div style={{ background: 'var(--background)', borderRadius: '24px', height: '220px', position: 'relative', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+                    <svg width="100%" height="100%" style={{ stroke: 'var(--border)', strokeWidth: 2 }}>
+                      <line x1="0" y1="50" x2="100%" y2="50" />
+                      <line x1="0" y1="100" x2="100%" y2="100" />
+                      <line x1="0" y1="150" x2="100%" y2="150" />
+                      <line x1="0" y1="200" x2="100%" y2="200" />
+                      <line x1="50" y1="0" x2="50" y2="100%" />
+                      <line x1="100" y1="0" x2="100" y2="100%" />
+                      <line x1="150" y1="0" x2="150" y2="100%" />
+                      <line x1="200" y1="0" x2="200" y2="100%" />
+                      <line x1="250" y1="0" x2="250" y2="100%" />
+                      <line x1="300" y1="0" x2="300" y2="100%" />
+                    </svg>
+                    {/* Path and Pins */}
+                    <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0, overflow: 'visible' }}>
+                      <path d="M 60,160 Q 150,50 240,120" fill="none" stroke="var(--primary)" strokeWidth="4" strokeDasharray="8 8" />
+                    </svg>
+                    <div style={{ position: 'absolute', top: '140px', left: '40px', color: 'var(--primary)' }}>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--primary)" stroke="var(--background)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" fill="var(--background)" /></svg>
+                    </div>
+                    <div style={{ position: 'absolute', top: '100px', left: '220px', color: 'var(--secondary)' }}>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--secondary)" stroke="var(--background)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" fill="var(--background)" /></svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style={{ flex: '1 1 400px' }}>
+                <div className="text-gradient" style={{ fontSize: '4rem', fontWeight: 900, opacity: 0.5, marginBottom: '-10px', lineHeight: 1 }}>03</div>
+                <h3 style={{ fontSize: '2rem', marginBottom: '20px', fontWeight: 800 }}>Navigate Like a Local</h3>
+                <p style={{ color: 'var(--gray-400)', fontSize: '1.15rem', lineHeight: '1.8' }}>
+                  No more juggling 5 different apps. Every itinerary comes with a custom interactive map routing. Drop a pin, grab an Uber, and go.
+                </p>
+              </div>
+            </div>
+
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: '80px' }}>
+          <div style={{ textAlign: 'center', marginTop: '100px' }}>
             <Link href="/explore" className="btn btn-primary" style={{ padding: '16px 48px', fontSize: '1.2rem', borderRadius: '100px' }}>
               Start Your Journey
             </Link>
           </div>
         </div>
-
-
       </section>
 
       {/* Trending Section */}
@@ -306,26 +324,7 @@ export default async function Home() {
             <p style={{ color: 'var(--gray-400)' }}>Learn from the best travelers who live life on the edge.</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '32px' }}>
-            {[
-              { name: "Sarah Travels", bio: "Culture explorer based in Kyoto. Sharing hidden shrines and tea houses.", handle: "@SarahTravels", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400", sales: "2.4k" },
-              { name: "WanderJohn", bio: "Adventure junkie & solo traveler. expert on the Amalfi Coast and Alps.", handle: "@WanderJohn", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400", sales: "1.8k" },
-              { name: "Bali Explorer", bio: "Living the dream in Ubud. Waterfalls, spiritual retreats, and surf spots.", handle: "@BaliExplorer", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400", sales: "3.2k" }
-            ].map((creator, i) => (
-              <div key={i} className="glass card card-hover" style={{ padding: '32px', textAlign: 'center', borderRadius: '32px' }}>
-                <div style={{ width: '120px', height: '120px', borderRadius: '50%', margin: '0 auto 24px auto', overflow: 'hidden', border: '4px solid var(--primary-light)', padding: '4px' }}>
-                  <img src={creator.img} alt={creator.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                </div>
-                <h3 style={{ fontSize: '1.4rem', marginBottom: '4px' }}>{creator.name}</h3>
-                <p style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.9rem', marginBottom: '16px' }}>{creator.handle}</p>
-                <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem', marginBottom: '24px', lineHeight: '1.6' }}>{creator.bio}</p>
-                <div style={{ background: 'var(--surface)', padding: '12px', borderRadius: '16px', display: 'flex', justifyContent: 'center', gap: '8px', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 800, fontSize: '1.1rem' }}>{creator.sales}</span>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)' }}>Sales</span>
-                </div>
-              </div>
-            ))}
-          </div>
+          <TopCreators />
         </div>
       </section>
     </div>
@@ -375,6 +374,80 @@ async function TrendingItineraries() {
           }}
         />
       ))}
+    </div>
+  );
+}
+
+async function TopCreators() {
+  await connectToDatabase();
+
+  // Aggregate user pipeline to find users with itineraries
+  let topCreators = await DbUser.aggregate([
+    { $match: { role: { $in: ['influencer', 'admin'] } } },
+    {
+      $lookup: {
+        from: 'itineraries',
+        localField: '_id',
+        foreignField: 'creator_id',
+        as: 'itineraries'
+      }
+    },
+    // Only keep creators who have published itineraries (or keep all if you want empty profiles too)
+    // For now, let's keep ones with itineraries to ensure they have content
+    { $match: { 'itineraries.0': { $exists: true } } },
+    {
+      $addFields: {
+        itineraryCount: { $size: "$itineraries" }
+      }
+    },
+    { $sort: { itineraryCount: -1 } },
+    { $limit: 3 }
+  ]);
+
+  if (!topCreators || topCreators.length === 0) {
+    // Fallback if no creators with itineraries exist yet
+    topCreators = await DbUser.find({ role: { $in: ['influencer', 'admin'] } }).limit(3).lean();
+    topCreators = topCreators.map(c => ({ ...c, itineraryCount: 0 }));
+  }
+
+  if (!topCreators || topCreators.length === 0) return <p style={{ textAlign: 'center', color: 'var(--gray-400)' }}>More creators joining soon...</p>;
+
+  // Convert ObjectIds to strings for Client Component safe passing if needed, 
+  // though we are in a server component rendering standard HTML elements here
+  const safeCreators = JSON.parse(JSON.stringify(topCreators));
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '32px' }}>
+      {safeCreators.map((creator: any, i: number) => {
+        const username = creator.username || creator.full_name.toLowerCase().replace(/\s+/g, '');
+        return (
+          <Link href={`/creators/${username}`} key={i} style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div className="glass card card-hover" style={{ padding: '32px', textAlign: 'center', borderRadius: '32px', height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ width: '120px', height: '120px', borderRadius: '50%', margin: '0 auto 24px auto', overflow: 'hidden', border: '4px solid var(--primary-light)', padding: '4px', background: 'var(--surface)' }}>
+                <img
+                  src={creator.profile_image || `https://images.unsplash.com/photo-${['1494790108377-be9c29b29330', '1500648767791-00dcc994a43e', '1507003211169-0a1dd7228f2d'][i % 3]}?q=80&w=400`}
+                  alt={creator.full_name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                />
+              </div>
+              <h3 style={{ fontSize: '1.4rem', marginBottom: '4px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
+                {creator.full_name}
+                {creator.is_verified && (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--primary)" stroke="var(--background)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" /><path d="m9 12 2 2 4-4" /></svg>
+                )}
+              </h3>
+              <p style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.9rem', marginBottom: '16px' }}>@{username}</p>
+              <p style={{ color: 'var(--gray-400)', fontSize: '0.9rem', marginBottom: '24px', lineHeight: '1.6', flexGrow: 1 }}>
+                {creator.bio || "Travel enthusiast and itinerary creator on ItineraryGravity."}
+              </p>
+              <div style={{ background: 'var(--background)', padding: '12px', borderRadius: '16px', display: 'flex', justifyContent: 'center', gap: '8px', alignItems: 'center', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)' }}>
+                <span className="text-gradient" style={{ fontWeight: 900, fontSize: '1.2rem' }}>{creator.itineraryCount || 0}</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)', fontWeight: 500, letterSpacing: '0.5px', textTransform: 'uppercase' }}>Available Guides</span>
+              </div>
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }

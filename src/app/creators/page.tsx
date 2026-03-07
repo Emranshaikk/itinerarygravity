@@ -130,7 +130,7 @@ export default function CreatorsPage() {
                             }
                         ].map((item, i) => (
                             <div key={i} className="glass card card-hover" style={{ padding: '40px', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                                <div style={{ marginBottom: '24px', background: 'rgba(255,255,255,0.05)', width: '64px', height: '64px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div style={{ marginBottom: '24px', background: 'var(--surface)', border: '1px solid var(--border)', width: '64px', height: '64px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     {item.icon}
                                 </div>
                                 <h3 style={{ fontSize: '1.4rem', marginBottom: '16px' }}>{item.title}</h3>
@@ -155,12 +155,12 @@ export default function CreatorsPage() {
                             { step: "02", title: "We Make it Beautiful", desc: "Our engine instantly turns your brain dump into a stunning, fast-loading web page and a downloadable PDF guide." },
                             { step: "03", title: "Share & Earn", desc: "Drop your unique shortlink in your Instagram bio, YouTube description, or TikTok. Watch the automated sales roll in." }
                         ].map((item, i) => (
-                            <div key={i} style={{ position: 'relative', padding: '24px' }}>
-                                <div className="text-gradient" style={{ fontSize: '4rem', fontWeight: 800, opacity: 0.3, position: 'absolute', top: -10, left: 10, zIndex: 0 }}>
+                            <div key={i} className="glass card card-hover" style={{ padding: '40px', display: 'flex', flexDirection: 'column' }}>
+                                <div className="text-gradient" style={{ fontSize: '4rem', fontWeight: 900, opacity: 0.5, marginBottom: '-10px', lineHeight: 1 }}>
                                     {item.step}
                                 </div>
                                 <div style={{ position: 'relative', zIndex: 1 }}>
-                                    <h3 style={{ fontSize: '1.5rem', marginBottom: '16px', paddingTop: '20px' }}>{item.title}</h3>
+                                    <h3 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>{item.title}</h3>
                                     <p style={{ color: 'var(--gray-400)', lineHeight: '1.6' }}>{item.desc}</p>
                                 </div>
                             </div>
@@ -231,7 +231,7 @@ export default function CreatorsPage() {
                         position: 'relative',
                         overflow: 'hidden'
                     }}>
-                        <div style={{ position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%', background: 'radial-gradient(circle at center, rgba(255,255,255,0.05) 0%, transparent 50%)', zIndex: 0 }} />
+                        <div style={{ position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%', background: 'radial-gradient(circle at center, var(--surface) 0%, transparent 50%)', zIndex: 0 }} />
                         <div style={{ position: 'relative', zIndex: 1 }}>
                             <h2 style={{ fontSize: 'clamp(1.75rem, 5vw, 2.5rem)', marginBottom: '16px' }}>Unlock Your Creator Business</h2>
                             <p style={{ color: 'var(--gray-400)', marginBottom: '32px', fontSize: 'clamp(1rem, 2vw, 1.1rem)', lineHeight: '1.6' }}>
@@ -247,7 +247,7 @@ export default function CreatorsPage() {
                             </Link>
                         </div>
                         <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-                            <div className="glass" style={{ borderRadius: '20px', padding: '32px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <div className="glass" style={{ borderRadius: '20px', padding: '32px', background: 'var(--background)', border: '1px solid var(--border)' }}>
                                 <h4 style={{ color: 'var(--gray-400)', marginBottom: '8px' }}>Your Potential Earnings</h4>
                                 <div className="text-gradient" style={{ fontSize: '3.5rem', fontWeight: 800, marginBottom: '8px' }}>$700</div>
                                 <p style={{ fontSize: '0.9rem', color: 'var(--gray-400)' }}>Selling ten $10 itineraries to 10 buyers per month.</p>
