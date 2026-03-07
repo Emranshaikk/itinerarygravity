@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, lazy, Suspense } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { ArrowLeft, Save, Eye, ChevronRight } from "lucide-react";
 import { ItineraryContent, initialItineraryContent } from "@/types/itinerary";
 import BuilderStepper from "@/components/itinerary-builder/BuilderStepper";
@@ -57,9 +57,13 @@ const checkSectionCompletion = (step: number, content: ItineraryContent) => {
 export default function EditItineraryPage() {
     const router = useRouter();
     const params = useParams();
+    const searchParams = useSearchParams();
     const id = params.id as string;
 
-    const [activeStep, setActiveStep] = useState(1);
+    // Read step from URL if transitioning from /create page, else default to 1
+    const initialStep = parseInt(searchParams.get('step') || '1', 10);
+
+    const [activeStep, setActiveStep] = useState(initialStep);
     const [content, setContent] = useState<ItineraryContent>(initialItineraryContent);
     const [isSaving, setIsSaving] = useState(false);
     const [loading, setLoading] = useState(true);

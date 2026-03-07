@@ -104,7 +104,8 @@ export default function CreateItineraryPage() {
             if (response.ok) {
                 const newItinerary = await response.json();
                 alert("Saved successfully!");
-                router.replace(`/dashboard/influencer/edit/${newItinerary.id}`);
+                const routeId = newItinerary.id || newItinerary._id;
+                router.replace(`/dashboard/influencer/edit/${routeId}?step=${activeStep}`);
             } else {
                 const error = await response.text();
                 throw new Error(error || "Failed to save itinerary");

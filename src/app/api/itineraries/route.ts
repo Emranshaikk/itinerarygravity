@@ -51,9 +51,15 @@ export async function POST(req: Request) {
         });
 
         // Add additional loose fields that might have mapped to Supabase
-        // Mongoose handles it if we have it properly configured or mixed
+        // Format for frontend
+        const docObj = newItinerary.toObject({ getters: true });
 
-        return NextResponse.json(newItinerary);
+        const responseData = {
+            ...docObj,
+            id: newItinerary._id.toString()
+        };
+
+        return NextResponse.json(responseData);
     } catch (error: any) {
         return handleApiError(error);
     }

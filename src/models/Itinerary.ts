@@ -37,11 +37,12 @@ export interface IItinerary extends Document {
     content: {
         days: IDay[];
         proofOfVisit?: {
-            images: string[];
+            images: { url: string; caption?: string }[];
             notes?: string;
         };
         logistics?: any;
         preTrip?: any;
+        [key: string]: any;
     };
     views_count: number;
     purchases_count: number;
@@ -152,15 +153,33 @@ const ItinerarySchema: Schema<IItinerary> = new Schema(
             },
             proofOfVisit: {
                 images: {
-                    type: [String],
+                    type: [{
+                        url: { type: String, required: true },
+                        caption: { type: String, default: '' }
+                    }],
                     validate: [
-                        { validator: (val: string[]) => val.length <= 20, msg: '{PATH} exceeds maximum of 20 images' }
+                        { validator: (val: any[]) => val.length <= 20, msg: '{PATH} exceeds maximum of 20 images' }
                     ]
                 },
                 notes: { type: String, maxlength: 2000 },
             },
             logistics: Schema.Types.Mixed,
             preTrip: Schema.Types.Mixed,
+            cover: Schema.Types.Mixed,
+            arrival: Schema.Types.Mixed,
+            dailyItinerary: Schema.Types.Mixed,
+            food: Schema.Types.Mixed,
+            transport: Schema.Types.Mixed,
+            secrets: Schema.Types.Mixed,
+            safety: Schema.Types.Mixed,
+            customization: Schema.Types.Mixed,
+            shopping: Schema.Types.Mixed,
+            departure: Schema.Types.Mixed,
+            postTrip: Schema.Types.Mixed,
+            bonus: Schema.Types.Mixed,
+            accommodation: Schema.Types.Mixed,
+            affiliateProducts: Schema.Types.Mixed,
+            creatorProducts: Schema.Types.Mixed,
         },
         views_count: {
             type: Number,
