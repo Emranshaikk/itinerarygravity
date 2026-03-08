@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle, MapPin, Star, ShieldCheck, Calendar, Clock, Info, Shield, Truck, Hotel, Coffee, MessageCircle, Share2, Compass, Navigation, ListChecks, Smartphone, Layout } from "@/components/Icons";
+import { Plane, BedDouble, Gift, Map, AlertTriangle, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import ReviewSection from "@/components/reviews/ReviewSection";
@@ -124,17 +125,21 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
             image_url: liveData.image_url || itinerary.image_url,
             content: liveData.content || { days: [], proofOfVisit: { images: [], notes: "" }, affiliateProducts: [], creatorProducts: [] },
             ...liveData.content,
-            days: liveData.content?.days?.map((d: any, idx: number) => ({
+            days: (
+                Array.isArray(liveData.content?.dailyItinerary) ? liveData.content.dailyItinerary :
+                    Array.isArray(liveData.content?.days) ? liveData.content.days :
+                        []
+            ).map((d: any, idx: number) => ({
                 ...d,
-                number: d.dayNumber || idx + 1,
+                number: d.dayNumber || d.number || idx + 1,
                 title: d.dayTitle || d.title || `Day ${idx + 1}`,
-                morning: d.morningPlan || d.morning || "",
-                afternoon: d.afternoonPlan || d.afternoon || "",
-                evening: d.eveningPlan || d.evening || "",
+                morning: d.morningPlan || (typeof d.morning === 'object' ? d.morning?.activity : d.morning) || "",
+                afternoon: d.afternoonPlan || (typeof d.afternoon === 'object' ? d.afternoon?.activity : d.afternoon) || "",
+                evening: d.eveningPlan || (typeof d.evening === 'object' ? d.evening?.activity : d.evening) || "",
                 hotel: d.hotelName || d.hotel || "",
                 transport: d.transportMode || d.transport || "",
                 meals: d.meals ? (Array.isArray(d.meals) ? d.meals : Object.keys(d.meals).filter(k => d.meals[k])) : []
-            })) || itinerary.days,
+            })),
             is_verified: liveData.profiles?.is_verified || false
         };
     }
@@ -672,6 +677,16 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                                     </div>
                                                 </div>
                                             )}
+
+                                            {/* Daily Route Map */}
+                                            {(isPurchased || activeDay === 1) && (
+                                                <div style={{ marginTop: '40px', paddingTop: '32px', borderTop: '1px solid var(--border)', filter: (!isPurchased && activeDay === 1) ? 'blur(4px)' : 'none' }}>
+                                                    <h4 style={{ marginBottom: '24px', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                        <MapPin size={24} color="var(--primary)" /> Route Map
+                                                    </h4>
+                                                    <ItineraryMap content={{ days: [day] } as any} />
+                                                </div>
+                                            )}
                                         </div>
                                     ))
                                 )}
@@ -681,9 +696,9 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                 {itinerary.days.map((day: any) => (
                                     <div key={day.number} style={{ marginBottom: '40px', pageBreakInside: 'avoid', borderBottom: '1px solid #eee', paddingBottom: '32px' }}>
                                         <h3 style={{ fontSize: '1.4rem', marginBottom: '16px' }}>Day {day.number}: {day.title}</h3>
-                                        <p style={{ marginBottom: '8px' }}><strong>Morning:</strong> {day.morning}</p>
-                                        <p style={{ marginBottom: '8px' }}><strong>Afternoon:</strong> {day.afternoon}</p>
-                                        <p style={{ marginBottom: '16px' }}><strong>Evening:</strong> {day.evening}</p>
+                                        <p style={{ marginBottom: '8px' }}><strong>Morning:</strong> {typeof day.morning === 'object' ? day.morning?.activity : day.morning}</p>
+                                        <p style={{ marginBottom: '8px' }}><strong>Afternoon:</strong> {typeof day.afternoon === 'object' ? day.afternoon?.activity : day.afternoon}</p>
+                                        <p style={{ marginBottom: '16px' }}><strong>Evening:</strong> {typeof day.evening === 'object' ? day.evening?.activity : day.evening}</p>
                                         <p style={{ fontSize: '0.9rem' }}>Stay: {day.hotel} • Transport: {day.transport} • Meals: {day.meals.join(', ')}</p>
                                     </div>
                                 ))}
@@ -723,6 +738,130 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                             </section>
                         )}
 
+                        {/* --- NEW SECTIONS --- */}
+                        {isPurchased && itinerary.content?.preTrip && (
+                            <section style={{ marginBottom: '60px' }}>
+                                <h2 style={{ fontSize: '1.8rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <Plane size={28} color="#2563eb" /> Pre-Trip & Packing
+                                </h2>
+                                <div style={{ display: 'grid', gap: '24px' }}>
+                                    {itinerary.content.preTrip.flightGuide && (
+                                        <div className="glass card" style={{ padding: '24px' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', color: 'var(--primary)' }}>Flight & Arrival Strategy</h3>
+                                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '12px' }}>
+                                                {itinerary.content.preTrip.flightGuide.bestAirports?.length > 0 && <li><strong>Best Airports:</strong> {itinerary.content.preTrip.flightGuide.bestAirports.join(', ')}</li>}
+                                                {itinerary.content.preTrip.flightGuide.arrivalDepartureStats && <li><strong>Arrival Info:</strong> {itinerary.content.preTrip.flightGuide.arrivalDepartureStats}</li>}
+                                                {itinerary.content.preTrip.flightGuide.baggageTips && <li><strong>Baggage Tips:</strong> {itinerary.content.preTrip.flightGuide.baggageTips}</li>}
+                                                {itinerary.content.preTrip.flightGuide.seatTips && <li><strong>Seat Secret:</strong> {itinerary.content.preTrip.flightGuide.seatTips}</li>}
+                                                {itinerary.content.preTrip.flightGuide.jetLagTips && <li><strong>Jet Lag Hack:</strong> {itinerary.content.preTrip.flightGuide.jetLagTips}</li>}
+                                            </ul>
+                                        </div>
+                                    )}
+                                    {itinerary.content.preTrip.packingList?.length > 0 && (
+                                        <div className="glass card" style={{ padding: '24px' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', color: '#ea580c' }}>Packing List</h3>
+                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+                                                {itinerary.content.preTrip.packingList.map((category: any, i: number) => (
+                                                    <div key={i}>
+                                                        <h4 style={{ fontSize: '0.9rem', marginBottom: '8px', color: 'var(--gray-400)' }}>{category.category}</h4>
+                                                        <ul style={{ paddingLeft: '20px', fontSize: '0.85rem' }}>
+                                                            {category.items?.map((item: string, j: number) => (
+                                                                <li key={j}>{item}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+
+                        {isPurchased && itinerary.content?.accommodation && (
+                            <section style={{ marginBottom: '60px' }}>
+                                <h2 style={{ fontSize: '1.8rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <BedDouble size={28} color="#0ea5e9" /> Accommodations
+                                </h2>
+                                <div style={{ display: 'grid', gap: '24px' }}>
+                                    {itinerary.content.accommodation.bestNeighborhoods?.length > 0 && (
+                                        <div className="glass card" style={{ padding: '24px' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', color: '#ec4899' }}>Best Neighborhoods</h3>
+                                            <div style={{ display: 'grid', gap: '16px' }}>
+                                                {itinerary.content.accommodation.bestNeighborhoods.map((hood: any, i: number) => (
+                                                    <div key={i} style={{ borderBottom: i !== itinerary.content.accommodation.bestNeighborhoods.length - 1 ? '1px solid var(--border)' : 'none', paddingBottom: i !== itinerary.content.accommodation.bestNeighborhoods.length - 1 ? '16px' : '0' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                            <strong style={{ fontSize: '1.05rem' }}>{hood.name}</strong>
+                                                            <span style={{ fontSize: '0.75rem', padding: '2px 8px', background: 'var(--surface)', borderRadius: '12px' }}>{hood.vibe}</span>
+                                                        </div>
+                                                        <p style={{ marginTop: '8px', fontSize: '0.9rem', color: 'var(--gray-400)' }}>{hood.whyStayHere}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    {itinerary.content.accommodation.hotelRecommendations?.length > 0 && (
+                                        <div className="glass card" style={{ padding: '24px' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', color: '#10b981' }}>Handpicked Hotels</h3>
+                                            <div style={{ display: 'grid', gap: '16px' }}>
+                                                {itinerary.content.accommodation.hotelRecommendations.map((hotel: any, i: number) => (
+                                                    <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '16px', background: 'var(--surface)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                            <div>
+                                                                <strong style={{ fontSize: '1.05rem' }}>{hotel.name}</strong>
+                                                                <div style={{ fontSize: '0.8rem', color: 'var(--gray-400)', marginTop: '2px' }}>{hotel.neighborhood}</div>
+                                                            </div>
+                                                            <div style={{ fontWeight: 'bold', color: '#10b981' }}>{hotel.priceRange}</div>
+                                                        </div>
+                                                        <p style={{ fontSize: '0.9rem', color: 'var(--foreground)' }}>{hotel.whyWeLoveIt}</p>
+                                                        {hotel.bookingLink && (
+                                                            <a href={hotel.bookingLink} target="_blank" rel="noopener noreferrer" style={{ alignSelf: 'flex-start', fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 'bold', marginTop: '4px' }}>View & Book Booking Platform →</a>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+
+                        {isPurchased && itinerary.content?.bonus && (
+                            <section style={{ marginBottom: '60px' }}>
+                                <h2 style={{ fontSize: '1.8rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <Gift size={28} color="#ec4899" /> Bonus Resources
+                                </h2>
+                                <div style={{ display: 'grid', gap: '24px' }}>
+                                    {itinerary.content.bonus.googleMapsLink && (
+                                        <a href={itinerary.content.bonus.googleMapsLink} target="_blank" rel="noopener noreferrer" className="glass card" style={{ padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', textDecoration: 'none' }}>
+                                            <div>
+                                                <h3 style={{ fontSize: '1.1rem', marginBottom: '4px', color: '#10b981', display: 'flex', alignItems: 'center', gap: '8px' }}><Map size={18} /> Google Maps Master List</h3>
+                                                <p style={{ fontSize: '0.9rem', color: 'var(--gray-400)', margin: 0 }}>Open saved locations directly in your Maps app.</p>
+                                            </div>
+                                            <ExternalLink size={20} color="var(--primary)" />
+                                        </a>
+                                    )}
+                                    {itinerary.content.bonus.commonMistakes && (
+                                        <div className="glass card" style={{ padding: '24px', borderLeft: '4px solid #ef4444' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '8px', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '8px' }}><AlertTriangle size={18} /> Common Mistakes</h3>
+                                            <p style={{ fontSize: '0.95rem', color: 'var(--gray-400)', margin: 0, whiteSpace: 'pre-wrap' }}>{itinerary.content.bonus.commonMistakes}</p>
+                                        </div>
+                                    )}
+                                    {itinerary.content.bonus.externalLinks?.length > 0 && (
+                                        <div className="glass card" style={{ padding: '24px' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', color: '#3b82f6' }}>External Links</h3>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                                                {itinerary.content.bonus.externalLinks.map((link: any, i: number) => (
+                                                    <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 12px', background: 'var(--surface)', borderRadius: '8px', fontSize: '0.85rem', color: 'var(--foreground)', textDecoration: 'none', border: '1px solid var(--border)' }}>
+                                                        {link.label} <ExternalLink size={14} color="var(--gray-400)" />
+                                                    </a>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        )}
 
                         <AffiliateShowcase
                             products={itinerary.content.affiliateProducts}

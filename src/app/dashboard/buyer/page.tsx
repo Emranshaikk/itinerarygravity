@@ -11,6 +11,8 @@ export default function BuyerDashboard() {
     const [wishlist, setWishlist] = useState<any[]>([]);
     const [marketplaceItems, setMarketplaceItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [generatingId, setGeneratingId] = useState<string | null>(null);
+
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
@@ -46,9 +48,41 @@ export default function BuyerDashboard() {
         );
     }
 
-    const handleDownload = (title: string) => {
-        alert(`Preparing PDF for "${title}"... Please select "Save as PDF" in the print dialog.`);
-        window.print();
+    const handleDownload = async (item: any) => {
+        setGeneratingId(item.id);
+        try {
+            const { generateItineraryPDF } = await import('@/lib/pdf-generator');
+
+            // Fetch full itinerary data
+            const res = await fetch(`/api/itineraries/${item.itinerary_id}`);
+            if (!res.ok) throw new Error("Failed to fetch itinerary data for PDF");
+
+            const fullData = await res.json();
+
+            // Map the data to the format expected by the PDF generator
+            const formattedData = {
+                ...fullData,
+                title: fullData.title,
+                location: fullData.location,
+                description: fullData.description,
+                price: Number(fullData.price),
+                currency: fullData.currency,
+                creator: fullData.profiles?.full_name || "@Influencer",
+                duration: fullData.duration,
+                days: fullData.content?.days || fullData.content?.dailyItinerary || [],
+                content: fullData.content || {}
+            };
+
+            const success = await generateItineraryPDF(formattedData, true, false);
+            if (!success) {
+                alert('Failed to generate PDF. We are working on a fix!');
+            }
+        } catch (error) {
+            console.error("Error generating PDF:", error);
+            alert("An error occurred while preparing your PDF download.");
+        } finally {
+            setGeneratingId(null);
+        }
     };
 
     return (
@@ -91,10 +125,11 @@ export default function BuyerDashboard() {
                                         </Link>
                                         <button
                                             className="btn btn-primary"
-                                            style={{ flex: 1, fontSize: '0.85rem', gap: '8px' }}
-                                            onClick={() => handleDownload(item.title)}
+                                            style={{ flex: 1, fontSize: '0.85rem', gap: '8px', opacity: generatingId === item.id ? 0.7 : 1, cursor: generatingId === item.id ? 'not-allowed' : 'pointer' }}
+                                            onClick={() => handleDownload(item)}
+                                            disabled={generatingId === item.id}
                                         >
-                                            <Download size={14} /> Download PDF
+                                            <Download size={14} /> {generatingId === item.id ? 'Generating...' : 'Download PDF'}
                                         </button>
                                     </div>
                                 </div>

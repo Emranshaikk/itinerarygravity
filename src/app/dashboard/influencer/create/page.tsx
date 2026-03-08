@@ -32,22 +32,22 @@ const SectionLoader = () => <div style={{ padding: '4rem', textAlign: 'center', 
 // To make percentage more alive, we check more fields
 const checkSectionCompletion = (step: number, content: ItineraryContent) => {
     switch (step) {
-        case 1: return !!content.cover.title && !!content.cover.destination;
-        case 2: return content.preTrip.packingList.length > 0 || !!content.preTrip.flightGuide.arrivalDepartureStats;
-        case 3: return !!content.logistics.currency.code && content.logistics.apps.length > 0;
-        case 4: return !!content.arrival.airportToCity;
-        case 5: return content.dailyItinerary.some(d => !!d.title && !!d.morning.activity);
-        case 6: return content.food.mustTryDishes.length > 0 || content.food.restaurantRecommendations.length > 0;
-        case 7: return content.transport.modes.length > 0;
-        case 8: return content.secrets.places.length > 0;
-        case 9: return content.safety.commonScams.length > 0 || content.safety.safetyTips.length > 0;
-        case 10: return !!content.customization.coupleTips || !!content.customization.familyTips;
-        case 11: return content.safety.emergencyNumbers.length > 0;
-        case 12: return content.shopping.whatToBuy.length > 0 || content.shopping.bestMarkets.length > 0;
-        case 13: return !!content.departure.checkoutTips;
-        case 14: return !!content.postTrip.jetLagRecovery || (content.postTrip.nextDestinationIdeas?.length ?? 0) > 0;
-        case 15: return !!content.bonus.googleMapsLink || content.bonus.externalLinks.length > 0;
-        case 16: return content.proofOfVisit.images.length > 0;
+        case 1: return !!content.cover?.title && !!content.cover?.destination;
+        case 2: return (content.preTrip?.packingList?.length ?? 0) > 0 || !!content.preTrip?.flightGuide?.arrivalDepartureStats;
+        case 3: return !!content.logistics?.currency?.code && (content.logistics?.apps?.length ?? 0) > 0;
+        case 4: return !!content.arrival?.airportToCity;
+        case 5: return (content.dailyItinerary ?? []).some(d => !!d?.title && !!d?.morning?.activity);
+        case 6: return (content.food?.mustTryDishes?.length ?? 0) > 0 || (content.food?.restaurantRecommendations?.length ?? 0) > 0;
+        case 7: return (content.transport?.modes?.length ?? 0) > 0;
+        case 8: return (content.secrets?.places?.length ?? 0) > 0;
+        case 9: return (content.safety?.commonScams?.length ?? 0) > 0 || (content.safety?.safetyTips?.length ?? 0) > 0;
+        case 10: return !!content.customization?.coupleTips || !!content.customization?.familyTips;
+        case 11: return (content.safety?.emergencyNumbers?.length ?? 0) > 0;
+        case 12: return (content.shopping?.whatToBuy?.length ?? 0) > 0 || (content.shopping?.bestMarkets?.length ?? 0) > 0;
+        case 13: return !!content.departure?.checkoutTips;
+        case 14: return !!content.postTrip?.jetLagRecovery || (content.postTrip?.nextDestinationIdeas?.length ?? 0) > 0;
+        case 15: return !!content.bonus?.googleMapsLink || (content.bonus?.externalLinks?.length ?? 0) > 0;
+        case 16: return (content.proofOfVisit?.images?.length ?? 0) > 0;
         case 17: return (content.affiliateProducts?.length ?? 0) > 0;
         case 18: return (content.creatorProducts?.length ?? 0) > 0;
         case 19: return (content.accommodation?.bestNeighborhoods?.length ?? 0) > 0 || (content.accommodation?.hotelRecommendations?.length ?? 0) > 0;

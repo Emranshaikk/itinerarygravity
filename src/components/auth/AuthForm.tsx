@@ -193,6 +193,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                     type="submit"
                     disabled={loading}
                     className="btn btn-primary"
+                    suppressHydrationWarning
                     style={{ padding: '14px', fontSize: '1rem', fontWeight: 600, marginTop: '10px' }}
                 >
                     {loading ? "Processing..." : mode === "login" ? "Sign In" : "Sign Up"}

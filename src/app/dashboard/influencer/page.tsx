@@ -27,7 +27,8 @@ export default function InfluencerDashboard() {
             setLoading(true);
             const res = await fetch("/api/dashboard/influencer");
             if (!res.ok) {
-                throw new Error("Failed to load generic dashboard data.");
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || "Failed to load generic dashboard data.");
             }
 
             const data = await res.json();
