@@ -262,20 +262,32 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                 doc.text(`TRANSPORT: ${day.transport || 'Local'}`, pageWidth - margin, yPosition, { align: 'right' });
                 yPosition += 12;
 
+                // Time Block Helper
+                const renderTimeBlock = (blockName: string, blockData: any) => {
+                    if (!blockData) return;
+                    addWrappedText(blockName, 10, 'bold', colorSecondary);
+                    if (typeof blockData === 'string') {
+                        addWrappedText(blockData, 11, 'normal', [50, 50, 50]);
+                    } else {
+                        if (blockData.time) addWrappedText(`Time: ${blockData.time}`, 10, 'italic', [100, 100, 100]);
+                        if (blockData.activity) addWrappedText(String(blockData.activity), 11, 'normal', [50, 50, 50]);
+                        if (blockData.location) addWrappedText(`📍 ${blockData.location}`, 10, 'normal', colorPrimary);
+                        if (blockData.travelTime) addWrappedText(`Commute: ${blockData.travelTime}`, 9, 'italic', [120, 120, 120]);
+                        if (blockData.food) addWrappedText(`Food Check: ${blockData.food}`, 10, 'normal', [80, 80, 80]);
+                        if (blockData.foodType) addWrappedText(`Food Check: ${blockData.foodType}`, 10, 'normal', [80, 80, 80]);
+                        if (blockData.foodBudget) addWrappedText(`Budget Food: ${blockData.foodBudget}`, 10, 'normal', [80, 80, 80]);
+                        if (blockData.foodPremium) addWrappedText(`Premium Food: ${blockData.foodPremium}`, 10, 'normal', [80, 80, 80]);
+                        if (blockData.notes || blockData.tips) addWrappedText(`Tip: ${blockData.notes || blockData.tips}`, 10, 'italic', [100, 100, 100]);
+                    }
+                    yPosition += 5;
+                };
+
                 // Morning
-                addWrappedText("MORNING", 10, 'bold', colorSecondary);
-                addWrappedText(day.morning, 11, 'normal', [50, 50, 50]);
-                yPosition += 5;
-
+                renderTimeBlock("MORNING", day.morning);
                 // Afternoon
-                addWrappedText("AFTERNOON", 10, 'bold', colorSecondary);
-                addWrappedText(day.afternoon, 11, 'normal', [50, 50, 50]);
-                yPosition += 5;
-
+                renderTimeBlock("AFTERNOON", day.afternoon);
                 // Evening
-                addWrappedText("EVENING", 10, 'bold', colorSecondary);
-                addWrappedText(day.evening, 11, 'normal', [50, 50, 50]);
-                yPosition += 8;
+                renderTimeBlock("EVENING", day.evening);
 
                 // Notes/Tips
                 if (day.notes) {
@@ -295,7 +307,104 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
             }
         }
 
-        // --- FINAL PAGE: POLICIES & MAP ---
+        // --- EXPERT GUIDES & SECRETS ---
+        if (!isPreview && (c?.food || c?.transport || c?.secrets || c?.shopping || c?.safety || c?.arrival || c?.customization)) {
+            doc.addPage();
+            yPosition = 30;
+            addPageHeader("Expert Travel Guide");
+
+            if (c.food?.mustTryDishes?.length > 0) {
+                addWrappedText("MUST-TRY LOCAL FOOD", 12, 'bold', colorPrimary);
+                c.food.mustTryDishes.forEach((dish: any) => {
+                    addWrappedText(`${dish.name} ${dish.bestPlace ? `(Best at: ${dish.bestPlace})` : ''}`, 10, 'bold', [50, 50, 50]);
+                    addWrappedText(dish.description, 10, 'normal', [80, 80, 80]);
+                    yPosition += 3;
+                });
+                yPosition += 5;
+            }
+
+            if (c.transport?.modes?.length > 0) {
+                addWrappedText("GETTING AROUND", 12, 'bold', colorPrimary);
+                c.transport.modes.forEach((m: any) => {
+                    addWrappedText(`${m.type} ${m.cost ? `(${m.cost})` : ''}`, 10, 'bold', [50, 50, 50]);
+                    addWrappedText(m.tips, 10, 'normal', [80, 80, 80]);
+                    yPosition += 3;
+                });
+                yPosition += 5;
+            }
+
+            if (c.secrets?.places?.length > 0) {
+                addWrappedText("HIDDEN GEMS", 12, 'bold', colorPrimary);
+                c.secrets.places.forEach((p: any) => {
+                    addWrappedText(`${p.name} [${p.type}]`, 10, 'bold', [50, 50, 50]);
+                    addWrappedText(p.description, 10, 'normal', [80, 80, 80]);
+                    yPosition += 3;
+                });
+                yPosition += 5;
+            }
+
+            if (c.safety) {
+                if (c.safety.commonScams?.length > 0) {
+                    addWrappedText("COMMON SCAMS TO AVOID", 12, 'bold', [239, 68, 68]);
+                    c.safety.commonScams.forEach((s: string) => addWrappedText(`• ${s}`, 10, 'normal', [80, 80, 80]));
+                    yPosition += 3;
+                }
+                if (c.safety.emergencyNumbers?.length > 0) {
+                    addWrappedText("EMERGENCY CONTACTS", 12, 'bold', colorPrimary);
+                    c.safety.emergencyNumbers.forEach((n: any) => addWrappedText(`${n.name}: ${n.number}`, 10, 'bold', [50, 50, 50]));
+                    yPosition += 5;
+                }
+            }
+            addPageFooter(doc.getNumberOfPages());
+        }
+
+        // --- ARRIVAL & MORE ---
+        if (!isPreview && (c?.arrival || c?.departure || c?.shopping || c?.customization || c?.postTrip)) {
+            doc.addPage();
+            yPosition = 30;
+            addPageHeader("Logistics & Extras");
+
+            if (c.arrival) {
+                addWrappedText("ARRIVAL LOGISTICS", 12, 'bold', colorPrimary);
+                if (c.arrival.airportToCity) addWrappedText(`Transfer: ${c.arrival.airportToCity}`, 10, 'normal', [80, 80, 80]);
+                if (c.arrival.simCardPickUp) addWrappedText(`SIM Card: ${c.arrival.simCardPickUp}`, 10, 'normal', [80, 80, 80]);
+                yPosition += 5;
+            }
+
+            if (c.shopping) {
+                if (c.shopping.whatToBuy?.length > 0) {
+                    addWrappedText("WHAT TO BUY", 12, 'bold', colorPrimary);
+                    c.shopping.whatToBuy.forEach((s: string) => addWrappedText(`• ${s}`, 10, 'normal', [80, 80, 80]));
+                    yPosition += 3;
+                }
+                if (c.shopping.bestMarkets?.length > 0) {
+                    addWrappedText("BEST MARKETS", 12, 'bold', colorPrimary);
+                    c.shopping.bestMarkets.forEach((s: string) => addWrappedText(`• ${s}`, 10, 'normal', [80, 80, 80]));
+                    yPosition += 5;
+                }
+            }
+
+            if (c.customization) {
+                addWrappedText("TRIP CUSTOMIZATION", 12, 'bold', colorPrimary);
+                if (c.customization.coupleTips) { addWrappedText("Couples:", 10, 'bold', [50, 50, 50]); addWrappedText(c.customization.coupleTips, 10, 'normal', [80, 80, 80]); }
+                if (c.customization.familyTips) { addWrappedText("Families:", 10, 'bold', [50, 50, 50]); addWrappedText(c.customization.familyTips, 10, 'normal', [80, 80, 80]); }
+                if (c.customization.soloTips) { addWrappedText("Solo Travelers:", 10, 'bold', [50, 50, 50]); addWrappedText(c.customization.soloTips, 10, 'normal', [80, 80, 80]); }
+                yPosition += 5;
+            }
+
+            if (c.postTrip) {
+                addWrappedText("POST-TRIP GUIDE", 12, 'bold', colorPrimary);
+                if (c.postTrip.jetLagRecovery) { addWrappedText("Jet Lag Recovery:", 10, 'bold', [50, 50, 50]); addWrappedText(c.postTrip.jetLagRecovery, 10, 'normal', [80, 80, 80]); }
+                if (c.postTrip.nextDestinationIdeas?.length > 0) {
+                    addWrappedText("Where to Next?", 10, 'bold', [50, 50, 50]);
+                    c.postTrip.nextDestinationIdeas.forEach((s: string) => addWrappedText(`• ${s}`, 10, 'normal', [80, 80, 80]));
+                }
+                yPosition += 5;
+            }
+
+            addPageFooter(doc.getNumberOfPages());
+        }
+
         if (!isPreview) {
             doc.addPage();
             yPosition = 30;
@@ -347,22 +456,47 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
             try {
                 // Collect coordinates
                 const coords: [number, number][] = [];
+
+                const addCoord = async (locationStr?: string, locationCoords?: any) => {
+                    if (locationCoords && Array.isArray(locationCoords) && locationCoords.length === 2 && typeof locationCoords[0] === 'number') {
+                        coords.push([locationCoords[0], locationCoords[1]]);
+                    } else if (locationStr && typeof locationStr === 'string' && locationStr.trim().length > 0) {
+                        try {
+                            const res = await fetch('/api/geocode', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ location: locationStr })
+                            });
+                            if (res.ok) {
+                                const geoData = await res.json();
+                                if (geoData.success && geoData.coordinates) {
+                                    coords.push(geoData.coordinates);
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Geocoding failed for", locationStr);
+                        }
+                    }
+                };
+
                 if (itineraryData.content?.accommodation?.hotelRecommendations) {
-                    itineraryData.content.accommodation.hotelRecommendations.forEach((hotel: any) => {
-                        if (hotel.locationCoordinates) coords.push(hotel.locationCoordinates);
-                    });
+                    for (const hotel of itineraryData.content.accommodation.hotelRecommendations) {
+                        await addCoord(hotel.neighborhood, hotel.locationCoordinates);
+                        await addCoord(hotel.name, hotel.locationCoordinates);
+                    }
                 }
+
                 if (itineraryData.content?.dailyItinerary) {
-                    itineraryData.content.dailyItinerary.forEach((day: any) => {
-                        if (day.morning?.locationCoordinates) coords.push(day.morning.locationCoordinates);
-                        if (day.afternoon?.locationCoordinates) coords.push(day.afternoon.locationCoordinates);
-                        if (day.evening?.locationCoordinates) coords.push(day.evening.locationCoordinates);
-                    });
+                    for (const day of itineraryData.content.dailyItinerary) {
+                        await addCoord(day.morning?.location, day.morning?.locationCoordinates);
+                        await addCoord(day.afternoon?.location, day.afternoon?.locationCoordinates);
+                        await addCoord(day.evening?.location, day.evening?.locationCoordinates);
+                    }
                 }
 
                 // Handle content.days (Schema v2)
                 if (itineraryData.content?.days) {
-                    itineraryData.content.days.forEach((day: any) => {
+                    for (const day of itineraryData.content.days) {
                         if (day.locationCoordinates && Array.isArray(day.locationCoordinates)) {
                             day.locationCoordinates.forEach((coord: any) => {
                                 const lng = typeof coord.longitude === 'number' ? coord.longitude : coord[0];
@@ -372,7 +506,7 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                                 }
                             });
                         }
-                    });
+                    }
                 }
 
                 if (coords.length > 0) {

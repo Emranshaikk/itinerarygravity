@@ -126,7 +126,7 @@ export default function EditItineraryPage() {
         return steps;
     };
 
-    const handleSave = async () => {
+    const handleSave = async (isFinish: boolean = false) => {
         if (!content.cover.title?.trim() || !content.cover.destination?.trim()) {
             alert("Please fill out the Itinerary Title and Destination in the Cover section before saving.");
             setActiveStep(1); // Jump back to step 1
@@ -154,7 +154,8 @@ export default function EditItineraryPage() {
             });
 
             if (response.ok) {
-                alert("Saved successfully!");
+                alert(isFinish ? "Itinerary published successfully!" : "Saved successfully!");
+                if (isFinish) router.push('/dashboard/influencer');
             } else {
                 const error = await response.text();
                 throw new Error(error || "Failed to update itinerary");
@@ -248,7 +249,7 @@ export default function EditItineraryPage() {
                     )}
 
                     <button
-                        onClick={handleSave}
+                        onClick={() => handleSave(false)}
                         disabled={isSaving}
                         className="btn btn-outline"
                         style={{ minWidth: '140px', padding: '1rem 2rem', borderRadius: '1.5rem', borderColor: 'var(--primary)', color: 'var(--primary)', fontWeight: 'bold', cursor: 'pointer' }}
@@ -265,7 +266,7 @@ export default function EditItineraryPage() {
                             if (currentIndex < ALL_SECTIONS.length - 1) {
                                 setActiveStep(ALL_SECTIONS[currentIndex + 1].id);
                             }
-                            else handleSave();
+                            else handleSave(true);
                         }}
                     >
                         {ALL_SECTIONS.findIndex(s => s.id === activeStep) === ALL_SECTIONS.length - 1 ? "Finish" : "Next"}

@@ -12,6 +12,7 @@ export async function POST(req: Request) {
         const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
         if (!mapboxToken) {
+            console.error("[GEOCODE ERROR] Mapbox token is completely missing from env limits!");
             return NextResponse.json({ error: "Mapbox token not configured" }, { status: 500 });
         }
 
@@ -42,7 +43,7 @@ export async function POST(req: Request) {
             });
         }
     } catch (error: any) {
-        console.error("Geocoding error:", error);
-        return NextResponse.json({ error: "Failed to geocode location" }, { status: 500 });
+        console.error("[GEOCODE EXCEPTION] Geocoding error caught:", error.message || error);
+        return NextResponse.json({ error: "Failed to geocode location", details: error.message }, { status: 500 });
     }
 }

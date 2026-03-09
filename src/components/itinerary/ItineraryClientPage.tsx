@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle, MapPin, Star, ShieldCheck, Calendar, Clock, Info, Shield, Truck, Hotel, Coffee, MessageCircle, Share2, Compass, Navigation, ListChecks, Smartphone, Layout } from "@/components/Icons";
-import { Plane, BedDouble, Gift, Map, AlertTriangle, ExternalLink } from "lucide-react";
+import { Plane, BedDouble, Gift, Map, AlertTriangle, ExternalLink, Utensils, Train, Sparkles, ShieldAlert, ShoppingBag, ArrowRightLeft, Users, SunMedium } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import ReviewSection from "@/components/reviews/ReviewSection";
@@ -820,6 +820,254 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                                     </div>
                                                 ))}
                                             </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+
+                        {isPurchased && itinerary.content?.food && (
+                            <section style={{ marginBottom: '60px' }}>
+                                <h2 style={{ fontSize: '1.8rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <Utensils size={28} color="#f97316" /> Local Food Guide
+                                </h2>
+                                <div style={{ display: 'grid', gap: '24px' }}>
+                                    {itinerary.content.food.mustTryDishes?.length > 0 && (
+                                        <div className="glass card" style={{ padding: '24px' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', color: '#f97316' }}>Must-Try Local Dishes</h3>
+                                            <div style={{ display: 'grid', gap: '16px' }}>
+                                                {itinerary.content.food.mustTryDishes.map((dish: any, i: number) => (
+                                                    <div key={i} style={{ borderBottom: i !== itinerary.content.food.mustTryDishes.length - 1 ? '1px solid var(--border)' : 'none', paddingBottom: i !== itinerary.content.food.mustTryDishes.length - 1 ? '16px' : '0' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                            <strong style={{ fontSize: '1.05rem' }}>{dish.name}</strong>
+                                                            {dish.bestPlace && <span style={{ fontSize: '0.75rem', padding: '2px 8px', background: 'var(--surface)', borderRadius: '12px' }}>Best at: {dish.bestPlace}</span>}
+                                                        </div>
+                                                        <p style={{ marginTop: '8px', fontSize: '0.9rem', color: 'var(--gray-400)' }}>{dish.description}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    {itinerary.content.food.restaurantRecommendations?.length > 0 && (
+                                        <div className="glass card" style={{ padding: '24px' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', color: '#84cc16' }}>Restaurant Recommendations</h3>
+                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+                                                {itinerary.content.food.restaurantRecommendations.map((rest: any, i: number) => (
+                                                    <div key={i} style={{ background: 'var(--surface)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                            <strong>{rest.name}</strong>
+                                                            <span style={{ color: '#10b981', fontWeight: 'bold' }}>{rest.priceRange}</span>
+                                                        </div>
+                                                        <div style={{ fontSize: '0.8rem', color: 'var(--primary)', marginTop: '4px' }}>{rest.cuisine}</div>
+                                                        {rest.notes && <p style={{ fontSize: '0.85rem', color: 'var(--gray-400)', marginTop: '8px', fontStyle: 'italic' }}>{rest.notes}</p>}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+
+                        {isPurchased && itinerary.content?.transport && (
+                            <section style={{ marginBottom: '60px' }}>
+                                <h2 style={{ fontSize: '1.8rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <Train size={28} color="#6366f1" /> Getting Around
+                                </h2>
+                                <div className="glass card" style={{ padding: '24px', display: 'grid', gap: '20px' }}>
+                                    {itinerary.content.transport.modes?.length > 0 && (
+                                        <div>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '12px', color: '#6366f1' }}>Best Transport Modes</h3>
+                                            <div style={{ display: 'grid', gap: '12px' }}>
+                                                {itinerary.content.transport.modes.map((m: any, i: number) => (
+                                                    <div key={i} style={{ padding: '12px', background: 'var(--surface)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                                            <strong>{m.type}</strong>
+                                                            {m.cost && <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)' }}>{m.cost}</span>}
+                                                        </div>
+                                                        <div style={{ fontSize: '0.9rem', color: 'var(--foreground)' }}>{m.tips}</div>
+                                                        {m.bestFor && <div style={{ fontSize: '0.8rem', color: 'var(--primary)', marginTop: '4px' }}>Best for: {m.bestFor}</div>}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    {itinerary.content.transport.passes && (
+                                        <div style={{ padding: '16px', background: 'rgba(99, 102, 241, 0.05)', borderRadius: '8px', borderLeft: '4px solid #6366f1' }}>
+                                            <h4 style={{ fontSize: '0.9rem', margin: '0 0 4px 0', color: '#6366f1' }}>Travel Passes</h4>
+                                            <p style={{ fontSize: '0.9rem', margin: 0 }}>{itinerary.content.transport.passes}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+
+                        {isPurchased && itinerary.content?.secrets?.places?.length > 0 && (
+                            <section style={{ marginBottom: '60px' }}>
+                                <h2 style={{ fontSize: '1.8rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <Sparkles size={28} color="#d946ef" /> Hidden Gems (Secrets)
+                                </h2>
+                                <div className="glass card" style={{ padding: '24px' }}>
+                                    <p style={{ color: 'var(--gray-400)', marginBottom: '24px' }}>Off-the-beaten-path locations most tourists miss.</p>
+                                    <div style={{ display: 'grid', gap: '20px' }}>
+                                        {itinerary.content.secrets.places.map((place: any, i: number) => (
+                                            <div key={i} style={{ borderBottom: i !== itinerary.content.secrets.places.length - 1 ? '1px solid var(--border)' : 'none', paddingBottom: i !== itinerary.content.secrets.places.length - 1 ? '20px' : '0' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                                    <h3 style={{ fontSize: '1.1rem', margin: 0 }}>{place.name}</h3>
+                                                    <span style={{ fontSize: '0.75rem', padding: '4px 10px', background: 'rgba(217, 70, 239, 0.1)', color: '#d946ef', borderRadius: '99px', fontWeight: 'bold' }}>{place.type}</span>
+                                                </div>
+                                                <p style={{ fontSize: '0.9rem', color: 'var(--foreground)', marginBottom: '8px' }}>{place.description}</p>
+                                                <div style={{ display: 'flex', gap: '16px', fontSize: '0.8rem', color: 'var(--gray-400)' }}>
+                                                    {place.bestTime && <span>🕒 Time: {place.bestTime}</span>}
+                                                    {place.idealFor && <span>✨ Idea: {place.idealFor}</span>}
+                                                </div>
+                                                {place.tips && <div style={{ marginTop: '8px', fontSize: '0.85rem', fontStyle: 'italic', color: 'var(--primary)' }}>Tip: {place.tips}</div>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </section>
+                        )}
+
+                        {isPurchased && itinerary.content?.shopping && (
+                            <section style={{ marginBottom: '60px' }}>
+                                <h2 style={{ fontSize: '1.8rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <ShoppingBag size={28} color="#f43f5e" /> Shopping & Markets
+                                </h2>
+                                <div style={{ display: 'grid', gap: '24px' }}>
+                                    {itinerary.content.shopping.whatToBuy?.length > 0 && (
+                                        <div className="glass card" style={{ padding: '24px' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', color: '#f43f5e' }}>What to Buy</h3>
+                                            <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                                                {itinerary.content.shopping.whatToBuy.map((item: string, i: number) => <li key={i} style={{ marginBottom: '8px' }}>{item}</li>)}
+                                            </ul>
+                                        </div>
+                                    )}
+                                    {itinerary.content.shopping.bestMarkets?.length > 0 && (
+                                        <div className="glass card" style={{ padding: '24px' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', color: '#f43f5e' }}>Best Markets</h3>
+                                            <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                                                {itinerary.content.shopping.bestMarkets.map((market: string, i: number) => <li key={i} style={{ marginBottom: '8px' }}>{market}</li>)}
+                                            </ul>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+
+                        {isPurchased && itinerary.content?.safety && (
+                            <section style={{ marginBottom: '60px' }}>
+                                <h2 style={{ fontSize: '1.8rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <ShieldAlert size={28} color="#ef4444" /> Safety & Local Culture
+                                </h2>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+                                    {itinerary.content.safety.commonScams?.length > 0 && (
+                                        <div className="glass card" style={{ padding: '24px', borderTop: '4px solid #ef4444' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', color: '#ef4444' }}>Common Scams</h3>
+                                            <ul style={{ paddingLeft: '20px', margin: 0, fontSize: '0.9rem' }}>
+                                                {itinerary.content.safety.commonScams.map((scam: string, i: number) => <li key={i} style={{ marginBottom: '8px' }}>{scam}</li>)}
+                                            </ul>
+                                        </div>
+                                    )}
+                                    {itinerary.content.safety.safetyTips?.length > 0 && (
+                                        <div className="glass card" style={{ padding: '24px', borderTop: '4px solid #10b981' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', color: '#10b981' }}>Safety Tips</h3>
+                                            <ul style={{ paddingLeft: '20px', margin: 0, fontSize: '0.9rem' }}>
+                                                {itinerary.content.safety.safetyTips.map((tip: string, i: number) => <li key={i} style={{ marginBottom: '8px' }}>{tip}</li>)}
+                                            </ul>
+                                        </div>
+                                    )}
+                                    {itinerary.content.safety.emergencyNumbers?.length > 0 && (
+                                        <div className="glass card" style={{ padding: '24px' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', color: 'var(--primary)' }}>Emergency Contacts</h3>
+                                            <div style={{ display: 'grid', gap: '8px' }}>
+                                                {itinerary.content.safety.emergencyNumbers.map((num: any, i: number) => (
+                                                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', background: 'var(--surface)', borderRadius: '6px' }}>
+                                                        <span>{num.name}</span>
+                                                        <strong style={{ color: '#ef4444' }}>{num.number}</strong>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+
+                        {isPurchased && (itinerary.content?.arrival || itinerary.content?.departure) && (
+                            <section style={{ marginBottom: '60px' }}>
+                                <h2 style={{ fontSize: '1.8rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <ArrowRightLeft size={28} color="#06b6d4" /> Arrival & Departure
+                                </h2>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+                                    {itinerary.content.arrival && (
+                                        <div className="glass card" style={{ padding: '24px' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', color: '#06b6d4' }}>Arrival Logistics</h3>
+                                            <ul style={{ paddingLeft: '20px', margin: 0, fontSize: '0.9rem', display: 'grid', gap: '10px' }}>
+                                                {itinerary.content.arrival.airportToCity && <li><strong>Airport Transfer:</strong> {itinerary.content.arrival.airportToCity}</li>}
+                                                {itinerary.content.arrival.simCardPickUp && <li><strong>SIM Card:</strong> {itinerary.content.arrival.simCardPickUp}</li>}
+                                            </ul>
+                                        </div>
+                                    )}
+                                    {itinerary.content.departure && (
+                                        <div className="glass card" style={{ padding: '24px' }}>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '16px', color: '#06b6d4' }}>Departure Day</h3>
+                                            <ul style={{ paddingLeft: '20px', margin: 0, fontSize: '0.9rem', display: 'grid', gap: '10px' }}>
+                                                {itinerary.content.departure.checkoutTips && <li><strong>Checkout Tips:</strong> {itinerary.content.departure.checkoutTips}</li>}
+                                                {itinerary.content.departure.airportBuffer && <li><strong>Airport Buffer:</strong> {itinerary.content.departure.airportBuffer}</li>}
+                                            </ul>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+
+                        {isPurchased && itinerary.content?.customization && (
+                            <section style={{ marginBottom: '60px' }}>
+                                <h2 style={{ fontSize: '1.8rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <Users size={28} color="#8b5cf6" /> Trip Customization
+                                </h2>
+                                <div className="glass card" style={{ padding: '24px', display: 'grid', gap: '16px' }}>
+                                    {itinerary.content.customization.coupleTips && (
+                                        <div>
+                                            <h4 style={{ color: '#8b5cf6', fontSize: '1rem', marginBottom: '4px' }}>Couples</h4>
+                                            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gray-400)' }}>{itinerary.content.customization.coupleTips}</p>
+                                        </div>
+                                    )}
+                                    {itinerary.content.customization.familyTips && (
+                                        <div>
+                                            <h4 style={{ color: '#8b5cf6', fontSize: '1rem', marginBottom: '4px' }}>Families</h4>
+                                            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gray-400)' }}>{itinerary.content.customization.familyTips}</p>
+                                        </div>
+                                    )}
+                                    {itinerary.content.customization.soloTips && (
+                                        <div>
+                                            <h4 style={{ color: '#8b5cf6', fontSize: '1rem', marginBottom: '4px' }}>Solo Travelers</h4>
+                                            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gray-400)' }}>{itinerary.content.customization.soloTips}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+
+                        {isPurchased && itinerary.content?.postTrip && (
+                            <section style={{ marginBottom: '60px' }}>
+                                <h2 style={{ fontSize: '1.8rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <SunMedium size={28} color="#f59e0b" /> Post-Trip
+                                </h2>
+                                <div className="glass card" style={{ padding: '24px', display: 'grid', gap: '16px' }}>
+                                    {itinerary.content.postTrip.jetLagRecovery && (
+                                        <div>
+                                            <h4 style={{ color: '#f59e0b', fontSize: '1rem', marginBottom: '4px' }}>Jet Lag Recovery</h4>
+                                            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gray-400)' }}>{itinerary.content.postTrip.jetLagRecovery}</p>
+                                        </div>
+                                    )}
+                                    {itinerary.content.postTrip.nextDestinationIdeas?.length > 0 && (
+                                        <div>
+                                            <h4 style={{ color: '#f59e0b', fontSize: '1rem', marginBottom: '4px' }}>Where to next?</h4>
+                                            <ul style={{ paddingLeft: '20px', margin: 0, fontSize: '0.9rem', color: 'var(--gray-400)' }}>
+                                                {itinerary.content.postTrip.nextDestinationIdeas.map((dest: string, i: number) => <li key={i}>{dest}</li>)}
+                                            </ul>
                                         </div>
                                     )}
                                 </div>
