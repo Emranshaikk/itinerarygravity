@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import autoTable from 'jspdf-autotable';
 import { generateStaticMapUrl } from "@/lib/map-utils";
 
 export interface ItineraryData {
@@ -34,9 +35,9 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
         let yPosition = margin;
 
         // Brand Colors
-        const colorPrimary = [255, 133, 162]; // #ff85a2
-        const colorSecondary = [139, 92, 246]; // #8b5cf6
-        const colorDark = [26, 26, 26];
+        const colorPrimary: [number, number, number] = [255, 133, 162]; // #ff85a2
+        const colorSecondary: [number, number, number] = [139, 92, 246]; // #8b5cf6
+        const colorDark: [number, number, number] = [26, 26, 26];
 
         // Helper: Add horizontal line
         const addLine = (y: number, color = [230, 230, 230]) => {
@@ -288,41 +289,73 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                     }
                 }
 
-                // Time Block Helper
-                const renderTimeBlock = (blockName: string, blockData: any, planString?: string) => {
+                // Create Table Data
+                const tableBody: any[] = [];
+
+                const processTimeBlock = (blockName: string, blockData: any, planString?: string) => {
                     if (!blockData && !planString) return;
-                    addWrappedText(blockName, 10, 'bold', colorSecondary);
+
+                    let activityText = "";
                     if (planString) {
-                        addWrappedText(planString, 11, 'normal', [50, 50, 50]);
+                        activityText = planString;
                     } else if (typeof blockData === 'string') {
-                        addWrappedText(blockData, 11, 'normal', [50, 50, 50]);
-                    } else {
-                        if (blockData.time) addWrappedText(`Time: ${blockData.time}`, 10, 'italic', [100, 100, 100]);
-                        if (blockData.activity) addWrappedText(String(blockData.activity), 11, 'normal', [50, 50, 50]);
-                        if (blockData.location) addWrappedText(`📍 ${blockData.location}`, 10, 'normal', colorPrimary);
-                        if (blockData.travelTime) addWrappedText(`Commute: ${blockData.travelTime}`, 9, 'italic', [120, 120, 120]);
-                        if (blockData.food) addWrappedText(`Food Check: ${blockData.food}`, 10, 'normal', [80, 80, 80]);
-                        if (blockData.foodType) addWrappedText(`Food Check: ${blockData.foodType}`, 10, 'normal', [80, 80, 80]);
-                        if (blockData.foodBudget) addWrappedText(`Budget Food: ${blockData.foodBudget}`, 10, 'normal', [80, 80, 80]);
-                        if (blockData.foodPremium) addWrappedText(`Premium Food: ${blockData.foodPremium}`, 10, 'normal', [80, 80, 80]);
-                        if (blockData.notes || blockData.tips) addWrappedText(`Tip: ${blockData.notes || blockData.tips}`, 10, 'italic', [100, 100, 100]);
+                        activityText = blockData;
+                    } else if (blockData.activity) {
+                        activityText = String(blockData.activity);
                     }
-                    yPosition += 5;
+
+                    const details = [];
+                    if (typeof blockData === 'object' && blockData !== null) {
+                        if (blockData.travelTime) details.push(`• Commute: ${blockData.travelTime}`);
+                        if (blockData.food) details.push(`• Food: ${blockData.food}`);
+                        if (blockData.foodType) details.push(`• Food: ${blockData.foodType}`);
+                        if (blockData.foodBudget) details.push(`• Budget Food: ${blockData.foodBudget}`);
+                        if (blockData.foodPremium) details.push(`• Premium Food: ${blockData.foodPremium}`);
+                        if (blockData.notes || blockData.tips) details.push(`• Tip: ${blockData.notes || blockData.tips}`);
+                    }
+
+                    const detailsStr = details.length > 0 ? `\n\nDetails:\n${details.join('\n')}` : '';
+                    const timeStr = (typeof blockData === 'object' && blockData?.time) ? blockData.time : blockName;
+                    const locationStr = (typeof blockData === 'object' && blockData?.location) ? `📍 ${blockData.location}` : '';
+
+                    tableBody.push([
+                        timeStr,
+                        activityText + detailsStr,
+                        locationStr
+                    ]);
                 };
 
-                // Morning
-                renderTimeBlock("MORNING", day.morning, day.morningPlan);
-                // Afternoon
-                renderTimeBlock("AFTERNOON", day.afternoon, day.afternoonPlan);
-                // Evening
-                renderTimeBlock("EVENING", day.evening, day.eveningPlan);
+                processTimeBlock("MORNING", day.morning, day.morningPlan);
+                processTimeBlock("AFTERNOON", day.afternoon, day.afternoonPlan);
+                processTimeBlock("EVENING", day.evening, day.eveningPlan);
+
+                if (tableBody.length > 0) {
+                    autoTable(doc, {
+                        startY: yPosition,
+                        head: [['Time', 'Activity & Details', 'Location']],
+                        body: tableBody,
+                        theme: 'grid',
+                        headStyles: { fillColor: colorPrimary, textColor: 255, fontStyle: 'bold' },
+                        bodyStyles: { textColor: 50, fontSize: 10, cellPadding: 4 },
+                        columnStyles: {
+                            0: { cellWidth: 35, fontStyle: 'bold', textColor: colorSecondary },
+                            1: { cellWidth: 'auto' },
+                            2: { cellWidth: 40, fontStyle: 'italic', textColor: colorPrimary }
+                        },
+                        margin: { left: margin, right: margin }
+                    });
+
+                    yPosition = (doc as any).lastAutoTable.finalY + 10;
+                }
 
                 // Notes/Tips
                 if (day.notes) {
                     doc.setFillColor(255, 133, 162, 0.1);
                     // Note box for tips
+                    doc.rect(margin, yPosition, contentWidth, 20, 'F');
                     addWrappedText("PRO TIP", 9, 'bold', colorPrimary);
                     addWrappedText(day.notes, 10, 'italic', [110, 110, 110]);
+                    yPosition += 10;
                 }
 
                 // --- DAY-WISE MAP ---
