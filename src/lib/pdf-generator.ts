@@ -70,7 +70,7 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
             doc.setTextColor(0, 0, 0);
         };
 
-        // Helper: Safe Text (No Emojis)
+        // Helper: Safe Text (No Emojis & Clean Special Chars)
         const safeText = (text: any) => {
             if (!text) return "";
             if (typeof text !== 'string') {
@@ -78,8 +78,18 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                 if (typeof text === 'object' && text.name) return safeText(text.name);
                 return String(text);
             }
-            // Remove common emojis and special chars that jsPDF helvetica doesn't support
-            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E6}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+
+            // 1. Remove emojis and complex symbols
+            let cleaned = text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E6}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}\u{2B50}\u{231B}\u{23F3}\u{231A}\u{23F0}]/gu, '');
+
+            // 2. Transliterate or remove non-latin characters that jsPDF's default fonts can't handle
+            // This is a common issue with locations having accented or non-english characters
+            cleaned = cleaned.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remove accents
+
+            // 3. Keep only basic printable ASCII for maximum safety (optional but very robust for PDF)
+            // cleaned = cleaned.replace(/[^\x20-\x7E]/g, ''); 
+
+            return cleaned.trim();
         };
 
         // Helper: Wrap and Add Text
@@ -391,15 +401,29 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                         }
                     });
                 } else {
+                    // Try to get coordinates for specific activities in order
                     await addDayCoord(day.morning?.location, day.morning?.locationCoordinates);
                     await addDayCoord(day.afternoon?.location, day.afternoon?.locationCoordinates);
                     await addDayCoord(day.evening?.location, day.evening?.locationCoordinates);
                 }
 
-                if (dayCoords.length > 0) {
+                // IMPROVED: Filter outliers to ensure city-wise focus
+                // If coordinates are more than 200km apart, they are likely wrong or different regions
+                // We'll keep the cluster that is most relevant to the itinerary location
+                let filteredCoords = dayCoords;
+                if (dayCoords.length > 1) {
+                    // Simple distance check: 1 degree approx 111km
+                    const first = dayCoords[0];
+                    filteredCoords = dayCoords.filter(c => {
+                        const dist = Math.sqrt(Math.pow(c[0] - first[0], 2) + Math.pow(c[1] - first[1], 2));
+                        return dist < 2.0; // Approx 220km radius
+                    });
+                }
+
+                if (filteredCoords.length > 0) {
                     addWrappedText("TODAY'S ROUTE MAP", 10, 'bold', colorSecondary);
                     try {
-                        const staticMapUrl = generateStaticMapUrl(dayCoords);
+                        const staticMapUrl = generateStaticMapUrl(filteredCoords);
                         if (staticMapUrl) {
                             const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(staticMapUrl)}`;
                             const res = await fetch(proxyUrl);
