@@ -175,8 +175,18 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
 
         if (isPreview) {
             // Save Preview PDF
-            const filename = `${itineraryData.title.replace(/[^a-z0-9]/gi, '_')}_preview.pdf`;
-            doc.save(filename);
+            const filename = `${itineraryData.title ? itineraryData.title.replace(/[^a-z0-9]/gi, '_') : 'itinerary'}_preview.pdf`;
+
+            const pdfBlob = doc.output('blob');
+            const url = URL.createObjectURL(pdfBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+
             return true;
         }
 
@@ -375,7 +385,7 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                                     addPageFooter(doc.getNumberOfPages());
                                 }
 
-                                doc.addImage(base64Data as string, 'PNG', margin, yPosition, contentWidth, 120);
+                                doc.addImage(base64Data as string, blob.type === 'image/jpeg' ? 'JPEG' : 'PNG', margin, yPosition, contentWidth, 120);
                                 yPosition += 130;
                             } else {
                                 addWrappedText("Map image temporarily unavailable.", 10, 'italic', [150, 150, 150]);
@@ -612,7 +622,7 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                             reader.readAsDataURL(blob);
                         });
 
-                        doc.addImage(base64Data as string, 'PNG', margin, yPosition, contentWidth, 120);
+                        doc.addImage(base64Data as string, blob.type === 'image/jpeg' ? 'JPEG' : 'PNG', margin, yPosition, contentWidth, 120);
                         yPosition += 130;
                     } else {
                         addWrappedText("Map rendering temporarily unavailable.", 12, 'italic', [150, 150, 150]);
@@ -627,8 +637,18 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
         }
 
         // Save PDF
-        const filename = `${itineraryData.title.replace(/[^a-z0-9]/gi, '_')}_${isPreview ? 'preview' : 'full'}.pdf`;
-        doc.save(filename);
+        const filename = `${itineraryData.title ? itineraryData.title.replace(/[^a-z0-9]/gi, '_') : 'itinerary'}_${isPreview ? 'preview' : 'full'}.pdf`;
+
+        const pdfBlob = doc.output('blob');
+        const url = URL.createObjectURL(pdfBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+
         return true;
     } catch (error) {
         console.error('Error generating PDF:', error);
