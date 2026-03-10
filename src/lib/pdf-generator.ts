@@ -244,29 +244,47 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
         if (displayDays.length === 0) {
             addWrappedText("Full schedule available after download.", 12, 'italic', [150, 150, 150], 'center');
         } else {
-            displayDays.forEach((day, index) => {
+            for (let index = 0; index < displayDays.length; index++) {
+                const day = displayDays[index];
                 // Day Header
                 doc.setFillColor(245, 245, 245);
                 doc.rect(margin, yPosition - 5, contentWidth, 15, 'F');
                 doc.setTextColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
                 doc.setFontSize(14);
                 doc.setFont("helvetica", "bold");
-                doc.text(`DAY ${day.number || index + 1}: ${safeText(day.title)}`, margin + 5, yPosition + 5);
+                doc.text(`DAY ${day.number || day.dayNumber || index + 1}: ${safeText(day.title)}`, margin + 5, yPosition + 5);
                 yPosition += 25;
 
                 // Transport & Stay
                 doc.setFontSize(9);
                 doc.setFont("helvetica", "bold");
                 doc.setTextColor(100, 100, 100);
-                doc.text(`STAY: ${day.hotel || 'Not specified'}`, margin, yPosition);
-                doc.text(`TRANSPORT: ${day.transport || 'Local'}`, pageWidth - margin, yPosition, { align: 'right' });
+                doc.text(`STAY: ${day.hotel || day.hotelName || 'Not specified'}`, margin, yPosition);
+                doc.text(`TRANSPORT: ${day.transport || day.transportMode || 'Local'}`, pageWidth - margin, yPosition, { align: 'right' });
                 yPosition += 12;
 
+                // Meals (if available)
+                if (day.meals) {
+                    const mealArr = [];
+                    if (day.meals.breakfast) mealArr.push("Breakfast");
+                    if (day.meals.lunch) mealArr.push("Lunch");
+                    if (day.meals.dinner) mealArr.push("Dinner");
+                    if (mealArr.length > 0) {
+                        doc.setFontSize(9);
+                        doc.setFont("helvetica", "italic");
+                        doc.setTextColor(120, 120, 120);
+                        doc.text(`INCLUDED MEALS: ${mealArr.join(", ")}`, margin, yPosition);
+                        yPosition += 10;
+                    }
+                }
+
                 // Time Block Helper
-                const renderTimeBlock = (blockName: string, blockData: any) => {
-                    if (!blockData) return;
+                const renderTimeBlock = (blockName: string, blockData: any, planString?: string) => {
+                    if (!blockData && !planString) return;
                     addWrappedText(blockName, 10, 'bold', colorSecondary);
-                    if (typeof blockData === 'string') {
+                    if (planString) {
+                        addWrappedText(planString, 11, 'normal', [50, 50, 50]);
+                    } else if (typeof blockData === 'string') {
                         addWrappedText(blockData, 11, 'normal', [50, 50, 50]);
                     } else {
                         if (blockData.time) addWrappedText(`Time: ${blockData.time}`, 10, 'italic', [100, 100, 100]);
@@ -283,11 +301,11 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                 };
 
                 // Morning
-                renderTimeBlock("MORNING", day.morning);
+                renderTimeBlock("MORNING", day.morning, day.morningPlan);
                 // Afternoon
-                renderTimeBlock("AFTERNOON", day.afternoon);
+                renderTimeBlock("AFTERNOON", day.afternoon, day.afternoonPlan);
                 // Evening
-                renderTimeBlock("EVENING", day.evening);
+                renderTimeBlock("EVENING", day.evening, day.eveningPlan);
 
                 // Notes/Tips
                 if (day.notes) {
@@ -297,8 +315,79 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                     addWrappedText(day.notes, 10, 'italic', [110, 110, 110]);
                 }
 
+                // --- DAY-WISE MAP ---
+                const dayCoords: [number, number][] = [];
+                const addDayCoord = async (locationStr?: string, locationCoords?: any) => {
+                    if (locationCoords && Array.isArray(locationCoords) && locationCoords.length === 2 && typeof locationCoords[0] === 'number') {
+                        dayCoords.push([locationCoords[0], locationCoords[1]]);
+                    } else if (locationStr && typeof locationStr === 'string' && locationStr.trim().length > 0) {
+                        try {
+                            const res = await fetch('/api/geocode', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ location: locationStr })
+                            });
+                            if (res.ok) {
+                                const geoData = await res.json();
+                                if (geoData.success && geoData.coordinates) {
+                                    dayCoords.push(geoData.coordinates);
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Geocoding failed for", locationStr);
+                        }
+                    }
+                };
+
+                if (day.locationCoordinates && Array.isArray(day.locationCoordinates)) {
+                    day.locationCoordinates.forEach((coord: any) => {
+                        const lng = typeof coord.longitude === 'number' ? coord.longitude : coord[0];
+                        const lat = typeof coord.latitude === 'number' ? coord.latitude : coord[1];
+                        if (typeof lng === 'number' && typeof lat === 'number') {
+                            dayCoords.push([lng, lat]);
+                        }
+                    });
+                } else {
+                    await addDayCoord(day.morning?.location, day.morning?.locationCoordinates);
+                    await addDayCoord(day.afternoon?.location, day.afternoon?.locationCoordinates);
+                    await addDayCoord(day.evening?.location, day.evening?.locationCoordinates);
+                }
+
+                if (dayCoords.length > 0) {
+                    addWrappedText("TODAY'S ROUTE MAP", 10, 'bold', colorSecondary);
+                    try {
+                        const staticMapUrl = generateStaticMapUrl(dayCoords);
+                        if (staticMapUrl) {
+                            const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(staticMapUrl)}`;
+                            const res = await fetch(proxyUrl);
+                            if (res.ok) {
+                                const blob = await res.blob();
+                                const base64Data = await new Promise((resolve) => {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => resolve(reader.result);
+                                    reader.readAsDataURL(blob);
+                                });
+
+                                if (yPosition + 120 > pageHeight - 30) {
+                                    doc.addPage();
+                                    yPosition = 30;
+                                    addPageHeader(`Day ${day.number || day.dayNumber || index + 1} Map`);
+                                    addPageFooter(doc.getNumberOfPages());
+                                }
+
+                                doc.addImage(base64Data as string, 'PNG', margin, yPosition, contentWidth, 120);
+                                yPosition += 130;
+                            } else {
+                                addWrappedText("Map image temporarily unavailable.", 10, 'italic', [150, 150, 150]);
+                            }
+                        }
+                    } catch (error) {
+                        addWrappedText("Map generation failed for today.", 10, 'italic', [150, 150, 150]);
+                    }
+                }
+
                 yPosition += 15;
-            });
+            }
 
             if (isPreview && itineraryData.days.length > 1) {
                 yPosition += 20;
