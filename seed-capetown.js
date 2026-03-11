@@ -47,6 +47,30 @@ async function seedCapeTown() {
             average_rating: 4.9,
             review_count: 124,
             content: {
+                proofOfVisit: {
+                    images: [
+                        { url: "https://images.unsplash.com/photo-1579626359300-47b2df1ec7e1?q=80&w=2070", caption: "Sunrise at Boulders Beach with the locals!" },
+                        { url: "https://images.unsplash.com/photo-1522045437190-84cf0d8293dd?q=80&w=2070", caption: "The view from Table Mountain is absolutely unreal." },
+                        { url: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?q=80&w=2071", caption: "Camps Bay vibes." }
+                    ],
+                    notes: "I've spent over 3 months living in Cape Town. I personally vetted every single hotel, trail, and restaurant listed in this guide. Enjoy the Mother City!"
+                },
+                affiliateProducts: [
+                    {
+                        title: "DJI Mini 3 Pro Drone",
+                        productUrl: "https://amazon.com",
+                        imageUrl: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?q=80&w=1000",
+                        priceDisplay: "$759.00",
+                        category: "Gear"
+                    },
+                    {
+                        title: "Patagonia Daypack",
+                        productUrl: "https://amazon.com",
+                        imageUrl: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=1000",
+                        priceDisplay: "$89.00",
+                        category: "Luggage"
+                    }
+                ],
                 days: [
                     {
                         dayNumber: 1,
