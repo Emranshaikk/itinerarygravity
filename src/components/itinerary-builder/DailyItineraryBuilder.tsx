@@ -21,9 +21,9 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                 description: "",
                 wakeUpTime: "08:00",
                 crowdTips: "",
-                morning: { time: "09:00", activity: "", travelTime: "15m" },
-                afternoon: { time: "13:00", activity: "", travelTime: "20m" },
-                evening: { time: "18:00", activity: "", travelTime: "10m" },
+                morning: { time: "09:00", activity: "", whyVisit: "", tips: "", transitToNext: "", localSecret: "" },
+                afternoon: { time: "13:00", activity: "", whyVisit: "", tips: "", transitToNext: "", localSecret: "" },
+                evening: { time: "18:00", activity: "", whyVisit: "", tips: "", transitToNext: "", localSecret: "" },
                 logistics: { transport: "", travelTime: "" }
             }
         ]);
@@ -197,71 +197,218 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                             </div>
                         </div>
 
-                        <div style={{ padding: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-                            {/* Morning Block */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+                            {/* --- MORNING BLOCK --- */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingBottom: '2rem', borderBottom: '1px dashed var(--border)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <h4 style={{ fontWeight: 'bold', color: '#ca8a04', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Sun size={18} /> Morning
+                                    <h4 style={{ fontWeight: 'bold', color: '#ca8a04', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.25rem' }}>
+                                        <Sun size={20} /> Morning Itinerary
                                     </h4>
                                     <input
                                         type="time"
-                                        style={{ background: 'transparent', border: 'none', fontSize: '0.875rem', color: 'var(--gray-400)', textAlign: 'right', fontWeight: '600' }}
+                                        style={{ background: 'var(--input-bg)', padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid var(--border)', fontSize: '0.875rem', color: 'var(--foreground)', fontWeight: '600' }}
                                         value={day.morning.time}
                                         onChange={(e) => updateDay(index, 'morning.time', e.target.value)}
                                     />
                                 </div>
-                                <textarea
-                                    className="form-input"
-                                    style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--border)', fontSize: '0.875rem', minHeight: '140px', color: 'var(--foreground)' }}
-                                    placeholder="Morning activity details..."
-                                    value={day.morning.activity}
-                                    onChange={(e) => updateDay(index, 'morning.activity', e.target.value)}
-                                />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+                                    <div>
+                                        <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--gray-400)', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block' }}>What to do (Activity)</label>
+                                        <textarea
+                                            className="form-input"
+                                            style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--border)', fontSize: '0.875rem', minHeight: '80px', color: 'var(--foreground)' }}
+                                            placeholder="Detailed morning activity..."
+                                            value={day.morning.activity}
+                                            onChange={(e) => updateDay(index, 'morning.activity', e.target.value)}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>✨ Premium: Why Visit?</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #8b5cf6', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="The hook for travelers..."
+                                                value={day.morning.whyVisit || ""}
+                                                onChange={(e) => updateDay(index, 'morning.whyVisit', e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>🧭 Premium: Transit to Next</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #8b5cf6', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="e.g., 10 min walk to cafe"
+                                                value={day.morning.transitToNext || ""}
+                                                onChange={(e) => updateDay(index, 'morning.transitToNext', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#f59e0b' }}>💡 Pro Tip (Time/Money Saver)</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #f59e0b', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="e.g., Book tickets online to skip line"
+                                                value={day.morning.tips || ""}
+                                                onChange={(e) => updateDay(index, 'morning.tips', e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#10b981' }}>🤫 Local Secret / Hidden Gem</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #10b981', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="A spot most tourists miss..."
+                                                value={day.morning.localSecret || ""}
+                                                onChange={(e) => updateDay(index, 'morning.localSecret', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* Afternoon Block */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {/* --- AFTERNOON BLOCK --- */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingBottom: '2rem', borderBottom: '1px dashed var(--border)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <h4 style={{ fontWeight: 'bold', color: '#ea580c', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Utensils size={18} /> Afternoon
+                                    <h4 style={{ fontWeight: 'bold', color: '#ea580c', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.25rem' }}>
+                                        <Utensils size={20} /> Afternoon Itinerary
                                     </h4>
                                     <input
                                         type="time"
-                                        style={{ background: 'transparent', border: 'none', fontSize: '0.875rem', color: 'var(--gray-400)', textAlign: 'right', fontWeight: '600' }}
+                                        style={{ background: 'var(--input-bg)', padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid var(--border)', fontSize: '0.875rem', color: 'var(--foreground)', fontWeight: '600' }}
                                         value={day.afternoon.time}
                                         onChange={(e) => updateDay(index, 'afternoon.time', e.target.value)}
                                     />
                                 </div>
-                                <textarea
-                                    className="form-input"
-                                    style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--border)', fontSize: '0.875rem', minHeight: '140px', color: 'var(--foreground)' }}
-                                    placeholder="Afternoon activity details..."
-                                    value={day.afternoon.activity}
-                                    onChange={(e) => updateDay(index, 'afternoon.activity', e.target.value)}
-                                />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+                                    <div>
+                                        <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--gray-400)', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block' }}>What to do (Activity)</label>
+                                        <textarea
+                                            className="form-input"
+                                            style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--border)', fontSize: '0.875rem', minHeight: '80px', color: 'var(--foreground)' }}
+                                            placeholder="Detailed afternoon activity..."
+                                            value={day.afternoon.activity}
+                                            onChange={(e) => updateDay(index, 'afternoon.activity', e.target.value)}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>✨ Premium: Why Visit?</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #8b5cf6', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="The hook for travelers..."
+                                                value={day.afternoon.whyVisit || ""}
+                                                onChange={(e) => updateDay(index, 'afternoon.whyVisit', e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>🧭 Premium: Transit to Next</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #8b5cf6', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="e.g., 20 min metro ride"
+                                                value={day.afternoon.transitToNext || ""}
+                                                onChange={(e) => updateDay(index, 'afternoon.transitToNext', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#f59e0b' }}>💡 Pro Tip (Time/Money Saver)</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #f59e0b', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="e.g., Order the lunch special before 2pm"
+                                                value={day.afternoon.tips || ""}
+                                                onChange={(e) => updateDay(index, 'afternoon.tips', e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#10b981' }}>🤫 Local Secret / Hidden Gem</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #10b981', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="A spot most tourists miss..."
+                                                value={day.afternoon.localSecret || ""}
+                                                onChange={(e) => updateDay(index, 'afternoon.localSecret', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* Evening Block */}
+                            {/* --- EVENING BLOCK --- */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <h4 style={{ fontWeight: 'bold', color: '#4f46e5', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Moon size={18} /> Evening
+                                    <h4 style={{ fontWeight: 'bold', color: '#4f46e5', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.25rem' }}>
+                                        <Moon size={20} /> Evening Itinerary
                                     </h4>
                                     <input
                                         type="time"
-                                        style={{ background: 'transparent', border: 'none', fontSize: '0.875rem', color: 'var(--gray-400)', textAlign: 'right', fontWeight: '600' }}
+                                        style={{ background: 'var(--input-bg)', padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid var(--border)', fontSize: '0.875rem', color: 'var(--foreground)', fontWeight: '600' }}
                                         value={day.evening.time}
                                         onChange={(e) => updateDay(index, 'evening.time', e.target.value)}
                                     />
                                 </div>
-                                <textarea
-                                    className="form-input"
-                                    style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--border)', fontSize: '0.875rem', minHeight: '140px', color: 'var(--foreground)' }}
-                                    placeholder="Evening activity details..."
-                                    value={day.evening.activity}
-                                    onChange={(e) => updateDay(index, 'evening.activity', e.target.value)}
-                                />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+                                    <div>
+                                        <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--gray-400)', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block' }}>What to do (Activity)</label>
+                                        <textarea
+                                            className="form-input"
+                                            style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--border)', fontSize: '0.875rem', minHeight: '80px', color: 'var(--foreground)' }}
+                                            placeholder="Detailed evening activity..."
+                                            value={day.evening.activity}
+                                            onChange={(e) => updateDay(index, 'evening.activity', e.target.value)}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>✨ Premium: Why Visit?</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #8b5cf6', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="The hook for travelers..."
+                                                value={day.evening.whyVisit || ""}
+                                                onChange={(e) => updateDay(index, 'evening.whyVisit', e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>🧭 Premium: Return Transit</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #8b5cf6', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="e.g., Safe taxi app to hotel"
+                                                value={day.evening.transitToNext || ""}
+                                                onChange={(e) => updateDay(index, 'evening.transitToNext', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#f59e0b' }}>💡 Pro Tip (Time/Money Saver)</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #f59e0b', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="e.g., Best view is from the second floor"
+                                                value={day.evening.tips || ""}
+                                                onChange={(e) => updateDay(index, 'evening.tips', e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#10b981' }}>🤫 Local Secret / Hidden Gem</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #10b981', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="A spot most tourists miss..."
+                                                value={day.evening.localSecret || ""}
+                                                onChange={(e) => updateDay(index, 'evening.localSecret', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -113,6 +113,40 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
             yPosition += 4;
         };
 
+        // Helper: Generic Remote Image Loader
+        const addRemoteImage = async (imageUrl: string, title?: string, renderHeight = 120) => {
+            if (!imageUrl) return;
+            try {
+                const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
+                const res = await fetch(proxyUrl);
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const base64Data = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    });
+
+                    if (yPosition + renderHeight + (title ? 15 : 0) > pageHeight - 30) {
+                        doc.addPage();
+                        yPosition = 30;
+                        addPageHeader(itineraryData.title || "Itinerary");
+                        addPageFooter(doc.getNumberOfPages());
+                    }
+
+                    if (title) {
+                        addWrappedText(title, 10, 'bold', [50, 50, 50]);
+                        yPosition += 2;
+                    }
+
+                    doc.addImage(base64Data as string, blob.type === 'image/jpeg' ? 'JPEG' : 'PNG', margin, yPosition, contentWidth, renderHeight);
+                    yPosition += renderHeight + 10;
+                }
+            } catch (e) {
+                console.error("Failed to load image", imageUrl);
+            }
+        };
+
         // --- PAGE 1: COVER ---
         addPageHeader("Trip Guide");
         yPosition = 50;
@@ -130,6 +164,10 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
         yPosition += 5;
         addWrappedText(itineraryData.location, 16, 'bold', colorSecondary);
         yPosition += 10;
+
+        if (itineraryData.content?.cover?.coverImage) {
+            await addRemoteImage(itineraryData.content.cover.coverImage, undefined, 140);
+        }
 
         addLine(yPosition, colorPrimary);
         yPosition += 15;
@@ -316,12 +354,15 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
 
                     const details = [];
                     if (typeof blockData === 'object' && blockData !== null) {
+                        if (blockData.whyVisit) details.push(`✨ Why Visit: ${blockData.whyVisit}`);
                         if (blockData.travelTime) details.push(`• Commute: ${blockData.travelTime}`);
+                        if (blockData.transitToNext) details.push(`🧭 Transit: ${blockData.transitToNext}`);
                         if (blockData.food) details.push(`• Food: ${blockData.food}`);
                         if (blockData.foodType) details.push(`• Food: ${blockData.foodType}`);
                         if (blockData.foodBudget) details.push(`• Budget Food: ${blockData.foodBudget}`);
                         if (blockData.foodPremium) details.push(`• Premium Food: ${blockData.foodPremium}`);
-                        if (blockData.notes || blockData.tips) details.push(`• Tip: ${blockData.notes || blockData.tips}`);
+                        if (blockData.notes || blockData.tips) details.push(`💡 Pro Tip: ${blockData.notes || blockData.tips}`);
+                        if (blockData.localSecret) details.push(`🤫 Local Secret: ${blockData.localSecret}`);
                     }
 
                     const detailsStr = details.length > 0 ? `\n\nDetails:\n${details.join('\n')}` : '';
@@ -590,9 +631,78 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
 
                 addPageFooter(doc.getNumberOfPages());
                 doc.addPage();
-                yPosition = 30;
+                addPageFooter(doc.getNumberOfPages());
             }
 
+            if (!isPreview && c?.proofOfVisit?.images && c.proofOfVisit.images.length > 0) {
+                doc.addPage();
+                yPosition = 30;
+                addPageHeader("Proof of Visit & Gallery");
+
+                for (const img of c.proofOfVisit.images) {
+                    if (img.url) {
+                        await addRemoteImage(img.url, img.caption || "Trip Memory", 140);
+                    }
+                }
+                if (c.proofOfVisit.notes) {
+                    addWrappedText("CREATOR NOTES:", 11, 'bold', colorPrimary);
+                    addWrappedText(c.proofOfVisit.notes, 11, 'italic', [80, 80, 80]);
+                    yPosition += 5;
+                }
+                addPageFooter(doc.getNumberOfPages());
+            }
+
+            if (!isPreview && ((c?.creatorProducts && c.creatorProducts.length > 0) || (c?.affiliateProducts && c.affiliateProducts.length > 0))) {
+                doc.addPage();
+                yPosition = 30;
+                addPageHeader("Shop the Trip");
+
+                if (c?.creatorProducts?.length > 0) {
+                    addWrappedText("CREATOR STORE", 14, 'bold', colorPrimary);
+                    yPosition += 5;
+                    for (const prod of c.creatorProducts) {
+                        if (prod.imageUrl) {
+                            await addRemoteImage(prod.imageUrl, `${prod.title} ${prod.price ? `- ${prod.price}` : ''}`, 100);
+                        } else {
+                            addWrappedText(`${prod.title} ${prod.price ? `- ${prod.price}` : ''}`, 11, 'bold', [50, 50, 50]);
+                            yPosition += 5;
+                        }
+                        if (prod.description) addWrappedText(prod.description, 10, 'normal', [80, 80, 80]);
+                        if (prod.url) addWrappedText(`Link: ${prod.url}`, 9, 'italic', colorSecondary);
+                        yPosition += 10;
+                    }
+                }
+
+                if (c?.affiliateProducts?.length > 0) {
+                    if (c?.creatorProducts?.length > 0) {
+                        if (yPosition > pageHeight - 60) {
+                            doc.addPage();
+                            yPosition = 30;
+                            addPageHeader("Shop the Trip");
+                            addPageFooter(doc.getNumberOfPages());
+                        } else {
+                            yPosition += 10;
+                        }
+                    }
+                    addWrappedText("RECOMMENDED GEAR & BOOKINGS", 14, 'bold', colorPrimary);
+                    yPosition += 5;
+                    for (const prod of c.affiliateProducts) {
+                        if (prod.imageUrl) {
+                            await addRemoteImage(prod.imageUrl, `${prod.title} ${prod.priceDisplay ? `- ${prod.priceDisplay}` : ''}`, 100);
+                        } else {
+                            addWrappedText(`${prod.title} ${prod.priceDisplay ? `- ${prod.priceDisplay}` : ''}`, 11, 'bold', [50, 50, 50]);
+                            yPosition += 5;
+                        }
+                        if (prod.productUrl) addWrappedText(`Link: ${prod.productUrl}`, 9, 'italic', colorSecondary);
+                        yPosition += 10;
+                    }
+                }
+
+                addPageFooter(doc.getNumberOfPages());
+            }
+
+            doc.addPage();
+            yPosition = 30;
             addPageHeader("Terms & Safety");
             addPageFooter(doc.getNumberOfPages());
 

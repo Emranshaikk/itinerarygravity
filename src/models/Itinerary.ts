@@ -1,13 +1,26 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
+export interface IDayPlan {
+    activity?: string;
+    whyVisit?: string;
+    tips?: string;
+    budgetEstimate?: string;
+    premiumUpgrade?: string;
+    transitToNext?: string;
+    localSecret?: string;
+    location?: string;
+    locationCoordinates?: [number, number];
+}
+
 export interface IDay {
     dayNumber: number;
     title?: string;
-    morningPlan?: string;
-    afternoonPlan?: string;
-    eveningPlan?: string;
+    morningPlan?: string | IDayPlan;
+    afternoonPlan?: string | IDayPlan;
+    eveningPlan?: string | IDayPlan;
     hotelName?: string;
     transportMode?: string;
+    notes?: string;
     meals?: {
         breakfast?: boolean;
         lunch?: boolean;
@@ -54,11 +67,12 @@ export interface IItinerary extends Document {
 const DaySchema = new Schema({
     dayNumber: { type: Number, required: true, min: 1, max: 30 },
     title: { type: String, maxlength: 100 },
-    morningPlan: { type: String, maxlength: 1000 },
-    afternoonPlan: { type: String, maxlength: 1000 },
-    eveningPlan: { type: String, maxlength: 1000 },
+    morningPlan: { type: Schema.Types.Mixed }, // Changed to Mixed to allow both plain string (legacy) and premium object
+    afternoonPlan: { type: Schema.Types.Mixed },
+    eveningPlan: { type: Schema.Types.Mixed },
     hotelName: { type: String, maxlength: 100 },
     transportMode: { type: String, maxlength: 100 },
+    notes: { type: String, maxlength: 2000 },
     meals: {
         breakfast: { type: Boolean, default: false },
         lunch: { type: Boolean, default: false },

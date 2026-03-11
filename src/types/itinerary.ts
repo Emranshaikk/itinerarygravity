@@ -94,6 +94,9 @@ export interface ItineraryContent {
             travelTime?: string;
             food?: string; // Breakfast spot
             tips?: string;
+            whyVisit?: string;
+            transitToNext?: string;
+            localSecret?: string;
         };
         afternoon: {
             time: string;
@@ -104,6 +107,9 @@ export interface ItineraryContent {
             food?: string; // Lunch spot
             foodType?: string; // Cuisine
             tips?: string;
+            whyVisit?: string;
+            transitToNext?: string;
+            localSecret?: string;
         };
         evening: {
             time: string;
@@ -115,6 +121,9 @@ export interface ItineraryContent {
             foodBudget?: string;
             foodPremium?: string;
             tips?: string; // Nightlife or chill
+            whyVisit?: string;
+            transitToNext?: string;
+            localSecret?: string;
         };
         logistics: {
             transport: string;
@@ -258,9 +267,9 @@ export const initialItineraryContent: ItineraryContent = {
             dayNumber: 1,
             title: "",
             description: "",
-            morning: { time: "09:00", activity: "", travelTime: "15m" },
-            afternoon: { time: "13:00", activity: "", travelTime: "20m" },
-            evening: { time: "18:00", activity: "", travelTime: "10m" },
+            morning: { time: "09:00", activity: "", travelTime: "15m", whyVisit: "", tips: "", transitToNext: "", localSecret: "" },
+            afternoon: { time: "13:00", activity: "", travelTime: "20m", whyVisit: "", tips: "", transitToNext: "", localSecret: "" },
+            evening: { time: "18:00", activity: "", travelTime: "10m", whyVisit: "", tips: "", transitToNext: "", localSecret: "" },
             logistics: { transport: "", travelTime: "" }
         }
     ],
