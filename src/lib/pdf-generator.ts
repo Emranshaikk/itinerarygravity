@@ -92,6 +92,18 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
             return cleaned.trim();
         };
 
+        // Helper: Check Page Break & Add Header/Footer
+        const checkPageBreak = (neededHeight: number, pageTitle: string = itineraryData.title) => {
+            if (yPosition + neededHeight > pageHeight - 30) {
+                doc.addPage();
+                yPosition = 30;
+                addPageHeader(pageTitle);
+                addPageFooter(doc.getNumberOfPages());
+                return true;
+            }
+            return false;
+        };
+
         // Helper: Wrap and Add Text
         const addWrappedText = (text: string, fontSize: number, style: 'normal' | 'bold' | 'italic' = 'normal', color = [0, 0, 0], align: 'left' | 'center' | 'right' = 'left') => {
             doc.setFontSize(fontSize);
@@ -101,12 +113,7 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
             const lines = doc.splitTextToSize(safeText(text), contentWidth);
 
             lines.forEach((line: string) => {
-                if (yPosition > pageHeight - 30) {
-                    doc.addPage();
-                    yPosition = 30;
-                    addPageHeader(itineraryData.title);
-                    addPageFooter(doc.getNumberOfPages());
-                }
+                checkPageBreak(fontSize * 0.5);
                 doc.text(line, align === 'center' ? pageWidth / 2 : (align === 'right' ? pageWidth - margin : margin), yPosition, { align });
                 yPosition += (fontSize * 0.5);
             });
@@ -127,12 +134,7 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                         reader.readAsDataURL(blob);
                     });
 
-                    if (yPosition + renderHeight + (title ? 15 : 0) > pageHeight - 30) {
-                        doc.addPage();
-                        yPosition = 30;
-                        addPageHeader(itineraryData.title || "Itinerary");
-                        addPageFooter(doc.getNumberOfPages());
-                    }
+                    checkPageBreak((title ? 15 : 0) + renderHeight);
 
                     if (title) {
                         addWrappedText(title, 10, 'bold', [50, 50, 50]);
@@ -243,9 +245,15 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
 
         // --- PRE-TRIP & ACCOMMODATIONS ---
         if (c?.preTrip || c?.accommodation) {
-            doc.addPage();
-            yPosition = 30;
-            addPageHeader("Pre-Trip & Accommodations");
+            checkPageBreak(50, "Pre-Trip & Accommodations");
+            if (yPosition === margin) { // If it didn't break, maybe we want a fresh page anyway for major sections?
+                // Let's only break if we are past middle of page1
+                if (yPosition > pageHeight * 0.6) {
+                    doc.addPage();
+                    yPosition = 30;
+                    addPageHeader("Pre-Trip & Accommodations");
+                }
+            }
 
             if (c.preTrip?.flightGuide) {
                 addWrappedText("FLIGHT & ARRIVAL STRATEGY", 12, 'bold', colorPrimary);
@@ -293,10 +301,13 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
         }
 
         // --- PAGES 2+: DAILY SCHEDULE ---
-        doc.addPage();
-        yPosition = 30;
-        addPageHeader("Daily Schedule");
-        addPageFooter(2);
+        checkPageBreak(pageHeight, "Daily Schedule"); // Force new page for schedule unless it's already a new page
+        if (yPosition > 30) {
+            doc.addPage();
+            yPosition = 30;
+            addPageHeader("Daily Schedule");
+        }
+        addPageFooter(doc.getNumberOfPages());
 
         const displayDays = isPreview ? itineraryData.days.slice(0, 1) : itineraryData.days;
 
@@ -399,14 +410,24 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                     yPosition = (doc as any).lastAutoTable.finalY + 10;
                 }
 
+                // Day Images
+                if (day.images && Array.isArray(day.images)) {
+                    for (const imgUrl of day.images) {
+                        await addRemoteImage(imgUrl, undefined, 100);
+                    }
+                }
+
                 // Notes/Tips
                 if (day.notes) {
+                    checkPageBreak(30);
                     doc.setFillColor(255, 133, 162, 0.1);
                     // Note box for tips
                     doc.rect(margin, yPosition, contentWidth, 20, 'F');
+                    const oldY = yPosition;
+                    yPosition += 5;
                     addWrappedText("PRO TIP", 9, 'bold', colorPrimary);
                     addWrappedText(day.notes, 10, 'italic', [110, 110, 110]);
-                    yPosition += 10;
+                    yPosition = Math.max(yPosition, oldY + 25);
                 }
 
                 // --- DAY-WISE MAP ---
@@ -506,9 +527,12 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
 
         // --- EXPERT GUIDES & SECRETS ---
         if (!isPreview && (c?.food || c?.transport || c?.secrets || c?.shopping || c?.safety || c?.arrival || c?.customization)) {
-            doc.addPage();
-            yPosition = 30;
-            addPageHeader("Expert Travel Guide");
+            checkPageBreak(100, "Expert Travel Guide");
+            if (yPosition > 30) {
+                doc.addPage();
+                yPosition = 30;
+                addPageHeader("Expert Travel Guide");
+            }
 
             if (c.food?.mustTryDishes?.length > 0) {
                 addWrappedText("MUST-TRY LOCAL FOOD", 12, 'bold', colorPrimary);
@@ -557,9 +581,12 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
 
         // --- ARRIVAL & MORE ---
         if (!isPreview && (c?.arrival || c?.departure || c?.shopping || c?.customization || c?.postTrip)) {
-            doc.addPage();
-            yPosition = 30;
-            addPageHeader("Logistics & Extras");
+            checkPageBreak(100, "Logistics & Extras");
+            if (yPosition > 30) {
+                doc.addPage();
+                yPosition = 30;
+                addPageHeader("Logistics & Extras");
+            }
 
             if (c.arrival) {
                 addWrappedText("ARRIVAL LOGISTICS", 12, 'bold', colorPrimary);
@@ -603,11 +630,13 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
         }
 
         if (!isPreview) {
-            doc.addPage();
-            yPosition = 30;
-
-            if (c?.bonus) {
-                addPageHeader("Bonus Resources");
+                checkPageBreak(100, "Bonus Resources");
+                if (yPosition > 30) {
+                    doc.addPage();
+                    yPosition = 30;
+                    addPageHeader("Bonus Resources");
+                }
+                addPageFooter(doc.getNumberOfPages());
 
                 if (c.bonus.googleMapsLink) {
                     addWrappedText("GOOGLE MAPS MASTER LIST", 12, 'bold', colorPrimary);
@@ -630,9 +659,6 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                 }
 
                 addPageFooter(doc.getNumberOfPages());
-                doc.addPage();
-                addPageFooter(doc.getNumberOfPages());
-            }
 
             if (!isPreview && c?.proofOfVisit?.images && c.proofOfVisit.images.length > 0) {
                 doc.addPage();
@@ -760,7 +786,6 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                     }
                 }
 
-                // Handle content.days (Schema v2)
                 if (itineraryData.content?.days) {
                     for (const day of itineraryData.content.days) {
                         if (day.locationCoordinates && Array.isArray(day.locationCoordinates)) {

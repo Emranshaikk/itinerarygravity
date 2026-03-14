@@ -90,23 +90,22 @@ async function seedCapeTown() {
                     {
                         dayNumber: 2,
                         title: "Coastal Charm & Wildlife",
-                        morningPlan: "Breakfast at the hotel, then head to Boulders Beach to see the famous penguin colony.",
+                        morningPlan: "Head to Boulders Beach to see the famous penguin colony and take photos.",
                         afternoonPlan: "Drive to Cape Point Nature Reserve for a scenic hike and visit the lighthouse.",
-                        eveningPlan: "Casual dinner in Kalk Bay and drinks at a local club in the city center.",
+                        eveningPlan: "Dinner at The Silo Hotel and then experience the nightlife at Shimmy Beach Club.",
                         hotelName: "The Silo Hotel",
                         transportMode: "Rental Car",
                         locationCoordinates: [
                             { longitude: 18.4513, latitude: -34.1973 }, // Boulders Beach
                             { longitude: 18.4844, latitude: -34.3568 }, // Cape Point
                             { longitude: 18.4235, latitude: -33.9085 }, // The Silo Hotel
-                            { longitude: 18.3780, latitude: -33.9515 }, // Camps Bay Beach
                             { longitude: 18.4285, latitude: -33.8998 }, // Shimmy Beach Club
                         ],
                         meals: { breakfast: true, lunch: true, dinner: true }
                     },
                     {
                         dayNumber: 3,
-                        title: "Winelands & Gastronomy",
+                        title: "Safari & Gastronomy",
                         morningPlan: "Full-day safari at Aquila Private Game Reserve (2 hours from city).",
                         afternoonPlan: "Continue safari and enjoy a late lunch at the wine estate.",
                         eveningPlan: "Fine dining at The Test Kitchen (Old Biscuit Mill).",
