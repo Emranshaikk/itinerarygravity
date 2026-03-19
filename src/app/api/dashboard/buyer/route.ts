@@ -25,16 +25,21 @@ export async function GET(req: Request) {
             .sort({ createdAt: -1 })
             .lean();
 
-        const formattedPurchases = purchases.map((p: any) => ({
-            id: p._id.toString(),
-            itinerary_id: p.itinerary_id?._id?.toString(),
-            title: p.itinerary_id?.title,
-            creator: p.itinerary_id?.creator_id?.full_name || "@Influencer",
-            location: p.itinerary_id?.location,
-            date: new Date(p.createdAt).toLocaleDateString(),
-            image: p.itinerary_id?.image_url || "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=600",
-            description: p.itinerary_id?.description || ""
-        }));
+        const formattedPurchases = purchases.map((p: any) => {
+            const itinerary = p.itinerary_id;
+            const itineraryId = itinerary?._id?.toString() || (typeof itinerary === 'string' ? itinerary : undefined);
+            
+            return {
+                id: p._id.toString(),
+                itinerary_id: itineraryId,
+                title: itinerary?.title || "Itinerary",
+                creator: itinerary?.creator_id?.full_name || "@Influencer",
+                location: itinerary?.location || "Unknown Location",
+                date: new Date(p.createdAt).toLocaleDateString(),
+                image: itinerary?.image_url || "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=600",
+                description: itinerary?.description || ""
+            };
+        });
 
         const wishlists = await Wishlist.find({ user_id: user.id })
             .populate('itinerary_id')

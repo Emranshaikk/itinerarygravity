@@ -11,6 +11,7 @@ export default function CheckoutPage() {
     const id = params?.id as string || "";
     const [isProcessing, setIsProcessing] = useState(false);
     const [isLoadingData, setIsLoadingData] = useState(true);
+    const [internalId, setInternalId] = useState<string>("");
     const [item, setItem] = useState({
         title: "Loading...",
         price: 0,
@@ -25,6 +26,7 @@ export default function CheckoutPage() {
                 const response = await fetch(`/api/itineraries/${id}`);
                 const data = await response.json();
                 if (data) {
+                    setInternalId(data.id || data._id);
                     setItem({
                         title: data.title,
                         price: data.price,
@@ -50,7 +52,7 @@ export default function CheckoutPage() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    itineraryId: id,
+                    itineraryId: internalId || id,
                     price: item.price,
                     title: item.title,
                 }),
@@ -75,7 +77,7 @@ export default function CheckoutPage() {
                                     razorpay_order_id: rzpResponse.razorpay_order_id,
                                     razorpay_payment_id: rzpResponse.razorpay_payment_id,
                                     razorpay_signature: rzpResponse.razorpay_signature,
-                                    itineraryId: id,
+                                    itineraryId: internalId || id,
                                     amount: data.amount
                                 })
                             });
