@@ -6,6 +6,8 @@ import { ArrowLeft, Save, Eye, ChevronRight } from "lucide-react";
 import { ItineraryContent, initialItineraryContent } from "@/types/itinerary";
 import BuilderStepper from "@/components/itinerary-builder/BuilderStepper";
 import { ALL_SECTIONS } from "@/lib/itinerary-sections";
+import { useDebounce } from "@/hooks/use-debounce";
+import { Check } from "lucide-react";
 
 const ItineraryCover = lazy(() => import("@/components/itinerary-builder/ItineraryCover"));
 const PreTripSection = lazy(() => import("@/components/itinerary-builder/PreTripSection"));
@@ -76,11 +78,56 @@ export default function EditItineraryPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [loading, setLoading] = useState(true);
     const [mounted, setMounted] = useState(false);
+    const [lastSavedString, setLastSavedString] = useState("");
+    const [isAutoSaving, setIsAutoSaving] = useState(false);
+    const [autoSaveError, setAutoSaveError] = useState(false);
+
+    const debouncedContent = useDebounce(content, 3000);
 
     useEffect(() => {
         setMounted(true);
         fetchItinerary();
     }, [id]);
+
+    useEffect(() => {
+        const contentStr = JSON.stringify(debouncedContent);
+        if (!loading && mounted && contentStr !== lastSavedString && contentStr !== JSON.stringify(initialItineraryContent)) {
+            performAutoSave(debouncedContent);
+        }
+    }, [debouncedContent, loading, mounted]);
+
+    const performAutoSave = async (contentToSave: ItineraryContent) => {
+        setIsAutoSaving(true);
+        setAutoSaveError(false);
+        try {
+            const payload = {
+                title: contentToSave.cover.title,
+                location: contentToSave.cover.destination,
+                price: contentToSave.cover.price || 0,
+                currency: contentToSave.cover.currency || "USD",
+                description: `A ${contentToSave.cover.tripType} trip to ${contentToSave.cover.destination} for ${contentToSave.cover.duration}.`,
+                duration: contentToSave.cover.duration,
+                content: contentToSave,
+            };
+
+            const response = await fetch(`/api/itineraries/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            if (response.ok) {
+                setLastSavedString(JSON.stringify(contentToSave));
+            } else {
+                setAutoSaveError(true);
+            }
+        } catch (err) {
+            console.error("Auto-save failed", err);
+            setAutoSaveError(true);
+        } finally {
+            setIsAutoSaving(false);
+        }
+    };
 
     const fetchItinerary = async () => {
         try {
@@ -115,6 +162,7 @@ export default function EditItineraryPage() {
                         }
                         return merged;
                     });
+                    setLastSavedString(JSON.stringify(data.content));
                 }
             } else {
                 console.error("Failed to fetch itinerary");
@@ -263,6 +311,16 @@ export default function EditItineraryPage() {
                             Back
                         </button>
                     )}
+
+                    <div style={{ marginRight: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem', color: autoSaveError ? '#ef4444' : 'var(--gray-400)', fontSize: '0.875rem' }}>
+                        {isAutoSaving ? (
+                            <>Saving...</>
+                        ) : autoSaveError ? (
+                            <>Auto-save failed</>
+                        ) : lastSavedString && (
+                            <><Check size={14} color="#10b981" /> Draft Saved</>
+                        )}
+                    </div>
 
                     <button
                         onClick={() => handleSave(false)}

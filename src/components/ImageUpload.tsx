@@ -20,7 +20,7 @@ export default function ImageUpload({
     folder = "uploads",
     label = "Upload Image",
     accept = "image/*",
-    maxSizeMB = 5
+    maxSizeMB = 20
 }: ImageUploadProps) {
     const [uploading, setUploading] = useState(false);
     const [progress, setProgress] = useState(0);

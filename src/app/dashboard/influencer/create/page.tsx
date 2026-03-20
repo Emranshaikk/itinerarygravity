@@ -72,7 +72,23 @@ export default function CreateItineraryPage() {
 
     useEffect(() => {
         setMounted(true);
+        // Load draft from localStorage
+        const savedDraft = localStorage.getItem("itinerary_create_draft");
+        if (savedDraft) {
+            try {
+                const parsed = JSON.parse(savedDraft);
+                setContent(parsed);
+            } catch (e) {
+                console.error("Failed to load itinerary draft", e);
+            }
+        }
     }, []);
+
+    useEffect(() => {
+        if (mounted && content !== initialItineraryContent) {
+            localStorage.setItem("itinerary_create_draft", JSON.stringify(content));
+        }
+    }, [content, mounted]);
 
     const getCompletedSteps = () => {
         const steps: number[] = [];
@@ -113,6 +129,7 @@ export default function CreateItineraryPage() {
                 const newItinerary = await response.json();
                 alert(isFinish ? "Itinerary published successfully!" : "Saved successfully!");
                 if (isFinish) {
+                    localStorage.removeItem("itinerary_create_draft");
                     router.push('/dashboard/influencer');
                 } else {
                     const routeId = newItinerary.id || newItinerary._id;
