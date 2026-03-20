@@ -70,50 +70,6 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
         }
     };
 
-    const autoFillDay = (index: number) => {
-        setGeneratingDay(index);
-        setTimeout(() => {
-            const newData = [...data];
-            newData[index] = {
-                ...newData[index],
-                title: "Cultural Immersion & Hidden Alleys",
-                wakeUpTime: "07:30",
-                crowdTips: "Arrive at the temple gate by 8:15 AM to beat tour buses.",
-                morning: {
-                    time: "08:30",
-                    activity: "Visit the Golden Pavilion followed by a serene walk in the zen rock gardens.",
-                    location: "Kinkaku-ji",
-                    travelTime: "20 min via Taxi",
-                    food: "Matcha Latte at Garden Teahouse",
-                    tips: "Silence phones. Respect the meditation spaces."
-                },
-                afternoon: {
-                    time: "13:00",
-                    activity: "Stroll through the Bamboo Grove and visit the Tenryu-ji temple.",
-                    location: "Arashiyama",
-                    travelTime: "30 min Train ride (JR Line)",
-                    food: "Arashiyama Yoshimura",
-                    foodType: "Soba Noodles (Local Speciality)",
-                    tips: "Rent a bike to explore the outer paths easily."
-                },
-                evening: {
-                    time: "18:30",
-                    activity: "Pontocho Alley food tour and riverside walk.",
-                    location: "Pontocho",
-                    travelTime: "20 min Metro",
-                    foodBudget: "Yakitori at Toraya ($20/pp)",
-                    foodPremium: "Kaiseki at Misoguigawa ($150/pp)",
-                    tips: "Reservations essential for reliable spots."
-                },
-                logistics: {
-                    transport: "Metro & Walking",
-                    travelTime: "Total ~1.5h transit"
-                }
-            };
-            onChange(newData);
-            setGeneratingDay(null);
-        }, 1200);
-    };
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -142,13 +98,6 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                                 />
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <button
-                                    onClick={() => autoFillDay(index)}
-                                    disabled={generatingDay === index}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '0.75rem', border: '1px solid var(--border)', backgroundColor: 'var(--surface)', color: 'var(--gray-400)', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}
-                                >
-                                    <Wand2 size={14} /> {generatingDay === index ? "Generating..." : "Auto-Fill Day"}
-                                </button>
                                 {data.length > 1 && (
                                     <button onClick={() => removeDay(index)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
                                         <Trash2 size={20} />

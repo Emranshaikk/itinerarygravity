@@ -20,7 +20,8 @@ export default function CheckoutPage() {
         title: "Loading...",
         price: 0,
         currency: "USD",
-        creator: "Loading..."
+        creator: "Loading...",
+        imageUrl: ""
     });
 
     useEffect(() => {
@@ -35,7 +36,8 @@ export default function CheckoutPage() {
                         title: data.title,
                         price: data.price,
                         currency: data.currency || "USD",
-                        creator: data.profiles?.full_name || "Creator"
+                        creator: data.profiles?.full_name || "Creator",
+                        imageUrl: data.image_url || ""
                     });
                 }
             } catch (err) {
@@ -182,74 +184,99 @@ export default function CheckoutPage() {
                     <ArrowLeft size={16} /> Back to Itinerary
                 </button>
 
-                <div className="glass card" style={{ padding: '48px', textAlign: 'center' }}>
+                <div className="glass card" style={{ padding: '0', textAlign: 'center', overflow: 'hidden' }}>
                     {isLoadingData ? (
-                        <h1 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>Loading...</h1>
+                        <div style={{ padding: '48px' }}>
+                            <h1 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>Loading...</h1>
+                        </div>
                     ) : (
                         <>
-                            <h1 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>Ready to Explore?</h1>
-                            <p style={{ color: 'var(--gray-400)', fontSize: '1.1rem', marginBottom: '40px' }}>
-                                You're about to purchase <strong>{item.title}</strong> by {item.creator}.
-                            </p>
+                            {item.imageUrl && (
+                                <div style={{ width: '100%', height: '250px', position: 'relative' }}>
+                                    <img 
+                                        src={item.imageUrl} 
+                                        alt={item.title} 
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                    />
+                                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.8))' }}></div>
+                                    <div style={{ position: 'absolute', bottom: '24px', left: '0', right: '0', padding: '0 48px' }}>
+                                        <h1 style={{ fontSize: '2.5rem', marginBottom: '8px', color: '#fff' }}>Ready to Explore?</h1>
+                                        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1.1rem', margin: 0 }}>
+                                            You're about to purchase <strong>{item.title}</strong> by {item.creator}.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {!item.imageUrl && (
+                                <div style={{ padding: '48px 48px 24px' }}>
+                                    <h1 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>Ready to Explore?</h1>
+                                    <p style={{ color: 'var(--gray-400)', fontSize: '1.1rem', marginBottom: '40px' }}>
+                                        You're about to purchase <strong>{item.title}</strong> by {item.creator}.
+                                    </p>
+                                </div>
+                            )}
+
+                            <div style={{ padding: '24px 48px 48px' }}>
+                                <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '16px', padding: '32px', marginBottom: '40px', maxWidth: '400px', margin: '0 auto 40px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                                        <span style={{ color: 'var(--gray-400)' }}>Original Price</span>
+                                        <span>{formatCurrency(item.price, item.currency)}</span>
+                                    </div>
+
+                                    {discount && (
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', color: '#10b981' }}>
+                                            <span>Discount ({discount.code})</span>
+                                            <span>-{discount.type === 'percentage' ? `${discount.value}%` : formatCurrency(discount.value, item.currency)}</span>
+                                        </div>
+                                    )}
+
+                                    <div className="form-group" style={{ marginBottom: '24px', textAlign: 'left' }}>
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <input
+                                                className="form-input"
+                                                placeholder="Coupon Code"
+                                                value={couponCode}
+                                                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                                disabled={isValidatingCoupon || !!discount}
+                                            />
+                                            <button
+                                                className="btn btn-outline"
+                                                style={{ padding: '0 20px', whiteSpace: 'nowrap' }}
+                                                onClick={handleApplyCoupon}
+                                                disabled={isValidatingCoupon || !couponCode || !!discount}
+                                            >
+                                                {isValidatingCoupon ? "..." : "Apply"}
+                                            </button>
+                                        </div>
+                                        {couponError && <p style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '4px' }}>{couponError}</p>}
+                                        {discount && (
+                                            <button
+                                                style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '0.8rem', marginTop: '4px', cursor: 'pointer', padding: 0 }}
+                                                onClick={() => setDiscount(null)}
+                                            >
+                                                Remove Coupon
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '1.5rem', paddingTop: '12px', borderTop: '1px solid var(--border)', alignItems: 'center' }}>
+                                        <span>Total</span>
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                            <span className="text-gradient">
+                                                {formatCurrency(calculateTotal(), item.currency)}
+                                            </span>
+                                            {item.currency !== 'INR' && (
+                                                <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)', fontWeight: 400, marginTop: '4px' }}>
+                                                    ≈ ₹{convertToINR(calculateTotal(), item.currency).toFixed(2)}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </>
                     )}
-
-                    <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '16px', padding: '32px', marginBottom: '40px', maxWidth: '400px', margin: '0 auto 40px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                            <span style={{ color: 'var(--gray-400)' }}>Original Price</span>
-                            <span>{formatCurrency(item.price, item.currency)}</span>
-                        </div>
-
-                        {discount && (
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', color: '#10b981' }}>
-                                <span>Discount ({discount.code})</span>
-                                <span>-{discount.type === 'percentage' ? `${discount.value}%` : formatCurrency(discount.value, item.currency)}</span>
-                            </div>
-                        )}
-
-                        <div className="form-group" style={{ marginBottom: '24px', textAlign: 'left' }}>
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                                <input
-                                    className="form-input"
-                                    placeholder="Coupon Code"
-                                    value={couponCode}
-                                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                                    disabled={isValidatingCoupon || !!discount}
-                                />
-                                <button
-                                    className="btn btn-outline"
-                                    style={{ padding: '0 20px', whiteSpace: 'nowrap' }}
-                                    onClick={handleApplyCoupon}
-                                    disabled={isValidatingCoupon || !couponCode || !!discount}
-                                >
-                                    {isValidatingCoupon ? "..." : "Apply"}
-                                </button>
-                            </div>
-                            {couponError && <p style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '4px' }}>{couponError}</p>}
-                            {discount && (
-                                <button
-                                    style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '0.8rem', marginTop: '4px', cursor: 'pointer', padding: 0 }}
-                                    onClick={() => setDiscount(null)}
-                                >
-                                    Remove Coupon
-                                </button>
-                            )}
-                        </div>
-
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '1.5rem', paddingTop: '12px', borderTop: '1px solid var(--border)', alignItems: 'center' }}>
-                            <span>Total</span>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                                <span className="text-gradient">
-                                    {item.currency === 'INR' ? formatCurrency(calculateTotal(), 'INR') : `≈ ₹${convertToINR(calculateTotal(), item.currency).toFixed(2)}`}
-                                </span>
-                                {item.currency !== 'INR' && (
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)', fontWeight: 400, marginTop: '4px' }}>
-                                        Original: {formatCurrency(item.price, item.currency)}
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    </div>
 
                     <button
                         onClick={handleCheckout}

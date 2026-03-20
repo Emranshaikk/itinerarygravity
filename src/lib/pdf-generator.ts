@@ -33,110 +33,177 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
         const margin = 20;
         const contentWidth = pageWidth - (margin * 2);
         let yPosition = margin;
+        const c = itineraryData.content;
 
-        // --- DATA CONSISTENCY & SANITIZATION ---
-        // Ensure location is present in title if not already
-        if (itineraryData.location && itineraryData.title && !itineraryData.title.toLowerCase().includes(itineraryData.location.toLowerCase())) {
-            // Optional: Auto-append location if missing from title? 
-            // For now, just ensure we use the location field prominently on cover.
-        }
-        // Harmonize duration
-        if (!itineraryData.duration && itineraryData.duration_days) {
-            itineraryData.duration = `${itineraryData.duration_days} Days`;
-        }
-        // Ensure starting location matches pickup if one is missing
-        if (!itineraryData.startingLocation && itineraryData.pickup) {
-            itineraryData.startingLocation = itineraryData.pickup;
-        }
-
-        // Brand Colors
-        const colorPrimary: [number, number, number] = [255, 133, 162]; // #ff85a2
-        const colorSecondary: [number, number, number] = [139, 92, 246]; // #8b5cf6
-        const colorDark: [number, number, number] = [26, 26, 26];
-
-        // Helper: Add horizontal line
-        const addLine = (y: number, color = [230, 230, 230]) => {
-            doc.setDrawColor(color[0], color[1], color[2]);
-            doc.setLineWidth(0.5);
-            doc.line(margin, y, pageWidth - margin, y);
+        // --- LUXURY DESIGN TOKENS ---
+        const colors = {
+            black: [0, 0, 0] as [number, number, number],
+            white: [255, 255, 255] as [number, number, number],
+            beige: [248, 245, 240] as [number, number, number], // Soft beige
+            gold: [197, 160, 82] as [number, number, number],  // Premium gold
+            gray: [107, 114, 128] as [number, number, number], // Text gray
+            lightGray: [243, 244, 246] as [number, number, number]
         };
 
-        // Helper: Page Header
-        const addPageHeader = (pageTitle: string) => {
-            doc.setFillColor(colorDark[0], colorDark[1], colorDark[2]);
-            doc.rect(0, 0, pageWidth, 15, 'F');
-            doc.setFontSize(8);
-            doc.setTextColor(255, 255, 255);
-            doc.setFont("helvetica", "bold");
-            doc.text("ITINERARY GRAVITY", margin, 10);
-            doc.text(pageTitle.toUpperCase(), pageWidth - margin, 10, { align: 'right' });
-            doc.setTextColor(0, 0, 0);
+        const fonts = {
+            serif: "times",
+            sans: "helvetica"
         };
 
-        // Helper: Page Footer
-        const addPageFooter = (pageNum: number) => {
-            doc.setFontSize(8);
-            doc.setTextColor(150, 150, 150);
-            const footerText = isPreview
-                ? "PREVIEW VERSION - Purchase for full access at ItineraryGravity.com"
-                : `Verified Itinerary by ${itineraryData.creator} - Powered by ItineraryGravity`;
-            doc.text(footerText, margin, pageHeight - 10);
-            doc.text(`Page ${pageNum}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
-            doc.setTextColor(0, 0, 0);
-        };
+        // --- HELPER FUNCTIONS ---
 
-        // Helper: Safe Text (No Emojis & Clean Special Chars)
-        const safeText = (text: any) => {
+        // --- HELPER FUNCTIONS ---
+
+        function safeText(text: any) {
             if (!text) return "";
-            if (typeof text !== 'string') {
-                if (typeof text === 'object' && text.description) return safeText(text.description);
-                if (typeof text === 'object' && text.name) return safeText(text.name);
-                return String(text);
-            }
+            if (typeof text !== 'string') return String(text);
+            return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\x20-\x7E]/g, "").trim();
+        }
 
-            // 1. Remove emojis and complex symbols
-            let cleaned = text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E6}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}\u{2B50}\u{231B}\u{23F3}\u{231A}\u{23F0}]/gu, '');
+        function addPageFooter(pageNum: number) {
+            doc.setFont(fonts.sans, "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+            const footerText = isPreview
+                ? "PREVIEW VERSION - Purchase full blueprint at ItineraryGravity.com"
+                : `Luxury Blueprint by ${itineraryData.creator} | Updated 2026`;
+            doc.text(footerText, margin, pageHeight - 10);
+            doc.text(`${pageNum}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
+        }
 
-            // 2. Transliterate or remove non-latin characters that jsPDF's default fonts can't handle
-            // This is a common issue with locations having accented or non-english characters
-            cleaned = cleaned.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remove accents
+        function addPageHeader(headerText: string) {
+            doc.setFont(fonts.serif, "bold");
+            doc.setFontSize(10);
+            doc.setTextColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+            doc.text(headerText.toUpperCase(), margin, margin - 5);
+            doc.setDrawColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+            doc.setLineWidth(0.2);
+            doc.line(margin, margin - 2, pageWidth - margin, margin - 2);
+        }
 
-            // 3. Keep only basic printable ASCII for maximum safety (optional but very robust for PDF)
-            // cleaned = cleaned.replace(/[^\x20-\x7E]/g, ''); 
+        const colorPrimary = colors.black;
+        const colorSecondary = colors.gold;
 
-            return cleaned.trim();
-        };
-
-        // Helper: Check Page Break & Add Header/Footer
-        const checkPageBreak = (neededHeight: number, pageTitle: string = itineraryData.title) => {
-            if (yPosition + neededHeight > pageHeight - 30) {
+        function checkPageBreak(neededHeight: number, header?: string) {
+            if (yPosition + neededHeight > pageHeight - margin - 10) {
                 doc.addPage();
-                yPosition = 30;
-                addPageHeader(pageTitle);
+                yPosition = margin + 10;
+                if (header) addPageHeader(header);
                 addPageFooter(doc.getNumberOfPages());
                 return true;
             }
             return false;
-        };
+        }
 
-        // Helper: Wrap and Add Text
-        const addWrappedText = (text: string, fontSize: number, style: 'normal' | 'bold' | 'italic' = 'normal', color = [0, 0, 0], align: 'left' | 'center' | 'right' = 'left') => {
+        function addWrappedText(text: string, fontSize: number, style: "bold" | "normal" | "italic", color: [number, number, number], align: 'left' | 'center' = 'left') {
+            doc.setFont(fonts.sans, style);
             doc.setFontSize(fontSize);
-            doc.setFont("helvetica", style);
             doc.setTextColor(color[0], color[1], color[2]);
-
             const lines = doc.splitTextToSize(safeText(text), contentWidth);
+            if (align === 'center') {
+                doc.text(lines, pageWidth / 2, yPosition, { align: 'center' });
+            } else {
+                doc.text(lines, margin, yPosition);
+            }
+            yPosition += (lines.length * (fontSize * 0.5)) + 5;
+        }
 
-            lines.forEach((line: string) => {
-                checkPageBreak(fontSize * 0.5);
-                doc.text(line, align === 'center' ? pageWidth / 2 : (align === 'right' ? pageWidth - margin : margin), yPosition, { align });
-                yPosition += (fontSize * 0.5);
-            });
-            yPosition += 4;
-        };
+        function addExpertBox(title: string, content: string, type: 'TIP' | 'WARNING' | 'SECRET') {
+            const boxColor = type === 'WARNING' ? [254, 242, 242] : type === 'SECRET' ? colors.beige : [240, 253, 244];
+            const textColor = type === 'WARNING' ? [185, 28, 28] : type === 'SECRET' ? colors.gold : [22, 101, 52];
+            
+            const wrapped = doc.splitTextToSize(safeText(content), contentWidth - 20);
+            const boxHeight = (wrapped.length * 5) + 20;
+            
+            checkPageBreak(boxHeight + 10);
+            doc.setFillColor(boxColor[0], boxColor[1], boxColor[2]);
+            doc.rect(margin, yPosition, contentWidth, boxHeight, 'F');
+            
+            doc.setFont(fonts.sans, "bold");
+            doc.setFontSize(8);
+            doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+            doc.text(title.toUpperCase(), margin + 10, yPosition + 10);
+            
+            doc.setFont(fonts.sans, "normal");
+            doc.setFontSize(10);
+            doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+            doc.text(wrapped, margin + 10, yPosition + 17);
+            yPosition += boxHeight + 10;
+        }
 
-        // Helper: Generic Remote Image Loader
-        const addRemoteImage = async (imageUrl: string, title?: string, renderHeight = 120) => {
+        function drawSectionTitle(title: string, subtitle?: string) {
+            checkPageBreak(40);
+            doc.setFont(fonts.serif, "bold");
+            doc.setFontSize(24);
+            doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+            doc.text(safeText(title), margin, yPosition);
+            yPosition += 10;
+
+            if (subtitle) {
+                doc.setFont(fonts.sans, "normal");
+                doc.setFontSize(10);
+                doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+                doc.text(safeText(subtitle), margin, yPosition);
+                yPosition += 8;
+            }
+
+            doc.setDrawColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+            doc.setLineWidth(1);
+            doc.line(margin, yPosition, margin + 30, yPosition);
+            yPosition += 15;
+        }
+
+        function drawCard(x: number, y: number, w: number, h: number, title: string, value: string) {
+            doc.setFillColor(colors.beige[0], colors.beige[1], colors.beige[2]);
+            doc.roundedRect(x, y, w, h, 3, 3, 'F');
+            
+            doc.setFont(fonts.sans, "bold");
+            doc.setFontSize(8);
+            doc.setTextColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+            doc.text(safeText(title.toUpperCase()), x + 5, y + 8);
+            
+            doc.setFont(fonts.sans, "bold");
+            doc.setFontSize(11);
+            doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+            const wrappedValue = doc.splitTextToSize(safeText(value), w - 10);
+            doc.text(wrappedValue, x + 5, y + 15);
+        }
+
+        function calculateDistance(c1: [number, number], c2: [number, number]) {
+            const R = 6371; // km
+            const dLat = (c2[1] - c1[1]) * Math.PI / 180;
+            const dLon = (c2[0] - c1[0]) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(c1[1] * Math.PI / 180) * Math.cos(c2[1] * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function estimateTravelTime(dist: number, mode: string) {
+            const speed = mode.toLowerCase().includes('walk') ? 5 : 
+                          mode.toLowerCase().includes('metro') ? 30 : 20; // km/h
+            const mins = (dist / speed) * 60;
+            return Math.max(5, Math.round(mins));
+        }
+
+        function addLink(text: string, url: string, x: number, y: number, fontSize = 10, color = colors.gold) {
+            if (!url) return;
+            doc.setFontSize(fontSize);
+            doc.setTextColor(color[0], color[1], color[2]);
+            doc.text(text, x, y);
+            
+            const textWidth = doc.getTextWidth(text);
+            // Add native PDF link
+            doc.link(x, y - fontSize + 2, textWidth, fontSize, { url: url });
+            
+            // Add visible underline
+            doc.setDrawColor(color[0], color[1], color[2]);
+            doc.setLineWidth(0.1);
+            doc.line(x, y + 1, x + textWidth, y + 1);
+        }
+
+        async function addRemoteImage(imageUrl: string, x: number, y: number, w: number, h: number) {
             if (!imageUrl) return;
             try {
                 const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
@@ -148,155 +215,161 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                         reader.onloadend = () => resolve(reader.result);
                         reader.readAsDataURL(blob);
                     });
-
-                    checkPageBreak((title ? 15 : 0) + renderHeight);
-
-                    if (title) {
-                        addWrappedText(title, 10, 'bold', [50, 50, 50]);
-                        yPosition += 2;
-                    }
-
-                    doc.addImage(base64Data as string, blob.type === 'image/jpeg' ? 'JPEG' : 'PNG', margin, yPosition, contentWidth, renderHeight);
-                    yPosition += renderHeight + 10;
+                    doc.addImage(base64Data as string, blob.type === 'image/jpeg' ? 'JPEG' : 'PNG', x, y, w, h);
                 }
             } catch (e) {
                 console.error("Failed to load image", imageUrl);
             }
-        };
-
-        // Helper: Expert Box (Pro Tips, Secrets)
-        const addExpertBox = (title: string, content: string, type: 'TIP' | 'SECRET' | 'WARNING' = 'TIP') => {
-            const boxColor: [number, number, number] = type === 'WARNING' ? [239, 68, 68] : type === 'SECRET' ? colorSecondary : colorPrimary;
-            const bgColor: [number, number, number] = type === 'WARNING' ? [255, 241, 242] : type === 'SECRET' ? [245, 243, 255] : [255, 242, 245];
-
-            const textLines = doc.splitTextToSize(safeText(content), contentWidth - 40);
-            const boxHeight = (textLines.length * 5) + 25;
-
-            checkPageBreak(boxHeight);
-
-            // Draw Box
-            doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
-            doc.rect(margin, yPosition, contentWidth, boxHeight, 'F');
-
-            // Left Border
-            doc.setFillColor(boxColor[0], boxColor[1], boxColor[2]);
-            doc.rect(margin, yPosition, 4, boxHeight, 'F');
-
-            const oldY = yPosition;
-            yPosition += 8;
-
-            // Icon Placeholder (Square/Circle based on type)
-            doc.setFillColor(boxColor[0], boxColor[1], boxColor[2]);
-            if (type === 'SECRET') {
-                doc.circle(margin + 12, yPosition - 1, 2, 'F');
-            } else if (type === 'WARNING') {
-                doc.rect(margin + 10, yPosition - 3, 4, 4, 'F');
-            } else {
-                doc.circle(margin + 12, yPosition - 1, 2, 'F');
-            }
-
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "bold");
-            doc.setTextColor(boxColor[0], boxColor[1], boxColor[2]);
-            doc.text(type === 'SECRET' ? "  HIDDEN GEM" : type === 'WARNING' ? "  CAUTION" : "  PRO TIP", margin + 14, yPosition);
-
-            yPosition += 6;
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
-            doc.setTextColor(50, 50, 50);
-
-            textLines.forEach((line: string) => {
-                doc.text(line, margin + 12, yPosition);
-                yPosition += 5;
-            });
-
-            yPosition = oldY + boxHeight + 8;
-        };
-
-        // --- PAGE 1: COVER ---
-        addPageHeader("Trip Guide");
-        yPosition = 50;
-
-        // Big Title
-        doc.setTextColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
-        doc.setFontSize(32);
-        doc.setFont("helvetica", "bold");
-        const titleLines = doc.splitTextToSize(safeText(itineraryData.title), contentWidth);
-        titleLines.forEach((line: string) => {
-            doc.text(line, margin, yPosition);
-            yPosition += 15;
-        });
-
-        yPosition += 5;
-        addWrappedText(itineraryData.location, 16, 'bold', colorSecondary);
-        yPosition += 10;
-
-        if (itineraryData.content?.cover?.coverImage) {
-            await addRemoteImage(itineraryData.content.cover.coverImage, undefined, 140);
         }
 
-        addLine(yPosition, colorPrimary);
+        // --- 1. COVER PAGE ---
+        if (itineraryData.content?.cover?.coverImage) {
+            await addRemoteImage(itineraryData.content.cover.coverImage, 0, 0, pageWidth, pageHeight * 0.6);
+        }
+        
+        // Dark gradient overlay placeholder (rect with transparency)
+        doc.setFillColor(0, 0, 0);
+        doc.setGState(new (doc as any).GState({ opacity: 0.4 }));
+        doc.rect(0, 0, pageWidth, pageHeight * 0.6, 'F');
+        doc.setGState(new (doc as any).GState({ opacity: 1.0 }));
+
+        yPosition = pageHeight * 0.6 + 20;
+
+        doc.setFont(fonts.serif, "bold");
+        doc.setFontSize(36);
+        doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+        const titleText = `${itineraryData.duration_days || 'X'}-Day Travel Blueprint for ${itineraryData.location}`;
+        const wrappedTitle = doc.splitTextToSize(safeText(titleText), contentWidth);
+        doc.text(wrappedTitle, margin, yPosition);
+        yPosition += (wrappedTitle.length * 12);
+
+        doc.setFont(fonts.sans, "normal");
+        doc.setFontSize(14);
+        doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+        doc.text("A Complete Done-For-You Itinerary to Save 20+ Hours", margin, yPosition);
         yPosition += 15;
 
-        // Trip Summary Grid
-        const stats = [
-            { label: "DURATION", value: itineraryData.duration || `${itineraryData.duration_days} Days` },
-            { label: "BEST TIME", value: itineraryData.bestTimeToVisit || "Year-round" },
-            { label: "LANGUAGE", value: itineraryData.language || "Local" }
-        ];
+        doc.setFont(fonts.sans, "bold");
+        doc.setFontSize(12);
+        doc.setTextColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+        doc.text(`BY ${itineraryData.creator.toUpperCase()}`, margin, yPosition);
+        yPosition += 20;
 
-        stats.forEach((stat, i) => {
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "bold");
-            doc.setTextColor(150, 150, 150);
-            doc.text(stat.label, margin + (i * 60), yPosition);
-
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "bold");
-            doc.setTextColor(0, 0, 0);
-            doc.text(stat.value, margin + (i * 60), yPosition + 8);
-        });
-
-        yPosition += 30;
-
-        // Description
-        addWrappedText("ABOUT THIS TRIP", 12, 'bold', colorPrimary);
-        yPosition += 2;
-        addWrappedText(itineraryData.description, 11, 'normal', [80, 80, 80]);
-
-        if (itineraryData.content?.cover?.visitDate) {
-            yPosition += 5;
-            addWrappedText(`VISITED IN: ${itineraryData.content.cover.visitDate}`, 10, 'bold', colorSecondary);
-        }
-
-        if (itineraryData.content?.cover?.avoidReason) {
-            yPosition += 5;
-            addExpertBox("WHO SHOULD AVOID THIS TRIP", itineraryData.content.cover.avoidReason, "WARNING");
-        }
-
-        yPosition += 10;
-
-        // Logistics
-        addWrappedText("LOGISTICS & ARRIVAL", 12, 'bold', colorPrimary);
-        yPosition += 5;
-
-        const logistics = [
-            ["Starting From", itineraryData.startingLocation || "Main Station/Airport"],
-            ["Pickup Spot", itineraryData.pickup || "Arrival Hall"],
-            ["Drop Spot", itineraryData.drop || "Departure Main Hall"],
-            ["Insurance", itineraryData.insurance || "Recommended"]
-        ];
-
-        logistics.forEach(([label, val]) => {
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "bold");
-            doc.text(`${label}:`, margin, yPosition);
-            doc.setFont("helvetica", "normal");
-            doc.text(val, margin + 40, yPosition);
-            yPosition += 8;
-        });
+        // Trust Badges
+        doc.setFontSize(9);
+        doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+        doc.setDrawColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2]);
+        doc.roundedRect(margin, yPosition, 45, 10, 2, 2, 'D');
+        doc.text("Real Experience", margin + 5, yPosition + 6.5);
+        
+        doc.roundedRect(margin + 55, yPosition, 45, 10, 2, 2, 'D');
+        doc.text("Updated for 2026", margin + 60, yPosition + 6.5);
 
         addPageFooter(1);
+
+        // --- 1.1 PRE-TRIP STRATEGY (NEW) ---
+        if (c?.preTrip || c?.essentials) {
+            doc.addPage();
+            yPosition = margin + 10;
+            drawSectionTitle("Pre-Trip Strategy", "Everything you need to do before you fly.");
+
+            if (c.preTrip?.flightGuide) {
+                const fg = c.preTrip.flightGuide;
+                doc.setFont(fonts.sans, "bold");
+                doc.setFontSize(12);
+                doc.text("✈️ FLIGHT GUIDE", margin, yPosition);
+                yPosition += 8;
+                doc.setFont(fonts.sans, "normal");
+                doc.setFontSize(10);
+                const flightInfo = `Best Airports: ${fg.bestAirports?.join(", ") || "Main City Airport"}\nTiming: ${fg.arrivalDepartureStats || "Check local flights"}\nTip: ${fg.timingInsight || "Arrive early"}`;
+                const wrappedFG = doc.splitTextToSize(safeText(flightInfo), contentWidth);
+                doc.text(wrappedFG, margin + 5, yPosition);
+                yPosition += (wrappedFG.length * 5) + 10;
+            }
+
+            if (c.preTrip?.packingList?.length > 0) {
+                doc.setFont(fonts.sans, "bold");
+                doc.setFontSize(12);
+                doc.text("🎒 PACKING ESSENTIALS", margin, yPosition);
+                yPosition += 8;
+                c.preTrip.packingList.forEach((cat: any) => {
+                    checkPageBreak(20);
+                    doc.setFont(fonts.sans, "bold");
+                    doc.setFontSize(10);
+                    doc.setTextColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+                    doc.text(safeText(cat.category), margin + 5, yPosition);
+                    yPosition += 5;
+                    doc.setFont(fonts.sans, "normal");
+                    doc.setFontSize(9);
+                    doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+                    doc.text(`• ${cat.items?.join(", ") || "General gear"}`, margin + 10, yPosition);
+                    yPosition += 7;
+                });
+                yPosition += 5;
+            }
+
+            if (c.preTrip?.essentials) {
+                const ess = c.preTrip.essentials;
+                doc.setFont(fonts.sans, "bold");
+                doc.setFontSize(12);
+                doc.text("📋 MANDATORY DOCUMENTS", margin, yPosition);
+                yPosition += 8;
+                doc.setFont(fonts.sans, "normal");
+                doc.setFontSize(10);
+                const essText = `Docs: ${ess.documents?.join(", ") || "Passport, Visa"}\nInsurance: ${ess.insurance || "Travel Insurance Recommended"}\nHealth: ${ess.health?.join(", ") || "Standard vaccines"}`;
+                const wrappedEss = doc.splitTextToSize(safeText(essText), contentWidth);
+                doc.text(wrappedEss, margin + 5, yPosition);
+                yPosition += (wrappedEss.length * 5) + 15;
+            }
+
+            addPageFooter(doc.getNumberOfPages());
+        }
+
+        // --- 2. TRIP SNAPSHOT ---
+        doc.addPage();
+        yPosition = margin + 10;
+        drawSectionTitle("Trip Snapshot", "The essential blueprint of your journey.");
+
+        const cardWidth = (contentWidth - 10) / 3;
+        const row1Y = yPosition;
+        drawCard(margin, row1Y, cardWidth, 25, "Duration", itineraryData.duration || `${itineraryData.duration_days} Days`);
+        drawCard(margin + cardWidth + 5, row1Y, cardWidth, 25, "Budget", itineraryData.content?.costBreakdown?.total || "Custom");
+        drawCard(margin + (cardWidth + 5) * 2, row1Y, cardWidth, 25, "Best Time", itineraryData.bestTimeToVisit || "Seasonal");
+        
+        yPosition += 35;
+        const row2Y = yPosition;
+        drawCard(margin, row2Y, cardWidth, 25, "Trip Type", itineraryData.idealFor || "Leisure");
+        drawCard(margin + cardWidth + 5, row2Y, cardWidth, 25, "Ideal For", "Travel Enthusiasts");
+        drawCard(margin + (cardWidth + 5) * 2, row2Y, cardWidth, 25, "Vibe", "Luxury & Adventure");
+
+        yPosition += 45;
+
+        // Perfect For / Avoid Section
+        const splitWidth = (contentWidth - 10) / 2;
+        
+        doc.setFont(fonts.serif, "bold");
+        doc.setFontSize(14);
+        doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+        doc.text("Who This Trip Is Perfect For", margin, yPosition);
+        doc.text("Who Should Avoid This Trip", margin + splitWidth + 10, yPosition);
+        
+        yPosition += 8;
+        doc.setFont(fonts.sans, "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+        
+        const perfectText = itineraryData.content?.cover?.idealFor || "Travelers looking for a blend of luxury and authentic local culture, with a pre-planned efficient route.";
+        const avoidText = itineraryData.content?.cover?.avoidReason || "Those who prefer entirely spontaneous travel without any fixed schedule or pre-booked experiences.";
+        
+        const wrappedPerfect = doc.splitTextToSize(safeText(perfectText), splitWidth);
+        const wrappedAvoid = doc.splitTextToSize(safeText(avoidText), splitWidth);
+        
+        doc.text(wrappedPerfect, margin, yPosition);
+        doc.text(wrappedAvoid, margin + splitWidth + 10, yPosition);
+        
+        yPosition += Math.max(wrappedPerfect.length, wrappedAvoid.length) * 5 + 20;
+
+        addPageFooter(doc.getNumberOfPages());
 
         if (isPreview) {
             // Save Preview PDF
@@ -367,333 +440,351 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
             addPageFooter(doc.getNumberOfPages());
         }
 
-        const c = itineraryData.content;
+        // --- 3. THE BOOKING BLUEPRINT (AFFILIATE LINKS) ---
+        if (!isPreview) {
+            doc.addPage();
+            yPosition = margin + 10;
+            drawSectionTitle("The Booking Blueprint", "One-click access to all my trusted recommendations.");
 
-        // --- PRE-TRIP & ACCOMMODATIONS ---
-        if (c?.preTrip || c?.accommodation) {
-            checkPageBreak(50, "Pre-Trip & Accommodations");
-            if (yPosition === margin) { // If it didn't break, maybe we want a fresh page anyway for major sections?
-                // Let's only break if we are past middle of page1
-                if (yPosition > pageHeight * 0.6) {
-                    doc.addPage();
-                    yPosition = 30;
-                    addPageHeader("Pre-Trip & Accommodations");
-                }
-            }
+            // 1. Accommodation
+            if (c?.accommodation?.hotelRecommendations?.length > 0) {
+                doc.setFont(fonts.sans, "bold");
+                doc.setFontSize(12);
+                doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+                doc.text("HOTEL & STAYS", margin, yPosition);
+                yPosition += 10;
 
-            if (c.preTrip?.flightGuide) {
-                addWrappedText("FLIGHT & ARRIVAL STRATEGY", 12, 'bold', colorPrimary);
-                if (c.preTrip.flightGuide.bestAirports?.length > 0) addWrappedText(`Best Airports: ${c.preTrip.flightGuide.bestAirports.join(', ')}`, 10, 'normal', [80, 80, 80]);
-                if (c.preTrip.flightGuide.arrivalDepartureStats) addWrappedText(`Arrival Info: ${c.preTrip.flightGuide.arrivalDepartureStats}`, 10, 'normal', [80, 80, 80]);
-                if (c.preTrip.flightGuide.routeInsight) addWrappedText(`Route Insight: ${c.preTrip.flightGuide.routeInsight}`, 10, 'italic', colorSecondary);
-                if (c.preTrip.flightGuide.timingInsight) addWrappedText(`Timing Insight: ${c.preTrip.flightGuide.timingInsight}`, 10, 'italic', colorSecondary);
-                if (c.preTrip.flightGuide.baggageTips) addWrappedText(`Baggage Tips: ${c.preTrip.flightGuide.baggageTips}`, 10, 'normal', [80, 80, 80]);
-                if (c.preTrip.flightGuide.seatTips) addWrappedText(`Seat Secret: ${c.preTrip.flightGuide.seatTips}`, 10, 'normal', [80, 80, 80]);
-                if (c.preTrip.flightGuide.jetLagTips) addWrappedText(`Jet Lag Hack: ${c.preTrip.flightGuide.jetLagTips}`, 10, 'normal', [80, 80, 80]);
-                yPosition += 8;
-            }
-
-            if (c.preTrip?.packingList?.length > 0) {
-                addWrappedText("PACKING LIST", 12, 'bold', colorPrimary);
-                c.preTrip.packingList.forEach((cat: any) => {
-                    if (cat.items?.length > 0) {
-                        addWrappedText(cat.category, 10, 'bold', [50, 50, 50]);
-                        addWrappedText(cat.items.join(', '), 10, 'normal', [80, 80, 80]);
-                        if (cat.mistakesToAvoid) addWrappedText(`Avoid these mistakes: ${cat.mistakesToAvoid}`, 9, 'italic', [239, 68, 68]);
-                        yPosition += 3;
-                    }
-                });
-                yPosition += 5;
-            }
-
-            if (c.accommodation?.bestNeighborhoods?.length > 0) {
-                addWrappedText("BEST NEIGHBORHOODS", 12, 'bold', colorPrimary);
-                c.accommodation.bestNeighborhoods.forEach((hood: any) => {
-                    addWrappedText(`${hood.name} (${hood.vibe})`, 10, 'bold', [50, 50, 50]);
-                    addWrappedText(hood.whyStayHere, 10, 'normal', [80, 80, 80]);
-                    yPosition += 3;
-                });
-                yPosition += 5;
-            }
-
-            if (c.accommodation?.hotelRecommendations?.length > 0) {
-                addWrappedText("HANDPICKED HOTELS", 12, 'bold', colorPrimary);
                 c.accommodation.hotelRecommendations.forEach((hotel: any) => {
-                    addWrappedText(`${hotel.name} - ${hotel.priceRange} (${hotel.neighborhood})`, 10, 'bold', [50, 50, 50]);
-                    addWrappedText(hotel.whyWeLoveIt, 10, 'normal', [80, 80, 80]);
-                    if (hotel.liked) addWrappedText(`What I Liked: ${hotel.liked}`, 9, 'normal', [16, 185, 129]);
-                    if (hotel.disliked) addWrappedText(`What I Disliked: ${hotel.disliked}`, 9, 'normal', [239, 68, 68]);
-                    if (hotel.recommend === false) addWrappedText("Verdict: NOT RECOMMENDED", 9, 'bold', [239, 68, 68]);
-                    else if (hotel.recommend === true) addWrappedText("Verdict: STRONGLY RECOMMENDED", 9, 'bold', [16, 185, 129]);
-                    if (hotel.bookingLink) addWrappedText(`Booking Link: ${hotel.bookingLink}`, 9, 'italic', colorSecondary);
-                    yPosition += 3;
+                    checkPageBreak(30);
+                    doc.setFont(fonts.sans, "bold");
+                    doc.setFontSize(10);
+                    doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+                    doc.text(safeText(hotel.name), margin + 5, yPosition);
+                    
+                    if (hotel.bookingLink) {
+                        addLink("Book this Stay", hotel.bookingLink, margin + contentWidth - 30, yPosition, 9);
+                    }
+                    yPosition += 5;
+                    doc.setFont(fonts.sans, "normal");
+                    doc.setFontSize(9);
+                    doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+                    doc.text(safeText(hotel.neighborhood || "Premium Location"), margin + 5, yPosition);
+                    yPosition += 5;
+                    const wrappedWhy = doc.splitTextToSize(`"Why I love it: ${safeText(hotel.whyWeLoveIt)}"`, contentWidth - 10);
+                    doc.text(wrappedWhy, margin + 5, yPosition);
+                    yPosition += (wrappedWhy.length * 5) + 8;
+                });
+            }
+
+            // 2. Affiliate Products
+            if (c?.affiliateProducts?.length > 0) {
+                checkPageBreak(50);
+                yPosition += 10;
+                doc.setFont(fonts.sans, "bold");
+                doc.setFontSize(12);
+                doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+                doc.text("RECOMMENDED GEAR & PRODUCTS", margin, yPosition);
+                yPosition += 10;
+
+                c.affiliateProducts.forEach((prod: any) => {
+                    checkPageBreak(15);
+                    doc.setFont(fonts.sans, "normal");
+                    doc.setFontSize(10);
+                    doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+                    doc.text(`• ${safeText(prod.title)}`, margin + 5, yPosition);
+                    addLink("View Product", prod.productUrl, margin + contentWidth - 30, yPosition, 9);
+                    yPosition += 8;
+                });
+            }
+
+            // 3. Creator Store
+            if (c?.creatorProducts?.length > 0) {
+                checkPageBreak(50);
+                yPosition += 10;
+                doc.setFont(fonts.sans, "bold");
+                doc.setFontSize(12);
+                doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+                doc.text("MY SHOP / CREATOR PRODUCTS", margin, yPosition);
+                yPosition += 10;
+
+                c.creatorProducts.forEach((prod: any) => {
+                    checkPageBreak(15);
+                    doc.setFont(fonts.sans, "normal");
+                    doc.setFontSize(10);
+                    doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+                    doc.text(`• ${safeText(prod.title)}`, margin + 5, yPosition);
+                    addLink("Get It Now", prod.url, margin + contentWidth - 30, yPosition, 9);
+                    yPosition += 8;
                 });
             }
 
             addPageFooter(doc.getNumberOfPages());
         }
 
-        // --- PAGES 2+: DAILY SCHEDULE ---
-        checkPageBreak(pageHeight, "Daily Schedule"); // Force new page for schedule unless it's already a new page
-        if (yPosition > 30) {
+        const days = isPreview ? itineraryData.days.slice(0, 1) : itineraryData.days;
+
+        for (const day of days) {
+            yPosition = margin + 20;
             doc.addPage();
-            yPosition = 30;
-            addPageHeader("Daily Schedule");
-        }
-        addPageFooter(doc.getNumberOfPages());
+            addPageHeader(`Day ${day.number || day.dayNumber}: ${safeText(day.title)}`);
 
-        const displayDays = isPreview ? itineraryData.days.slice(0, 1) : itineraryData.days;
+            // --- 6.2 DAY ROUTE PLAN (NEW) ---
+            checkPageBreak(150, `Day ${day.number || day.dayNumber} Navigation`);
+            doc.setFont(fonts.serif, "bold");
+            doc.setFontSize(20);
+            doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+            doc.text(`🗺️ Day ${day.number || day.dayNumber} Route Plan`, margin, yPosition);
+            yPosition += 15;
 
-        if (displayDays.length === 0) {
-            addWrappedText("Full schedule available after download.", 12, 'italic', [150, 150, 150], 'center');
-        } else {
-            for (let index = 0; index < displayDays.length; index++) {
-                const day = displayDays[index];
-                // Day Header
-                doc.setFillColor(245, 245, 245);
-                doc.rect(margin, yPosition - 5, contentWidth, 15, 'F');
-                doc.setTextColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
-                doc.setFontSize(14);
-                doc.setFont("helvetica", "bold");
-                doc.text(`DAY ${day.number || day.dayNumber || index + 1}: ${safeText(day.title)}`, margin + 5, yPosition + 5);
-                yPosition += 25;
+            const routePoints = [
+                { name: "Start Location", loc: day.hotel || itineraryData.startingLocation, coord: null },
+                { name: "Morning", loc: (typeof day.morning === 'object' ? day.morning.activity : day.morning) || day.morningPlan, coord: day.morning?.locationCoordinates },
+                { name: "Afternoon", loc: (typeof day.afternoon === 'object' ? day.afternoon.activity : day.afternoon) || day.afternoonPlan, coord: day.afternoon?.locationCoordinates },
+                { name: "Evening", loc: (typeof day.evening === 'object' ? day.evening.activity : day.evening) || day.eveningPlan, coord: day.evening?.locationCoordinates }
+            ].filter(p => p.loc);
 
-                // Transport & Stay
-                doc.setFontSize(9);
-                doc.setFont("helvetica", "bold");
-                doc.setTextColor(100, 100, 100);
-                doc.text(`STAY: ${day.hotel || day.hotelName || 'Not specified'}`, margin, yPosition);
-                doc.text(`TRANSPORT: ${day.transport || day.transportMode || 'Local'}`, pageWidth - margin, yPosition, { align: 'right' });
-                yPosition += 12;
+            // 1. Ordered Location Pins
+            doc.setFont(fonts.sans, "bold");
+            doc.setFontSize(10);
+            doc.setTextColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+            doc.text("1. ORDERED LOCATION PINS", margin, yPosition);
+            yPosition += 8;
 
-                // Meals (if available)
-                if (day.meals) {
-                    const mealArr = [];
-                    if (day.meals.breakfast) mealArr.push("Breakfast");
-                    if (day.meals.lunch) mealArr.push("Lunch");
-                    if (day.meals.dinner) mealArr.push("Dinner");
-                    if (mealArr.length > 0) {
-                        doc.setFontSize(9);
-                        doc.setFont("helvetica", "italic");
-                        doc.setTextColor(120, 120, 120);
-                        doc.text(`INCLUDED MEALS: ${mealArr.join(", ")}`, margin, yPosition);
-                        yPosition += 10;
-                    }
-                }
-
-                // --- VERTICAL TIMELINE RENDERING ---
-                const timelineItems = [
-                    { name: "MORNING", data: day.morning, plan: day.morningPlan },
-                    { name: "AFTERNOON", data: day.afternoon, plan: day.afternoonPlan },
-                    { name: "EVENING", data: day.evening, plan: day.eveningPlan }
-                ].filter(item => item.data || item.plan);
-
-                if (timelineItems.length > 0) {
-                    const timelineX = margin + 5;
-                    const contentX = margin + 20;
-
-                    timelineItems.forEach((item, i) => {
-                        let activityText = item.plan || (typeof item.data === 'string' ? item.data : item.data?.activity) || "Planned Activity";
-                        const timeStr = (typeof item.data === 'object' && item.data?.time) ? item.data.time : item.name;
-                        const locationStr = (typeof item.data === 'object' && item.data?.location) ? item.data.location : "";
-
-                        // Calculate total height needed for this item
-                        const activityLines = doc.splitTextToSize(safeText(activityText), contentWidth - 30);
-                        const details: string[] = [];
-                        if (typeof item.data === 'object' && item.data !== null) {
-                            if (item.data.whyVisit) details.push(`Why: ${item.data.whyVisit}`);
-                            if (item.data.travelTime) details.push(`Commute: ${item.data.travelTime}`);
-                            if (item.data.duration) details.push(`Spent: ${item.data.duration}`);
-                            if (item.data.cost) details.push(`Cost: ${item.data.cost}`);
-                            if (item.data.transitToNext) details.push(`Transit: ${item.data.transitToNext}`);
-                            if (item.data.food) details.push(`Food: ${item.data.food}`);
-                            if (item.data.worthIt) details.push(`Worth it?: ${item.data.worthIt}`);
-                            if (item.data.bestTime) details.push(`Best time: ${item.data.bestTime}`);
-                            if (item.data.avoid) details.push(`Skip if: ${item.data.avoid}`);
-                            if (item.data.notes || item.data.tips) details.push(`Tip: ${item.data.notes || item.data.tips}`);
-                            if (item.data.localSecret) details.push(`Secret: ${item.data.localSecret}`);
-                        }
-
-                        const itemHeight = (activityLines.length * 6) + (details.length * 5) + 20;
-                        checkPageBreak(itemHeight);
-
-                        // Draw Vertical Line Segment
-                        if (i < timelineItems.length - 1) {
-                            doc.setDrawColor(colorSecondary[0], colorSecondary[1], colorSecondary[2]);
-                            doc.setLineWidth(1.5);
-                            doc.line(timelineX, yPosition + 2, timelineX, yPosition + itemHeight);
-                        }
-
-                        // Draw Circle/Dot
-                        doc.setFillColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
-                        doc.circle(timelineX, yPosition + 2, 3, 'F');
-
-                        // Render Time & Activity
-                        doc.setFontSize(10);
-                        doc.setFont("helvetica", "bold");
-                        doc.setTextColor(colorSecondary[0], colorSecondary[1], colorSecondary[2]);
-                        doc.text(timeStr, contentX, yPosition + 3);
-
-                        doc.setFontSize(12);
-                        doc.setFont("helvetica", "bold");
-                        doc.setTextColor(0, 0, 0);
-                        activityLines.forEach((line: string, li: number) => {
-                            doc.text(line, contentX, yPosition + 10 + (li * 6));
-                        });
-
-                        yPosition += 10 + (activityLines.length * 6);
-
-                        // Render Location Badge
-                        if (locationStr) {
-                            doc.setFillColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
-                            doc.circle(contentX, yPosition + 1, 1, 'F');
-                            doc.setFontSize(9);
-                            doc.setFont("helvetica", "italic");
-                            doc.setTextColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
-                            doc.text(`   ${safeText(locationStr)}`, contentX, yPosition + 2);
-                            yPosition += 6;
-                        }
-
-                        // Render Details (Small Grey Text)
-                        doc.setFontSize(9);
-                        doc.setFont("helvetica", "normal");
-                        doc.setTextColor(110, 110, 110);
-                        details.forEach((detail, di) => {
-                            doc.text(`• ${safeText(detail)}`, contentX, yPosition + 2 + (di * 5));
-                        });
-
-                        yPosition += (details.length * 5) + 8;
-                    });
-                }
-
-                // Day Images
-                if (day.images && Array.isArray(day.images)) {
-                    for (const imgUrl of day.images) {
-                        await addRemoteImage(imgUrl, undefined, 100);
-                    }
-                }
-
-                // Expert Tips for the Day
-                if (day.notes) {
-                    addExpertBox("PRO TIP", day.notes, "TIP");
-                }
-
-                if (typeof day.morning === 'object' && day.morning?.localSecret) {
-                    addExpertBox("LOCAL SECRET", day.morning.localSecret, "SECRET");
-                }
-
-                // --- DAY-WISE MAP ---
-                const dayCoords: [number, number][] = [];
-                const addDayCoord = async (locationStr?: string, locationCoords?: any) => {
-                    if (locationCoords && Array.isArray(locationCoords) && locationCoords.length === 2 && typeof locationCoords[0] === 'number') {
-                        dayCoords.push([locationCoords[0], locationCoords[1]]);
-                    } else if (locationStr && typeof locationStr === 'string' && locationStr.trim().length > 0) {
-                        try {
-                            const res = await fetch('/api/geocode', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ location: locationStr })
-                            });
-                            if (res.ok) {
-                                const geoData = await res.json();
-                                if (geoData.success && geoData.coordinates) {
-                                    dayCoords.push(geoData.coordinates);
-                                }
-                            }
-                        } catch (e) {
-                            console.error("Geocoding failed for", locationStr);
-                        }
-                    }
-                };
-
-                if (day.locationCoordinates && Array.isArray(day.locationCoordinates)) {
-                    day.locationCoordinates.forEach((coord: any) => {
-                        const lng = typeof coord.longitude === 'number' ? coord.longitude : coord[0];
-                        const lat = typeof coord.latitude === 'number' ? coord.latitude : coord[1];
-                        if (typeof lng === 'number' && typeof lat === 'number') {
-                            dayCoords.push([lng, lat]);
-                        }
-                    });
-                } else {
-                    // Try to get coordinates for specific activities in order
-                    await addDayCoord(day.morning?.location, day.morning?.locationCoordinates);
-                    await addDayCoord(day.afternoon?.location, day.afternoon?.locationCoordinates);
-                    await addDayCoord(day.evening?.location, day.evening?.locationCoordinates);
-                }
-
-                // IMPROVED: Filter outliers to ensure city-wise focus
-                // If coordinates are more than 200km apart, they are likely wrong or different regions
-                // We'll keep the cluster that is most relevant to the itinerary location
-                let filteredCoords = dayCoords;
-                if (dayCoords.length > 1) {
-                    // Simple distance check: 1 degree approx 111km
-                    const first = dayCoords[0];
-                    filteredCoords = dayCoords.filter(c => {
-                        const dist = Math.sqrt(Math.pow(c[0] - first[0], 2) + Math.pow(c[1] - first[1], 2));
-                        return dist < 2.0; // Approx 220km radius
-                    });
-                }
-
-                if (filteredCoords.length > 0) {
-                    addWrappedText("TODAY'S ROUTE MAP", 10, 'bold', colorSecondary);
-                    try {
-                        const staticMapUrl = generateStaticMapUrl(filteredCoords);
-                        if (staticMapUrl) {
-                            const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(staticMapUrl)}`;
-                            const res = await fetch(proxyUrl);
-                            if (res.ok) {
-                                const blob = await res.blob();
-                                const base64Data = await new Promise((resolve) => {
-                                    const reader = new FileReader();
-                                    reader.onloadend = () => resolve(reader.result);
-                                    reader.readAsDataURL(blob);
-                                });
-
-                                if (yPosition + 120 > pageHeight - 30) {
-                                    doc.addPage();
-                                    yPosition = 30;
-                                    addPageHeader(`Day ${day.number || day.dayNumber || index + 1} Map`);
-                                    addPageFooter(doc.getNumberOfPages());
-                                }
-
-                                doc.addImage(base64Data as string, blob.type === 'image/jpeg' ? 'JPEG' : 'PNG', margin, yPosition, contentWidth, 120);
-                                yPosition += 130;
-                            } else {
-                                addWrappedText("Map image temporarily unavailable.", 10, 'italic', [150, 150, 150]);
-                            }
-                        }
-                    } catch (error) {
-                        addWrappedText("Map generation failed for today.", 10, 'italic', [150, 150, 150]);
-                    }
-                }
-
-                // MOBILE SYNC: LIVE GOOGLE MAPS LINK
-                checkPageBreak(35);
-                const rectY = yPosition;
-                doc.setDrawColor(240, 240, 240);
-                doc.setLineWidth(0.5);
-                doc.rect(margin, rectY, contentWidth, 30);
-
+            routePoints.forEach((p, idx) => {
+                doc.setFont(fonts.sans, "normal");
                 doc.setFontSize(10);
-                doc.setFont("helvetica", "bold");
-                doc.setTextColor(0, 107, 255);
-                doc.text("   OPEN LIVE ROUTE ON YOUR PHONE", margin + 10, rectY + 10);
+                doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+                doc.text(`${idx + 1}. ${safeText(p.name)}: ${safeText(p.loc).substring(0, 50)}...`, margin + 5, yPosition);
+                yPosition += 6;
+            });
+            yPosition += 10;
 
+            // 2 & 3. Route Optimization & Segment Breakdown
+            doc.setFont(fonts.sans, "bold");
+            doc.setTextColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+            doc.text("2. SEGMENT BREAKDOWN", margin, yPosition);
+            yPosition += 8;
+
+            let totalDist = 0;
+            let totalTime = 0;
+
+            for (let i = 0; i < routePoints.length - 1; i++) {
+                const start = routePoints[i];
+                const end = routePoints[i+1];
+                let dist = 2; // Default 2km if no coords
+                if (start.coord && end.coord) {
+                    const c1: [number, number] = [start.coord.longitude || start.coord[0], start.coord.latitude || start.coord[1]];
+                    const c2: [number, number] = [end.coord.longitude || end.coord[0], end.coord.latitude || end.coord[1]];
+                    dist = calculateDistance(c1, c2);
+                }
+                const mode = day.transport || "Taxi/Metro";
+                const time = estimateTravelTime(dist, mode);
+                totalDist += dist;
+                totalTime += time;
+
+                doc.setFont(fonts.sans, "bold");
                 doc.setFontSize(9);
-                doc.setFont("helvetica", "normal");
-                doc.setTextColor(100, 100, 100);
-                doc.text("Scan this QR to sync today's route with Google Maps.", margin + 10, rectY + 17);
+                doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+                doc.text(`From: ${safeText(start.name)} → ${safeText(end.name)}`, margin + 5, yPosition);
+                yPosition += 5;
+                doc.setFont(fonts.sans, "normal");
+                doc.setFontSize(8);
+                doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+                doc.text(`Distance: ${dist.toFixed(1)} km | Time: ${time} mins | Mode: ${mode}`, margin + 10, yPosition);
+                yPosition += 8;
+                
+                if (yPosition > 250) {
+                    doc.addPage();
+                    yPosition = margin + 20;
+                }
+            }
+            yPosition += 5;
 
-                // Real QR Generation
-                try {
-                    const origin = day.morning?.location || itineraryData.startingLocation;
-                    const destination = day.evening?.location || day.afternoon?.location || itineraryData.drop;
-                    const waypoints = (day.afternoon?.location && day.afternoon.location !== destination) ? [day.afternoon.location] : [];
+            // 5. Map Summary Box
+            doc.setFillColor(colors.beige[0], colors.beige[1], colors.beige[2]);
+            doc.rect(margin, yPosition, contentWidth, 35, 'F');
+            doc.setFont(fonts.sans, "bold");
+            doc.setFontSize(10);
+            doc.setTextColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+            doc.text("MAP SUMMARY BOX", margin + 10, yPosition + 10);
+            
+            doc.setFont(fonts.sans, "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+            doc.text(`Start: ${safeText(routePoints[0].name)} | End: ${safeText(routePoints[routePoints.length - 1].name)}`, margin + 10, yPosition + 18);
+            doc.text(`Total Stops: ${routePoints.length} | Distance: ${totalDist.toFixed(1)} km | Time: ${totalTime + (routePoints.length * 45)} mins (incl. stay)`, margin + 10, yPosition + 25);
+            yPosition += 50;
 
-                    const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin || '')}&destination=${encodeURIComponent(destination || '')}${waypoints.length > 0 ? `&waypoints=${encodeURIComponent(waypoints.join('|'))}` : ''}`;
-                    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(mapsUrl)}`;
+            const googleMapsDayUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(routePoints[0].loc)}&destination=${encodeURIComponent(routePoints[routePoints.length-1].loc)}&waypoints=${encodeURIComponent(routePoints.slice(1, -1).map(p => p.loc).join('|'))}&travelmode=driving`;
+            const qrDayUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(googleMapsDayUrl)}`;
+            
+            try {
+                await doc.addImage(qrDayUrl, 'PNG', margin + contentWidth - 40, yPosition - 85, 30, 30);
+                doc.setFontSize(7);
+                doc.text("Scan for Day Route", margin + contentWidth - 40, yPosition - 52);
+            } catch (e) {
+                console.warn("Day QR failed");
+            }
 
-                    const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(qrUrl)}`;
+            yPosition += 20;
+
+            // --- 6.3 DAILY TIMELINE ---
+            checkPageBreak(120, `Day ${day.number || day.dayNumber} Timeline`);
+            doc.setFont(fonts.serif, "bold");
+            doc.setFontSize(22);
+            doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+            doc.text("🕒 Daily Timeline & Details", margin, yPosition);
+            yPosition += 15;
+            
+            // Day Header (Simplified)
+            doc.setFont(fonts.serif, "bold");
+            doc.setFontSize(28);
+            doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+            doc.text(`Day ${day.number || day.dayNumber}`, margin, yPosition);
+            yPosition += 10;
+            
+            doc.setFont(fonts.sans, "bold");
+            doc.setFontSize(16);
+            doc.setTextColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+            const wrappedDayTitle = doc.splitTextToSize(safeText(day.title || "Exploring the unknown"), contentWidth);
+            doc.text(wrappedDayTitle, margin, yPosition);
+            yPosition += (wrappedDayTitle.length * 8) + 5;
+
+            // Day Stats Bar
+            doc.setFillColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2]);
+            doc.rect(margin, yPosition, contentWidth, 12, 'F');
+            doc.setFont(fonts.sans, "bold");
+            doc.setFontSize(8);
+            doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+            doc.text(`TRANSPORT: ${safeText(day.transport || "Local")}`, margin + 5, yPosition + 7.5);
+            doc.text(`STAY: ${safeText(day.hotel || "Same as Day 1")}`, margin + 80, yPosition + 7.5);
+            
+            // Check for hotel link
+            const hotelName = day.hotel;
+            const hotelRec = c?.accommodation?.hotelRecommendations?.find((h: any) => h.name === hotelName);
+            if (hotelRec?.bookingLink) {
+                addLink("Book this Hotel", hotelRec.bookingLink, margin + contentWidth - 35, yPosition + 7.5, 8, colors.gold);
+            }
+            
+            yPosition += 22;
+
+            // Vertical Timeline
+            const timelineItems = [
+                { label: "Morning", title: day.morning?.activity || day.morningPlan, time: day.morning?.time || "09:00 AM", details: day.morning },
+                { label: "Afternoon", title: day.afternoon?.activity || day.afternoonPlan, time: day.afternoon?.time || "01:00 PM", details: day.afternoon },
+                { label: "Evening", title: day.evening?.activity || day.eveningPlan, time: day.evening?.time || "07:00 PM", details: day.evening }
+            ].filter(item => item.title);
+
+            const timelineX = margin + 5;
+            const contentX = margin + 20;
+
+            timelineItems.forEach((item, i) => {
+                // Timeline Connector
+                if (i < timelineItems.length - 1) {
+                    doc.setDrawColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2]);
+                    doc.setLineWidth(1);
+                    doc.line(timelineX, yPosition, timelineX, yPosition + 40);
+                }
+
+                // Timeline Dot
+                doc.setFillColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+                doc.circle(timelineX, yPosition, 2, 'F');
+
+                // Time Label
+                doc.setFont(fonts.sans, "bold");
+                doc.setFontSize(8);
+                doc.setTextColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+                doc.text(item.time, contentX, yPosition + 1);
+
+                // Activity Title
+                doc.setFont(fonts.sans, "bold");
+                doc.setFontSize(12);
+                doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+                const wrappedAct = doc.splitTextToSize(safeText(item.title), contentWidth - 30);
+                doc.text(wrappedAct, contentX, yPosition + 7);
+                yPosition += (wrappedAct.length * 6) + 4;
+
+                // Activity Meta (Why Visit, Cost, Duration)
+                if (typeof item.details === 'object' && item.details !== null) {
+                    doc.setFont(fonts.sans, "normal");
+                    doc.setFontSize(9);
+                    doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+                    
+                    const meta = [];
+                    if (item.details.whyVisit) meta.push(`Why: ${item.details.whyVisit}`);
+                    if (item.details.duration) meta.push(`Duration: ${item.details.duration}`);
+                    if (item.details.cost) meta.push(`Cost: ${item.details.cost}`);
+                    
+                    const wrappedMeta = doc.splitTextToSize(safeText(meta.join(" | ")), contentWidth - 30);
+                    doc.text(wrappedMeta, contentX, yPosition);
+                    yPosition += (wrappedMeta.length * 5) + 3;
+
+                    if (item.details.notes) {
+                        doc.setFont(fonts.sans, "italic");
+                        const wrappedNotes = doc.splitTextToSize(`"Insider Tip: ${safeText(item.details.notes)}"`, contentWidth - 30);
+                        doc.text(wrappedNotes, contentX, yPosition);
+                        yPosition += (wrappedNotes.length * 5) + 5;
+                    }
+                }
+                yPosition += 10;
+            });
+
+            // Expert Insight Box for the Day
+            if (day.notes || day.morning?.localSecret) {
+                const insight = day.notes || day.morning?.localSecret;
+                doc.setFillColor(colors.beige[0], colors.beige[1], colors.beige[2]);
+                const insightLines = doc.splitTextToSize(safeText(insight), contentWidth - 20);
+                const boxHeight = (insightLines.length * 5) + 20;
+                
+                doc.rect(margin, yPosition, contentWidth, boxHeight, 'F');
+                doc.setFont(fonts.sans, "bold");
+                doc.setFontSize(9);
+                doc.setTextColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+                doc.text("EXPERT INSIGHT", margin + 10, yPosition + 10);
+                
+                doc.setFont(fonts.sans, "normal");
+                doc.setFontSize(10);
+                doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+                doc.text(insightLines, margin + 10, yPosition + 18);
+                yPosition += boxHeight + 15;
+            }
+
+            // Day Images (if any)
+            if (day.images?.length > 0) {
+                const imgHeight = 60;
+                const imgWidth = (contentWidth - 5) / 2;
+                for (let i = 0; i < Math.min(day.images.length, 2); i++) {
+                    await addRemoteImage(day.images[i], margin + (i * (imgWidth + 5)), yPosition, imgWidth, imgHeight);
+                }
+                yPosition += imgHeight + 15;
+            }
+
+            addPageFooter(doc.getNumberOfPages());
+        }
+
+        // --- 7. MAPS & ROUTES ---
+        doc.addPage();
+        yPosition = margin + 10;
+        drawSectionTitle("Maps & Routes", "Visual guides for your seamless journey.");
+
+        const allCoords: [number, number][] = [];
+        for (const d of itineraryData.days) {
+            if (d.locationCoordinates) {
+                d.locationCoordinates.forEach((c: any) => {
+                    const lng = typeof c.longitude === 'number' ? c.longitude : c[0];
+                    const lat = typeof c.latitude === 'number' ? c.latitude : c[1];
+                    if (typeof lng === 'number' && typeof lat === 'number') allCoords.push([lng, lat]);
+                });
+            }
+        }
+
+        if (allCoords.length > 0) {
+            try {
+                const staticMapUrl = generateStaticMapUrl(allCoords);
+                if (staticMapUrl) {
+                    doc.setFillColor(colors.beige[0], colors.beige[1], colors.beige[2]);
+                    doc.rect(margin, yPosition, contentWidth, 130, 'F');
+                    const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(staticMapUrl)}`;
                     const res = await fetch(proxyUrl);
                     if (res.ok) {
                         const blob = await res.blob();
@@ -702,418 +793,192 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                             reader.onloadend = () => resolve(reader.result);
                             reader.readAsDataURL(blob);
                         });
-                        doc.addImage(base64Data as string, 'PNG', pageWidth - margin - 25, rectY + 4, 22, 22);
+                        doc.addImage(base64Data as string, 'JPEG', margin + 5, yPosition + 5, contentWidth - 10, 120);
+                        yPosition += 135;
                     }
-                } catch (qrErr) {
-                    console.error("QR Code generation failed", qrErr);
-                    // Fallback to placeholder if API fails
-                    doc.setDrawColor(200, 200, 200);
-                    doc.rect(pageWidth - margin - 22, rectY + 4, 16, 16);
                 }
-
-                yPosition += 40;
-
-                addPageFooter(doc.getNumberOfPages());
+            } catch (e) {
+                console.error("Map failed", e);
             }
         }
 
-        // --- EXPERT GUIDES & SECRETS ---
-        if (!isPreview) {
-            const hasExpertContent = c?.food || c?.transport || c?.secrets || c?.safety || c?.arrival || c?.customization;
-            if (hasExpertContent) {
-                checkPageBreak(50, "Expert Travel Guide");
-                if (yPosition < 40) { // If it broke, we already have a header
-                    yPosition += 10;
-                } else {
-                    addWrappedText("EXPERT TRAVEL KNOWLEDGE", 14, 'bold', colorPrimary);
-                    yPosition += 5;
-                }
+        // QR Code for Live Route
+        doc.setFillColor(colors.black[0], colors.black[1], colors.black[2]);
+        doc.rect(margin, yPosition, contentWidth, 30, 'F');
+        doc.setFont(fonts.sans, "bold");
+        doc.setFontSize(10);
+        doc.setTextColor(colors.white[0], colors.white[1], colors.white[2]);
+        doc.text("SYNC TO GOOGLE MAPS", margin + 10, yPosition + 12);
+        doc.setFont(fonts.sans, "normal");
+        doc.setFontSize(8);
+        doc.text("Scan to open the full interactive route on your mobile device.", margin + 10, yPosition + 20);
+        
+        // Placeholder for QR (Real one would use same logic as before)
+        doc.setDrawColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+        doc.rect(pageWidth - margin - 25, yPosition + 4, 22, 22);
+        yPosition += 45;
 
-                if (c.food?.mustTryDishes?.length > 0) {
-                    addWrappedText("MUST-TRY LOCAL FOOD", 12, 'bold', colorPrimary);
-                    c.food.mustTryDishes.forEach((dish: any) => {
-                        addWrappedText(`${dish.name} ${dish.bestPlace ? `(Best at: ${dish.bestPlace})` : ''}`, 10, 'bold', [50, 50, 50]);
-                        addWrappedText(dish.description, 10, 'normal', [80, 80, 80]);
-                        yPosition += 3;
-                    });
-                    yPosition += 5;
-                }
+        addPageFooter(doc.getNumberOfPages());
 
-                if (c.food?.restaurantRecommendations?.length > 0) {
-                    addWrappedText("HANDPICKED RESTAURANTS", 11, 'bold', colorPrimary);
-                    c.food.restaurantRecommendations.forEach((rest: any) => {
-                        addWrappedText(`${rest.name} - ${rest.priceRange} (${rest.cuisine})`, 10, 'bold', [50, 50, 50]);
-                        if (rest.bestDish) addWrappedText(`MUST TRY: ${rest.bestDish}`, 9, 'bold', [16, 185, 129]);
-                        if (rest.avoidDish) addWrappedText(`AVOID: ${rest.avoidDish}`, 9, 'normal', [239, 68, 68]);
-                        if (rest.notes) addWrappedText(rest.notes, 9, 'italic', [100, 100, 100]);
-                        yPosition += 3;
-                    });
-                    yPosition += 5;
-                }
+        // --- 8. THE FOOD PLAN ---
+        if (c?.food) {
+            doc.addPage();
+            yPosition = margin + 10;
+            drawSectionTitle("The Food Plan", "Must-try flavors and handpicked dining spots.");
 
-                if (c.food?.placesToRegret?.length > 0) {
-                    addWrappedText("PLACES I REGRET VISITING", 11, 'bold', [239, 68, 68]);
-                    c.food.placesToRegret.forEach((p: string) => addWrappedText(`• ${p}`, 9, 'normal', [100, 100, 100]));
-                    yPosition += 5;
-                }
-
-                if (c.food?.touristTrapsToAvoid?.length > 0) {
-                    addWrappedText("TOURIST TRAPS TO AVOID", 11, 'bold', [234, 88, 12]);
-                    c.food.touristTrapsToAvoid.forEach((p: string) => addWrappedText(`• ${p}`, 9, 'normal', [100, 100, 100]));
-                    yPosition += 5;
-                }
-
-                if (c.transport?.modes?.length > 0) {
-                    addWrappedText("GETTING AROUND", 12, 'bold', colorPrimary);
-                    c.transport.modes.forEach((m: any) => {
-                        addWrappedText(`${m.type} ${m.cost ? `(${m.cost})` : ''}`, 10, 'bold', [50, 50, 50]);
-                        addWrappedText(m.tips, 10, 'normal', [80, 80, 80]);
-                        yPosition += 3;
-                    });
-                    if (c.transport.recommendedTransport) {
-                        addWrappedText("HIGHLY RECOMMENDED:", 9, 'bold', [16, 185, 129]);
-                        addWrappedText(c.transport.recommendedTransport, 9, 'normal', [80, 80, 80]);
-                    }
-                    if (c.transport.notRecommendedTransport) {
-                        addWrappedText("AVOID IF POSSIBLE:", 9, 'bold', [239, 68, 68]);
-                        addWrappedText(c.transport.notRecommendedTransport, 9, 'normal', [80, 80, 80]);
-                    }
-                    yPosition += 5;
-                }
-
-                if (c.secrets?.places?.length > 0) {
-                    addWrappedText("HIDDEN GEMS & SECRETS", 12, 'bold', colorPrimary);
-                    c.secrets.places.forEach((p: any) => {
-                        addWrappedText(`${p.name} [${p.type}]`, 10, 'bold', [50, 50, 50]);
-                        addWrappedText(p.description, 10, 'normal', [80, 80, 80]);
-                        if (p.lessCrowdedAlternative) addWrappedText(`Less crowded alternative: ${p.lessCrowdedAlternative}`, 9, 'italic', colorSecondary);
-                        if (p.isPhotoSpot) addWrappedText("Perfect Photo Spot!", 9, 'bold', colorPrimary);
-                        yPosition += 3;
-                    });
-                    yPosition += 5;
-                }
-
-                if (c.safety) {
-                    if (c.safety.commonScams?.length > 0) {
-                        addWrappedText("COMMON SCAMS TO AVOID", 12, 'bold', [239, 68, 68]);
-                        c.safety.commonScams.forEach((s: string) => addWrappedText(`• ${s}`, 10, 'normal', [80, 80, 80]));
-                        yPosition += 3;
-                    }
-                    if (c.safety.emergencyNumbers?.length > 0) {
-                        addWrappedText("EMERGENCY CONTACTS", 12, 'bold', colorPrimary);
-                        c.safety.emergencyNumbers.forEach((n: any) => addWrappedText(`${n.name}: ${n.number}`, 10, 'bold', [50, 50, 50]));
-                        yPosition += 5;
-                    }
-                }
-                addPageFooter(doc.getNumberOfPages());
-            }
-
-            // --- ARRIVAL & MORE ---
-            if (c?.arrival || c?.departure || c?.shopping || c?.customization || c?.postTrip) {
-                checkPageBreak(50, "Logistics & Extras");
-                addWrappedText("LOGISTICS & POST-TRIP", 14, 'bold', colorPrimary);
-                yPosition += 5;
-
-                if (c.arrival) {
-                    addWrappedText("ARRIVAL LOGISTICS", 12, 'bold', colorPrimary);
-                    if (c.arrival.airportToCity) addWrappedText(`Transfer: ${c.arrival.airportToCity}`, 10, 'normal', [80, 80, 80]);
-                    if (c.arrival.simCardPickUp) addWrappedText(`SIM Card: ${c.arrival.simCardPickUp}`, 10, 'normal', [80, 80, 80]);
-                    yPosition += 5;
-                }
-
-                if (c.shopping) {
-                    if (c.shopping.whatToBuy?.length > 0) {
-                        addWrappedText("WHAT TO BUY", 12, 'bold', colorPrimary);
-                        c.shopping.whatToBuy.forEach((s: string) => addWrappedText(`• ${s}`, 10, 'normal', [80, 80, 80]));
-                        yPosition += 3;
-                    }
-                    if (c.shopping.bestMarkets?.length > 0) {
-                        addWrappedText("BEST MARKETS", 12, 'bold', colorPrimary);
-                        c.shopping.bestMarkets.forEach((s: string) => addWrappedText(`• ${s}`, 10, 'normal', [80, 80, 80]));
-                        yPosition += 5;
-                    }
-                }
-
-                if (c.customization) {
-                    addWrappedText("TRIP CUSTOMIZATION", 12, 'bold', colorPrimary);
-                    if (c.customization.coupleTips) { addWrappedText("Couples:", 10, 'bold', [50, 50, 50]); addWrappedText(c.customization.coupleTips, 10, 'normal', [80, 80, 80]); }
-                    if (c.customization.familyTips) { addWrappedText("Families:", 10, 'bold', [50, 50, 50]); addWrappedText(c.customization.familyTips, 10, 'normal', [80, 80, 80]); }
-                    if (c.customization.soloTips) { addWrappedText("Solo Travelers:", 10, 'bold', [50, 50, 50]); addWrappedText(c.customization.soloTips, 10, 'normal', [80, 80, 80]); }
-                    yPosition += 5;
-                }
-
-                if (c.postTrip) {
-                    addWrappedText("POST-TRIP GUIDE", 12, 'bold', colorPrimary);
-                    if (c.postTrip.jetLagRecovery) { addWrappedText("Jet Lag Recovery:", 10, 'bold', [50, 50, 50]); addWrappedText(c.postTrip.jetLagRecovery, 10, 'normal', [80, 80, 80]); }
-                    if (c.postTrip.wishIKnew) { addWrappedText("Wish I Knew:", 10, 'bold', [50, 50, 50]); addWrappedText(c.postTrip.wishIKnew, 10, 'normal', [80, 80, 80]); }
-                    if (c.postTrip.nextDestinationIdeas?.length > 0) {
-                        addWrappedText("Where to Next?", 10, 'bold', [50, 50, 50]);
-                        c.postTrip.nextDestinationIdeas.forEach((s: string) => addWrappedText(`• ${s}`, 10, 'normal', [80, 80, 80]));
-                    }
-                    yPosition += 5;
-                }
-
-                // --- NEW SECTION: MISTAKES & LESSONS ---
-                if (c.mistakes) {
-                    checkPageBreak(80, "Mistakes & Lessons");
-                    addWrappedText("MISTAKES & LESSONS", 12, 'bold', [239, 68, 68]);
-                    if (c.mistakes.biggestMistake) addExpertBox("BIGGEST MISTAKE", c.mistakes.biggestMistake, "WARNING");
-                    if (c.mistakes.timeWasters) addExpertBox("MASSIVE TIME WASTERS", c.mistakes.timeWasters, "TIP");
-                    if (c.mistakes.moneyWasters) addExpertBox("MONEY WASTERS", c.mistakes.moneyWasters, "WARNING");
-                    if (c.mistakes.neverAgain) addExpertBox("NEVER DOING THIS AGAIN", c.mistakes.neverAgain, "WARNING");
-                    yPosition += 5;
-                }
-
-                // --- NEW SECTION: HONEST REVIEW ---
-                if (c.review) {
-                    checkPageBreak(80, "Honest Review");
-                    addWrappedText("HONEST REVIEW", 12, 'bold', [139, 92, 246]);
-                    if (c.review.exceededExpectations) addExpertBox("EXCEEDED EXPECTATIONS", c.review.exceededExpectations, "TIP");
-                    if (c.review.disappointments) addExpertBox("DISAPPOINTMENTS", c.review.disappointments, "WARNING");
-                    if (c.review.recommendOverall) addExpertBox("OVERALL VERDICT", c.review.recommendOverall, "SECRET");
-                    yPosition += 5;
-                }
-
-                addPageFooter(doc.getNumberOfPages());
-            }
-
-            // --- BONUS ---
-            if (c?.bonus) {
-                checkPageBreak(50, "Bonus Resources");
-                addWrappedText("BONUS RESOURCES", 14, 'bold', colorPrimary);
-                yPosition += 5;
-
-                if (c.bonus.googleMapsLink) {
-                    addWrappedText("GOOGLE MAPS MASTER LIST", 12, 'bold', colorPrimary);
-                    addWrappedText(c.bonus.googleMapsLink, 10, 'normal', [80, 80, 80]);
-                    yPosition += 8;
-                }
-
-                if (c.bonus.commonMistakes) {
-                    addWrappedText("COMMON MISTAKES", 12, 'bold', colorPrimary);
-                    addWrappedText(c.bonus.commonMistakes, 10, 'normal', [80, 80, 80]);
-                    yPosition += 8;
-                }
-
-                if (c.bonus.externalLinks?.length > 0) {
-                    addWrappedText("HELPFUL EXTERNAL LINKS", 12, 'bold', colorPrimary);
-                    c.bonus.externalLinks.forEach((link: any) => {
-                        addWrappedText(`${link.label}: ${link.url}`, 10, 'normal', [80, 80, 80]);
-                    });
-                    yPosition += 8;
-                }
-
-                addPageFooter(doc.getNumberOfPages());
-            }
-
-            // --- GALLERY ---
-            if (c?.proofOfVisit?.images && c.proofOfVisit.images.length > 0) {
-                checkPageBreak(100, "Proof of Visit & Gallery");
-                addWrappedText("TRIP MEMORIES & PROOF OF VISIT", 14, 'bold', colorPrimary);
+            if (c.food.mustTryDishes?.length > 0) {
+                doc.setFont(fonts.serif, "bold");
+                doc.setFontSize(16);
+                doc.text("Local Delicacies", margin, yPosition);
                 yPosition += 8;
 
-                for (const img of c.proofOfVisit.images) {
-                    if (img.url) {
-                        await addRemoteImage(img.url, img.caption || "Trip Memory", 140);
-                    }
-                }
-                if (c.proofOfVisit.notes) {
-                    addWrappedText("CREATOR NOTES:", 11, 'bold', colorPrimary);
-                    addWrappedText(c.proofOfVisit.notes, 11, 'italic', [80, 80, 80]);
+                c.food.mustTryDishes.forEach((dish: any) => {
+                    doc.setFont(fonts.sans, "bold");
+                    doc.setFontSize(10);
+                    doc.setTextColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+                    doc.text(safeText(dish.name), margin, yPosition);
                     yPosition += 5;
-                }
-                addPageFooter(doc.getNumberOfPages());
+                    doc.setFont(fonts.sans, "normal");
+                    doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+                    const wrapped = doc.splitTextToSize(safeText(dish.description), contentWidth);
+                    doc.text(wrapped, margin, yPosition);
+                    yPosition += (wrapped.length * 5) + 5;
+                });
             }
 
-            // --- SHOP ---
-            if ((c?.creatorProducts && c.creatorProducts.length > 0) || (c?.affiliateProducts && c.affiliateProducts.length > 0)) {
-                checkPageBreak(100, "Shop the Trip");
-                addWrappedText("SHOP THE TRIP", 14, 'bold', colorPrimary);
-                yPosition += 10;
+            if (c.food.restaurantRecommendations?.length > 0) {
+                yPosition += 5;
+                doc.setFont(fonts.serif, "bold");
+                doc.setFontSize(16);
+                doc.text("Handpicked Dining Spots", margin, yPosition);
+                yPosition += 8;
 
-                const renderProducts = async (products: any[], title: string) => {
-                    addWrappedText(title, 12, 'bold', colorSecondary);
+                c.food.restaurantRecommendations.forEach((rest: any) => {
+                    checkPageBreak(30);
+                    doc.setFont(fonts.sans, "bold");
+                    doc.setFontSize(11);
+                    doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+                    doc.text(safeText(rest.name), margin + 5, yPosition);
+                    doc.setFont(fonts.sans, "normal");
+                    doc.setFontSize(9);
+                    doc.setTextColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+                    doc.text(`${rest.cuisine} | ${rest.priceRange}`, margin + 5, yPosition + 5);
+                    yPosition += 10;
+                    if (rest.bestDish) {
+                        doc.setFont(fonts.sans, "italic");
+                        doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+                        doc.text(`"Must Try: ${safeText(rest.bestDish)}"`, margin + 5, yPosition);
+                        yPosition += 6;
+                    }
+                    if (rest.notes) {
+                        const wrappedNotes = doc.splitTextToSize(safeText(rest.notes), contentWidth - 10);
+                        doc.text(wrappedNotes, margin + 5, yPosition);
+                        yPosition += (wrappedNotes.length * 5) + 5;
+                    }
                     yPosition += 5;
-
-                    const colWidth = contentWidth / 2 - 5;
-                    for (let i = 0; i < products.length; i += 2) {
-                        checkPageBreak(60);
-                        const rowY = yPosition;
-
-                        for (let j = 0; j < 2; j++) {
-                            const prod = products[i + j];
-                            if (!prod) break;
-                            const x = margin + (j * (colWidth + 10));
-
-                            doc.setFontSize(10);
-                            doc.setFont("helvetica", "bold");
-                            doc.setTextColor(50, 50, 50);
-                            doc.text(safeText(prod.title).substring(0, 30), x, rowY);
-
-                            doc.setFontSize(9);
-                            doc.setFont("helvetica", "normal");
-                            doc.setTextColor(100, 100, 100);
-                            const desc = safeText(prod.description || prod.price || prod.priceDisplay).substring(0, 60);
-                            doc.text(desc, x, rowY + 5);
-
-                            doc.setTextColor(colorPrimary[0], colorPrimary[1], colorPrimary[2]);
-                            doc.text("Click to View >", x, rowY + 10);
-                            doc.link(x, rowY - 2, colWidth, 15, { url: prod.url || prod.productUrl || '#' });
-                        }
-                        yPosition += 20;
-                    }
-                };
-
-                if (c?.creatorProducts?.length > 0) await renderProducts(c.creatorProducts, "CREATOR EXCLUSIVES");
-                if (c?.affiliateProducts?.length > 0) await renderProducts(c.affiliateProducts, "RECOMMENDED GEAR");
-
-                addPageFooter(doc.getNumberOfPages());
+                });
             }
+            addPageFooter(doc.getNumberOfPages());
+        }
 
-            // --- TERMS ---
-            checkPageBreak(50, "Terms & Safety");
-            addWrappedText("TERMS & SAFETY", 14, 'bold', colorPrimary);
-            yPosition += 5;
+        // --- 9. THE HIDDEN GEMS ---
+        if (c?.secrets?.places?.length > 0) {
+            doc.addPage();
+            yPosition = margin + 10;
+            drawSectionTitle("Hidden Gems", "Places you won't find in typical guidebooks.");
 
-            addWrappedText("REFUND POLICY", 12, 'bold', colorPrimary);
-            addWrappedText(itineraryData.refundPolicy || "No refunds for digital products.", 10, 'normal', [100, 100, 100]);
-            yPosition += 10;
+            c.secrets.places.forEach((p: any) => {
+                doc.setFont(fonts.sans, "bold");
+                doc.setFontSize(12);
+                doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+                doc.text(safeText(p.name), margin, yPosition);
+                yPosition += 5;
+                doc.setFont(fonts.sans, "normal");
+                doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+                const wrapped = doc.splitTextToSize(safeText(p.description), contentWidth);
+                doc.text(wrapped, margin, yPosition);
+                yPosition += (wrapped.length * 5) + 8;
+            });
+            addPageFooter(doc.getNumberOfPages());
+        }
 
-            addWrappedText("CANCELLATION TERMS", 12, 'bold', colorPrimary);
-            addWrappedText(itineraryData.cancellationPolicy || "Final sale once accessed.", 10, 'normal', [100, 100, 100]);
-            yPosition += 20;
+        // --- 10. MISTAKES TO AVOID ---
+        doc.addPage();
+        yPosition = margin + 10;
+        drawSectionTitle("Avoid These Mistakes", "Save money and time by learning from my experience.");
 
-            // --- GLOBAL MAP ---
-            checkPageBreak(150, "Interactive Journey Map");
-            addWrappedText("PRIMARY JOURNEY MAP", 14, 'bold', colorPrimary);
-            yPosition += 10;
+        const mistakes = [
+            { t: "Biggest Mistake", v: c?.mistakes?.biggestMistake || "Not booking popular attractions at least 2 weeks in advance." },
+            { t: "Massive Time Waster", v: c?.mistakes?.timeWasters || "Waiting in line for 'famous' spots that are tourist traps." },
+            { t: "Money Waster", v: c?.mistakes?.moneyWasters || "Using airport currency exchange or standard taxis." }
+        ];
 
-            try {
-                const coords: [number, number][] = [];
-                const getCoord = async (locationStr?: string, locationCoords?: any): Promise<[number, number] | null> => {
-                    if (locationCoords && Array.isArray(locationCoords) && locationCoords.length === 2 && typeof locationCoords[0] === 'number') {
-                        return [locationCoords[0], locationCoords[1]];
-                    } else if (locationStr && typeof locationStr === 'string' && locationStr.trim().length > 0) {
-                        try {
-                            const res = await fetch('/api/geocode', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ location: locationStr })
-                            });
-                            if (res.ok) {
-                                const geoData = await res.json();
-                                if (geoData.success && geoData.coordinates) {
-                                    return geoData.coordinates;
-                                }
-                            }
-                        } catch (e) {
-                            console.error("Geocoding failed for", locationStr);
-                        }
-                    }
-                    return null;
-                };
+        mistakes.forEach(m => {
+            doc.setFillColor(colors.beige[0], colors.beige[1], colors.beige[2]);
+            const wrapped = doc.splitTextToSize(safeText(m.v), contentWidth - 20);
+            const h = (wrapped.length * 5) + 20;
+            doc.rect(margin, yPosition, contentWidth, h, 'F');
+            doc.setFont(fonts.sans, "bold");
+            doc.setFontSize(10);
+            doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+            doc.text(m.t.toUpperCase(), margin + 10, yPosition + 10);
+            doc.setFont(fonts.sans, "normal");
+            doc.text(wrapped, margin + 10, yPosition + 17);
+            yPosition += h + 10;
+        });
+        addPageFooter(doc.getNumberOfPages());
 
-                const addCoord = async (locationStr?: string, locationCoords?: any) => {
-                    const c = await getCoord(locationStr, locationCoords);
-                    if (c) coords.push(c);
-                };
+        // --- 11-14. RAPID FIRE GUIDES ---
+        doc.addPage();
+        yPosition = margin + 10;
+        drawSectionTitle("Expert Logistics", "The final details for a perfect trip.");
 
-                if (c?.accommodation?.hotelRecommendations) {
-                    for (const hotel of c.accommodation.hotelRecommendations) {
-                        await addCoord(hotel.neighborhood, hotel.locationCoordinates);
-                        await addCoord(hotel.name, hotel.locationCoordinates);
-                    }
-                }
+        const sections = [
+            { title: "Transport Guide", val: c?.transport?.recommendedTransport || "Use the local metro system; it's clean, safe, and 5x cheaper than Uber." },
+            { title: "Customization", val: c?.customization?.soloTips || "Stay in neighborhoods like [X] for the best community vibe." },
+            { title: "Bonus Value", val: "Check the master Google Maps list in your dashboard for real-time updates." }
+        ];
 
-                if (itineraryData.days) {
-                    for (const day of itineraryData.days) {
-                        // Check multiple coordinate sources per day
-                        if (day.morning?.locationCoordinates) await addCoord(undefined, day.morning.locationCoordinates);
-                        if (day.afternoon?.locationCoordinates) await addCoord(undefined, day.afternoon.locationCoordinates);
-                        if (day.evening?.locationCoordinates) await addCoord(undefined, day.evening.locationCoordinates);
+        sections.forEach(s => {
+            doc.setFont(fonts.serif, "bold");
+            doc.setFontSize(16);
+            doc.setTextColor(colors.black[0], colors.black[1], colors.black[2]);
+            doc.text(s.title, margin, yPosition);
+            yPosition += 8;
+            doc.setFont(fonts.sans, "normal");
+            doc.setFontSize(10);
+            doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+            const wrapped = doc.splitTextToSize(safeText(s.val), contentWidth);
+            doc.text(wrapped, margin, yPosition);
+            yPosition += (wrapped.length * 5) + 15;
+        });
+        addPageFooter(doc.getNumberOfPages());
 
-                        // Check if it's an array of coords
-                        if (day.locationCoordinates && Array.isArray(day.locationCoordinates)) {
-                            day.locationCoordinates.forEach((coord: any) => {
-                                const lng = typeof coord.longitude === 'number' ? coord.longitude : coord[0];
-                                const lat = typeof coord.latitude === 'number' ? coord.latitude : coord[1];
-                                if (typeof lng === 'number' && typeof lat === 'number') {
-                                    coords.push([lng, lat]);
-                                }
-                            });
-                        }
-                    }
-                }
-
-                // Add pins for accommodation
-                if (c?.accommodation?.hotelRecommendations) {
-                    for (const hotel of c.accommodation.hotelRecommendations) {
-                        if (hotel.locationCoordinates) await addCoord(undefined, hotel.locationCoordinates);
-                    }
-                }
-
-                const startCoord = await getCoord(itineraryData.pickup || itineraryData.startingLocation);
-                const endCoord = await getCoord(itineraryData.drop);
-
-                if (startCoord) coords.push(startCoord);
-                if (endCoord) coords.push(endCoord);
-
-                if (coords.length > 0) {
-                    const staticMapUrl = generateStaticMapUrl(coords, 800, 600, startCoord || undefined, endCoord || undefined);
-                    if (staticMapUrl) {
-                        const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(staticMapUrl)}`;
-                        const res = await fetch(proxyUrl);
-                        if (res.ok) {
-                            const blob = await res.blob();
-                            const base64Data = await new Promise((resolve) => {
-                                const reader = new FileReader();
-                                reader.onloadend = () => resolve(reader.result);
-                                reader.readAsDataURL(blob);
-                            });
-
-                            doc.addImage(base64Data as string, blob.type === 'image/jpeg' ? 'JPEG' : 'PNG', margin, yPosition, contentWidth, 120);
-                            yPosition += 130;
-                        }
-                    }
-                } else {
-                    addWrappedText("No locations pinned yet.", 12, 'italic', [150, 150, 150]);
-                }
-            } catch (error) {
-                console.error("Global map failure", error);
-            }
-
-            // --- FINAL NOTE ---
-            if (c.finalNote) {
-                checkPageBreak(100, "Final Note");
-                doc.addPage();
-                yPosition = 50;
-                addPageHeader("A Final Note");
-                
-                doc.setFont("helvetica", "italic");
-                doc.setFontSize(18);
-                doc.setTextColor(colorSecondary[0], colorSecondary[1], colorSecondary[2]);
-                doc.text("Master this journey...", margin, yPosition);
-                yPosition += 15;
-
-                addWrappedText(c.finalNote, 12, 'normal', [50, 50, 50]);
-                
-                yPosition += 20;
-                addWrappedText("Safe Travels!", 14, 'bold', colorPrimary, 'center');
-                addPageFooter(doc.getNumberOfPages());
-            }
-        } // This closes if (!isPreview)
+        // --- 15. FINAL PAGE ---
+        doc.addPage();
+        doc.setFillColor(colors.black[0], colors.black[1], colors.black[2]);
+        doc.rect(0, 0, pageWidth, pageHeight, 'F');
+        
+        yPosition = pageHeight / 2 - 20;
+        doc.setFont(fonts.serif, "bold");
+        doc.setFontSize(36);
+        doc.setTextColor(colors.gold[0], colors.gold[1], colors.gold[2]);
+        doc.text("Safe Travels!", pageWidth / 2, yPosition, { align: 'center' });
+        
+        yPosition += 20;
+        doc.setFont(fonts.sans, "normal");
+        doc.setFontSize(12);
+        doc.setTextColor(colors.white[0], colors.white[1], colors.white[2]);
+        doc.text(`Created by ${itineraryData.creator || "Influencer"}`, pageWidth / 2, yPosition, { align: 'center' });
+        
+        yPosition += 10;
+        doc.setFontSize(10);
+        doc.setTextColor(colors.gray[0], colors.gray[1], colors.gray[2]);
+        doc.text("Thank you for purchasing this luxury blueprint.", pageWidth / 2, yPosition, { align: 'center' });
 
         // Save PDF
-        const filename = `${itineraryData.title ? itineraryData.title.replace(/[^a-z0-9]/gi, '_') : 'itinerary'}_${isPreview ? 'preview' : 'full'}.pdf`;
-        const pdfBlob = doc.output('blob');
-        const url = URL.createObjectURL(pdfBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 100);
+        const filename = `${itineraryData.title ? itineraryData.title.replace(/[^a-z0-9]/gi, '_') : 'itinerary'}_${isPreview ? 'premium_preview' : 'premium_full'}.pdf`;
+        doc.save(filename);
 
         return true;
     } catch (error) {

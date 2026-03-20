@@ -489,8 +489,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                 </div>
 
                                 <h2 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>
-                                    {itinerary.currency === 'INR' || !itinerary.currency ? '₹' : itinerary.currency === 'USD' ? '$' : itinerary.currency === 'EUR' ? '€' : itinerary.currency + ' '}
-                                    {itinerary.price}
+                                    {getCurrencySymbol(itinerary.currency || 'USD')} {itinerary.price}
                                     <span style={{ fontSize: '1rem', color: 'var(--gray-400)', marginLeft: '8px', fontWeight: 500 }}>{itinerary.priceType}</span>
                                 </h2>
 
@@ -566,7 +565,7 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                             </div>
                             <div className="print-only">
                                 <p>Verified Itinerary Guide</p>
-                                <p>Price: {itinerary.currency === 'INR' ? '₹' : itinerary.currency === 'USD' ? '$' : itinerary.currency} {itinerary.price}</p>
+                                <p>Price: {getCurrencySymbol(itinerary.currency || 'USD')} {itinerary.price}</p>
                             </div>
 
                             <div style={{ marginTop: '24px' }}>
