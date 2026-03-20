@@ -264,7 +264,17 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
         yPosition += 2;
         addWrappedText(itineraryData.description, 11, 'normal', [80, 80, 80]);
 
-        yPosition += 15;
+        if (itineraryData.content?.cover?.visitDate) {
+            yPosition += 5;
+            addWrappedText(`VISITED IN: ${itineraryData.content.cover.visitDate}`, 10, 'bold', colorSecondary);
+        }
+
+        if (itineraryData.content?.cover?.avoidReason) {
+            yPosition += 5;
+            addExpertBox("WHO SHOULD AVOID THIS TRIP", itineraryData.content.cover.avoidReason, "WARNING");
+        }
+
+        yPosition += 10;
 
         // Logistics
         addWrappedText("LOGISTICS & ARRIVAL", 12, 'bold', colorPrimary);
@@ -305,6 +315,58 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
             return true;
         }
 
+        // --- NEW SECTION: COST BREAKDOWN ---
+        if (!isPreview && itineraryData.content?.costBreakdown) {
+            const cb = itineraryData.content.costBreakdown;
+            checkPageBreak(100, "Real Cost Breakdown");
+            doc.addPage();
+            yPosition = 30;
+            addPageHeader("Real Cost Breakdown");
+            
+            addWrappedText("THE REAL COST OF THIS TRIP", 16, 'bold', [16, 185, 129]); // Green
+            addWrappedText("Based on my personal spending during this exact trip.", 10, 'italic', [100, 100, 100]);
+            yPosition += 10;
+
+            doc.setFillColor(240, 253, 244); // Light green bg
+            doc.rect(margin, yPosition, contentWidth, 25, 'F');
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(5, 150, 105);
+            doc.text(`TOTAL SPENT: ${itineraryData.currency || '$'}${cb.totalSpent}`, margin + 10, yPosition + 15);
+            yPosition += 35;
+
+            const costItems = [
+                ["Flights", cb.flights],
+                ["Stay", cb.stay],
+                ["Food", cb.food],
+                ["Transport", cb.transport],
+                ["Activities", cb.activities]
+            ];
+
+            costItems.forEach(([label, val]) => {
+                doc.setFontSize(11);
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(50, 50, 50);
+                doc.text(`${label}:`, margin + 10, yPosition);
+                doc.setFont("helvetica", "normal");
+                doc.text(`${itineraryData.currency || '$'}${val}`, margin + 60, yPosition);
+                yPosition += 8;
+            });
+
+            if (cb.overspentComment) {
+                yPosition += 5;
+                addExpertBox("WHERE I OVERSPENT", cb.overspentComment, "WARNING");
+            }
+            if (cb.savedMoneyComment) {
+                addExpertBox("WHERE I SAVED", cb.savedMoneyComment, "TIP");
+            }
+            if (cb.optimizationTips) {
+                addExpertBox("COST OPTIMIZATION TIPS", cb.optimizationTips, "SECRET");
+            }
+            
+            addPageFooter(doc.getNumberOfPages());
+        }
+
         const c = itineraryData.content;
 
         // --- PRE-TRIP & ACCOMMODATIONS ---
@@ -323,6 +385,8 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                 addWrappedText("FLIGHT & ARRIVAL STRATEGY", 12, 'bold', colorPrimary);
                 if (c.preTrip.flightGuide.bestAirports?.length > 0) addWrappedText(`Best Airports: ${c.preTrip.flightGuide.bestAirports.join(', ')}`, 10, 'normal', [80, 80, 80]);
                 if (c.preTrip.flightGuide.arrivalDepartureStats) addWrappedText(`Arrival Info: ${c.preTrip.flightGuide.arrivalDepartureStats}`, 10, 'normal', [80, 80, 80]);
+                if (c.preTrip.flightGuide.routeInsight) addWrappedText(`Route Insight: ${c.preTrip.flightGuide.routeInsight}`, 10, 'italic', colorSecondary);
+                if (c.preTrip.flightGuide.timingInsight) addWrappedText(`Timing Insight: ${c.preTrip.flightGuide.timingInsight}`, 10, 'italic', colorSecondary);
                 if (c.preTrip.flightGuide.baggageTips) addWrappedText(`Baggage Tips: ${c.preTrip.flightGuide.baggageTips}`, 10, 'normal', [80, 80, 80]);
                 if (c.preTrip.flightGuide.seatTips) addWrappedText(`Seat Secret: ${c.preTrip.flightGuide.seatTips}`, 10, 'normal', [80, 80, 80]);
                 if (c.preTrip.flightGuide.jetLagTips) addWrappedText(`Jet Lag Hack: ${c.preTrip.flightGuide.jetLagTips}`, 10, 'normal', [80, 80, 80]);
@@ -335,6 +399,7 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                     if (cat.items?.length > 0) {
                         addWrappedText(cat.category, 10, 'bold', [50, 50, 50]);
                         addWrappedText(cat.items.join(', '), 10, 'normal', [80, 80, 80]);
+                        if (cat.mistakesToAvoid) addWrappedText(`Avoid these mistakes: ${cat.mistakesToAvoid}`, 9, 'italic', [239, 68, 68]);
                         yPosition += 3;
                     }
                 });
@@ -356,6 +421,10 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                 c.accommodation.hotelRecommendations.forEach((hotel: any) => {
                     addWrappedText(`${hotel.name} - ${hotel.priceRange} (${hotel.neighborhood})`, 10, 'bold', [50, 50, 50]);
                     addWrappedText(hotel.whyWeLoveIt, 10, 'normal', [80, 80, 80]);
+                    if (hotel.liked) addWrappedText(`What I Liked: ${hotel.liked}`, 9, 'normal', [16, 185, 129]);
+                    if (hotel.disliked) addWrappedText(`What I Disliked: ${hotel.disliked}`, 9, 'normal', [239, 68, 68]);
+                    if (hotel.recommend === false) addWrappedText("Verdict: NOT RECOMMENDED", 9, 'bold', [239, 68, 68]);
+                    else if (hotel.recommend === true) addWrappedText("Verdict: STRONGLY RECOMMENDED", 9, 'bold', [16, 185, 129]);
                     if (hotel.bookingLink) addWrappedText(`Booking Link: ${hotel.bookingLink}`, 9, 'italic', colorSecondary);
                     yPosition += 3;
                 });
@@ -434,8 +503,13 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                         if (typeof item.data === 'object' && item.data !== null) {
                             if (item.data.whyVisit) details.push(`Why: ${item.data.whyVisit}`);
                             if (item.data.travelTime) details.push(`Commute: ${item.data.travelTime}`);
+                            if (item.data.duration) details.push(`Spent: ${item.data.duration}`);
+                            if (item.data.cost) details.push(`Cost: ${item.data.cost}`);
                             if (item.data.transitToNext) details.push(`Transit: ${item.data.transitToNext}`);
                             if (item.data.food) details.push(`Food: ${item.data.food}`);
+                            if (item.data.worthIt) details.push(`Worth it?: ${item.data.worthIt}`);
+                            if (item.data.bestTime) details.push(`Best time: ${item.data.bestTime}`);
+                            if (item.data.avoid) details.push(`Skip if: ${item.data.avoid}`);
                             if (item.data.notes || item.data.tips) details.push(`Tip: ${item.data.notes || item.data.tips}`);
                             if (item.data.localSecret) details.push(`Secret: ${item.data.localSecret}`);
                         }
@@ -665,6 +739,30 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                     yPosition += 5;
                 }
 
+                if (c.food?.restaurantRecommendations?.length > 0) {
+                    addWrappedText("HANDPICKED RESTAURANTS", 11, 'bold', colorPrimary);
+                    c.food.restaurantRecommendations.forEach((rest: any) => {
+                        addWrappedText(`${rest.name} - ${rest.priceRange} (${rest.cuisine})`, 10, 'bold', [50, 50, 50]);
+                        if (rest.bestDish) addWrappedText(`MUST TRY: ${rest.bestDish}`, 9, 'bold', [16, 185, 129]);
+                        if (rest.avoidDish) addWrappedText(`AVOID: ${rest.avoidDish}`, 9, 'normal', [239, 68, 68]);
+                        if (rest.notes) addWrappedText(rest.notes, 9, 'italic', [100, 100, 100]);
+                        yPosition += 3;
+                    });
+                    yPosition += 5;
+                }
+
+                if (c.food?.placesToRegret?.length > 0) {
+                    addWrappedText("PLACES I REGRET VISITING", 11, 'bold', [239, 68, 68]);
+                    c.food.placesToRegret.forEach((p: string) => addWrappedText(`• ${p}`, 9, 'normal', [100, 100, 100]));
+                    yPosition += 5;
+                }
+
+                if (c.food?.touristTrapsToAvoid?.length > 0) {
+                    addWrappedText("TOURIST TRAPS TO AVOID", 11, 'bold', [234, 88, 12]);
+                    c.food.touristTrapsToAvoid.forEach((p: string) => addWrappedText(`• ${p}`, 9, 'normal', [100, 100, 100]));
+                    yPosition += 5;
+                }
+
                 if (c.transport?.modes?.length > 0) {
                     addWrappedText("GETTING AROUND", 12, 'bold', colorPrimary);
                     c.transport.modes.forEach((m: any) => {
@@ -672,14 +770,24 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                         addWrappedText(m.tips, 10, 'normal', [80, 80, 80]);
                         yPosition += 3;
                     });
+                    if (c.transport.recommendedTransport) {
+                        addWrappedText("HIGHLY RECOMMENDED:", 9, 'bold', [16, 185, 129]);
+                        addWrappedText(c.transport.recommendedTransport, 9, 'normal', [80, 80, 80]);
+                    }
+                    if (c.transport.notRecommendedTransport) {
+                        addWrappedText("AVOID IF POSSIBLE:", 9, 'bold', [239, 68, 68]);
+                        addWrappedText(c.transport.notRecommendedTransport, 9, 'normal', [80, 80, 80]);
+                    }
                     yPosition += 5;
                 }
 
                 if (c.secrets?.places?.length > 0) {
-                    addWrappedText("HIDDEN GEMS", 12, 'bold', colorPrimary);
+                    addWrappedText("HIDDEN GEMS & SECRETS", 12, 'bold', colorPrimary);
                     c.secrets.places.forEach((p: any) => {
                         addWrappedText(`${p.name} [${p.type}]`, 10, 'bold', [50, 50, 50]);
                         addWrappedText(p.description, 10, 'normal', [80, 80, 80]);
+                        if (p.lessCrowdedAlternative) addWrappedText(`Less crowded alternative: ${p.lessCrowdedAlternative}`, 9, 'italic', colorSecondary);
+                        if (p.isPhotoSpot) addWrappedText("Perfect Photo Spot!", 9, 'bold', colorPrimary);
                         yPosition += 3;
                     });
                     yPosition += 5;
@@ -737,10 +845,32 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                 if (c.postTrip) {
                     addWrappedText("POST-TRIP GUIDE", 12, 'bold', colorPrimary);
                     if (c.postTrip.jetLagRecovery) { addWrappedText("Jet Lag Recovery:", 10, 'bold', [50, 50, 50]); addWrappedText(c.postTrip.jetLagRecovery, 10, 'normal', [80, 80, 80]); }
+                    if (c.postTrip.wishIKnew) { addWrappedText("Wish I Knew:", 10, 'bold', [50, 50, 50]); addWrappedText(c.postTrip.wishIKnew, 10, 'normal', [80, 80, 80]); }
                     if (c.postTrip.nextDestinationIdeas?.length > 0) {
                         addWrappedText("Where to Next?", 10, 'bold', [50, 50, 50]);
                         c.postTrip.nextDestinationIdeas.forEach((s: string) => addWrappedText(`• ${s}`, 10, 'normal', [80, 80, 80]));
                     }
+                    yPosition += 5;
+                }
+
+                // --- NEW SECTION: MISTAKES & LESSONS ---
+                if (c.mistakes) {
+                    checkPageBreak(80, "Mistakes & Lessons");
+                    addWrappedText("MISTAKES & LESSONS", 12, 'bold', [239, 68, 68]);
+                    if (c.mistakes.biggestMistake) addExpertBox("BIGGEST MISTAKE", c.mistakes.biggestMistake, "WARNING");
+                    if (c.mistakes.timeWasters) addExpertBox("MASSIVE TIME WASTERS", c.mistakes.timeWasters, "TIP");
+                    if (c.mistakes.moneyWasters) addExpertBox("MONEY WASTERS", c.mistakes.moneyWasters, "WARNING");
+                    if (c.mistakes.neverAgain) addExpertBox("NEVER DOING THIS AGAIN", c.mistakes.neverAgain, "WARNING");
+                    yPosition += 5;
+                }
+
+                // --- NEW SECTION: HONEST REVIEW ---
+                if (c.review) {
+                    checkPageBreak(80, "Honest Review");
+                    addWrappedText("HONEST REVIEW", 12, 'bold', [139, 92, 246]);
+                    if (c.review.exceededExpectations) addExpertBox("EXCEEDED EXPECTATIONS", c.review.exceededExpectations, "TIP");
+                    if (c.review.disappointments) addExpertBox("DISAPPOINTMENTS", c.review.disappointments, "WARNING");
+                    if (c.review.recommendOverall) addExpertBox("OVERALL VERDICT", c.review.recommendOverall, "SECRET");
                     yPosition += 5;
                 }
 
@@ -950,6 +1080,26 @@ export const generateItineraryPDF = async (itineraryData: ItineraryData, isPurch
                 }
             } catch (error) {
                 console.error("Global map failure", error);
+            }
+
+            // --- FINAL NOTE ---
+            if (c.finalNote) {
+                checkPageBreak(100, "Final Note");
+                doc.addPage();
+                yPosition = 50;
+                addPageHeader("A Final Note");
+                
+                doc.setFont("helvetica", "italic");
+                doc.setFontSize(18);
+                doc.setTextColor(colorSecondary[0], colorSecondary[1], colorSecondary[2]);
+                doc.text("Master this journey...", margin, yPosition);
+                yPosition += 15;
+
+                addWrappedText(c.finalNote, 12, 'normal', [50, 50, 50]);
+                
+                yPosition += 20;
+                addWrappedText("Safe Travels!", 14, 'bold', colorPrimary, 'center');
+                addPageFooter(doc.getNumberOfPages());
             }
         } // This closes if (!isPreview)
 

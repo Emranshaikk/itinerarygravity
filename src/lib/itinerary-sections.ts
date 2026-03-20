@@ -60,6 +60,8 @@ export const ITINERARY_PHASES: ItineraryPhase[] = [
             { id: 9, label: "Safety & Culture", icon: Shield, desc: "Scams & respect" },
             { id: 11, label: "Emergency Info", icon: AlertTriangle, desc: "Important contacts" },
             { id: 3, label: "Money & Connectivity", icon: CreditCard, desc: "Sims, cash, budget" },
+            { id: 20, label: "Cost Breakdown", icon: CreditCard, desc: "Where money went" },
+            { id: 21, label: "Mistakes & Lessons", icon: AlertTriangle, desc: "What to avoid" },
             { id: 10, label: "Customization", icon: Sliders, desc: "Couples, Families, Solos" },
             { id: 14, label: "Post-Trip", icon: ImageIcon, desc: "Memories & sharing" },
         ]
@@ -70,6 +72,8 @@ export const ITINERARY_PHASES: ItineraryPhase[] = [
         sections: [
             { id: 17, label: "Affiliate Links", icon: Link, desc: "Products to buy" },
             { id: 18, label: "Creator Store", icon: ShoppingCart, desc: "Your own products" },
+            { id: 22, label: "Honest Review", icon: Star, desc: "Your final verdict" },
+            { id: 23, label: "Final Note", icon: Gift, desc: "Message to buyer" },
             { id: 15, label: "Bonus & Extras", icon: Gift, desc: "Freebies & external links" },
         ]
     }
@@ -77,7 +81,7 @@ export const ITINERARY_PHASES: ItineraryPhase[] = [
 
 export const ALL_SECTIONS: ItinerarySection[] = ITINERARY_PHASES.flatMap(phase => phase.sections);
 
-// Ensure we have exactly 19 sections
-if (ALL_SECTIONS.length !== 19) {
-    console.warn(`ITINERARY_PHASES configured with ${ALL_SECTIONS.length} sections instead of 19.`);
+// Ensure we have exactly 23 sections
+if (ALL_SECTIONS.length !== 23) {
+    console.warn(`ITINERARY_PHASES configured with ${ALL_SECTIONS.length} sections instead of 23.`);
 }

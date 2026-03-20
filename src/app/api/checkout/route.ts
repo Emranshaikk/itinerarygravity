@@ -12,7 +12,7 @@ export async function POST(req: Request) {
         }
 
         const userId = (session.user as any).id;
-        const { itineraryId } = await req.json();
+        const { itineraryId, couponCode } = await req.json();
 
         if (!itineraryId) {
             return NextResponse.json({ error: "Missing data" }, { status: 400 });
@@ -21,6 +21,7 @@ export async function POST(req: Request) {
         // Fetch itinerary to find creator
         const { Itinerary } = await import('@/models/Itinerary');
         const { User } = await import('@/models/User');
+        const { Coupon } = await import('@/models/Coupon');
         await import('@/lib/mongodb').then(m => m.default());
 
         const itinerary = await Itinerary.findById(itineraryId);
@@ -30,9 +31,37 @@ export async function POST(req: Request) {
 
         const creator = await User.findById(itinerary.creator_id);
 
+        let finalPrice = itinerary.price;
+        let discountDetails = null;
+
+        // Apply coupon if provided
+        if (couponCode) {
+            const coupon = await Coupon.findOne({
+                code: couponCode.toUpperCase(),
+                isActive: true,
+                expiresAt: { $gt: new Date() }
+            });
+
+            if (coupon) {
+                // Verify itinerary restriction if any
+                if (!coupon.itineraryId || coupon.itineraryId.toString() === itineraryId) {
+                    if (coupon.discountType === 'percentage') {
+                        finalPrice = finalPrice * (1 - coupon.value / 100);
+                    } else {
+                        finalPrice = Math.max(0, finalPrice - coupon.value);
+                    }
+                    discountDetails = {
+                        code: coupon.code,
+                        type: coupon.discountType,
+                        value: coupon.value
+                    };
+                }
+            }
+        }
+
         // Convert foreign currencies to INR for Razorpay (Razorpay expects amount in paise)
         const { convertToINR } = await import('@/lib/currency');
-        const inrAmount = convertToINR(itinerary.price, itinerary.currency || 'USD');
+        const inrAmount = convertToINR(finalPrice, itinerary.currency || 'USD');
         const amountInPaise = Math.round(inrAmount * 100);
 
         const options: any = {
@@ -44,7 +73,9 @@ export async function POST(req: Request) {
                 itineraryId,
                 title: itinerary.title,
                 originalCurrency: itinerary.currency || 'USD',
-                originalPrice: itinerary.price
+                originalPrice: itinerary.price,
+                discountedPrice: finalPrice,
+                couponCode: couponCode || ""
             }
         };
 

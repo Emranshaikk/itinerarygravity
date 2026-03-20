@@ -6,7 +6,9 @@ export interface ItineraryContent {
         tripType: 'Luxury' | 'Budget' | 'Adventure' | 'Honeymoon' | 'Family' | 'Solo' | 'Cultural' | string;
         duration: string; // e.g. "7 Days / 6 Nights"
         bestTimeToVisit: string;
+        visitDate?: string; // Month + Year of visit
         targetAudience: string;
+        avoidReason?: string; // Who should AVOID this trip
         brandName?: string;
         brandLogo?: string; // URL
         coverImage?: string; // URL
@@ -26,6 +28,8 @@ export interface ItineraryContent {
         flightGuide: {
             bestAirports: string[];
             arrivalDepartureStats: string; // Ideal times
+            routeInsight?: string; // NEW: Personal route experience
+            timingInsight?: string; // NEW: Personal timing experience
             seatTips?: string;
             baggageTips?: string;
             jetLagTips?: string;
@@ -34,6 +38,7 @@ export interface ItineraryContent {
             category: string; // Clothes, Electronics, Documents
             items: string[]; // List of items
             tips?: string;
+            mistakesToAvoid?: string; // NEW
         }[];
         essentials: {
             documents: string[];
@@ -46,7 +51,17 @@ export interface ItineraryContent {
     // 3. Accommodation & Neighborhoods
     accommodation?: {
         bestNeighborhoods: { name: string; vibe: string; whyStayHere: string; locationCoordinates?: [number, number] }[];
-        hotelRecommendations: { name: string; priceRange: string; neighborhood: string; whyWeLoveIt: string; bookingLink?: string; locationCoordinates?: [number, number] }[];
+        hotelRecommendations: { 
+            name: string; 
+            priceRange: string; 
+            neighborhood: string; 
+            whyWeLoveIt: string; 
+            liked?: string; // NEW
+            disliked?: string; // NEW
+            recommend?: boolean; // NEW
+            bookingLink?: string; 
+            locationCoordinates?: [number, number] 
+        }[];
         bookingTips: string;
     };
 
@@ -70,6 +85,18 @@ export interface ItineraryContent {
         }[];
     };
 
+    costBreakdown?: { // NEW SECTION
+        totalSpent: number;
+        flights: number;
+        stay: number;
+        food: number;
+        transport: number;
+        activities: number;
+        overspentComment?: string;
+        savedMoneyComment?: string;
+        optimizationTips?: string;
+    };
+
     // 4. Arrival Day Experience
     arrival: {
         airportToCity: string;
@@ -77,6 +104,7 @@ export interface ItineraryContent {
         firstMealSuggestion: string;
         orientationTips: string;
         simCardPickUp: string;
+        mistakesToAvoid?: string; // NEW
     };
 
     // 5. Day-by-Day Itinerary (Core)
@@ -92,9 +120,14 @@ export interface ItineraryContent {
             location?: string;
             locationCoordinates?: [number, number];
             travelTime?: string;
+            duration?: string; // NEW: How long spent
+            cost?: string; // NEW: Activity cost
             food?: string; // Breakfast spot
             tips?: string;
             whyVisit?: string;
+            worthIt?: string; // NEW: Personal insight
+            bestTime?: string; // NEW
+            avoid?: string; // NEW
             transitToNext?: string;
             localSecret?: string;
         };
@@ -104,10 +137,15 @@ export interface ItineraryContent {
             location?: string;
             locationCoordinates?: [number, number];
             travelTime?: string;
+            duration?: string; // NEW
+            cost?: string; // NEW
             food?: string; // Lunch spot
             foodType?: string; // Cuisine
             tips?: string;
             whyVisit?: string;
+            worthIt?: string; // NEW
+            bestTime?: string; // NEW
+            avoid?: string; // NEW
             transitToNext?: string;
             localSecret?: string;
         };
@@ -117,11 +155,16 @@ export interface ItineraryContent {
             location?: string;
             locationCoordinates?: [number, number];
             travelTime?: string;
+            duration?: string; // NEW
+            cost?: string; // NEW
             food?: string; // Dinner
             foodBudget?: string;
             foodPremium?: string;
             tips?: string; // Nightlife or chill
             whyVisit?: string;
+            worthIt?: string; // NEW
+            bestTime?: string; // NEW
+            avoid?: string; // NEW
             transitToNext?: string;
             localSecret?: string;
         };
@@ -135,7 +178,16 @@ export interface ItineraryContent {
     // 6. Local Food Guide
     food: {
         mustTryDishes: { name: string; description: string; bestPlace?: string }[];
-        restaurantRecommendations: { name: string; priceRange: string; cuisine: string; notes?: string }[];
+        restaurantRecommendations: { 
+            name: string; 
+            priceRange: string; 
+            cuisine: string; 
+            bestDish?: string; // NEW
+            avoidDish?: string; // NEW
+            notes?: string 
+        }[];
+        placesToRegret?: string[]; // NEW
+        touristTrapsToAvoid?: string[]; // NEW
         dietaryOptions?: string; // Veg/Vegan
         foodSafety: string; // What not to eat
     };
@@ -150,6 +202,8 @@ export interface ItineraryContent {
         scams: string;
         airportTransfer: string;
         dailyStrategy: string;
+        recommendedTransport?: string; // NEW
+        notRecommendedTransport?: string; // NEW
     };
 
     // 8. Hidden Gems (Secrets)
@@ -160,9 +214,18 @@ export interface ItineraryContent {
             type: string;
             bestTime?: string;
             idealFor?: string;
+            lessCrowdedAlternative?: string; // NEW
+            isPhotoSpot?: boolean; // NEW
             tips?: string;
             locationUrl?: string;
         }[];
+    };
+
+    mistakes?: { // NEW SECTION
+        biggestMistake: string;
+        timeWasters: string;
+        moneyWasters: string;
+        neverAgain: string;
     };
 
     // 9. Safety, Scams & Culture
@@ -198,6 +261,7 @@ export interface ItineraryContent {
         jetLagRecovery?: string;
         photoTips?: string;
         nextDestinationIdeas?: string[];
+        wishIKnew?: string; // NEW
     };
 
     // 13. Bonus & Value Adds
@@ -210,6 +274,15 @@ export interface ItineraryContent {
         includeBudgetPlanner?: boolean;
         externalLinks: { label: string; url: string }[];
     };
+    
+    review?: { // NEW SECTION
+        exceededExpectations: string;
+        disappointments: string;
+        recommendOverall: string;
+    };
+
+    finalNote?: string; // NEW SECTION
+
     proofOfVisit: {
         images: { url: string; caption: string }[];
         notes?: string;

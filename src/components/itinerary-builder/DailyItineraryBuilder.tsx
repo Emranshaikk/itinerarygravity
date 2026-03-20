@@ -224,6 +224,28 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                                     </div>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                         <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>⏱️ Duration spent</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #8b5cf6', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="e.g. 2 hours"
+                                                value={day.morning.duration || ""}
+                                                onChange={(e) => updateDay(index, 'morning.duration', e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>💰 Estimated Cost</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #8b5cf6', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="e.g. $15"
+                                                value={day.morning.cost || ""}
+                                                onChange={(e) => updateDay(index, 'morning.cost', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div>
                                             <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>✨ Premium: Why Visit?</label>
                                             <input
                                                 className="form-input"
@@ -241,6 +263,38 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                                                 placeholder="e.g., 10 min walk to cafe"
                                                 value={day.morning.transitToNext || ""}
                                                 onChange={(e) => updateDay(index, 'morning.transitToNext', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#ec4899' }}>❤️ Was it worth it? (Personal Insight)</label>
+                                        <input
+                                            className="form-input"
+                                            style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #ec4899', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                            placeholder="Would you do it again? Better alternative?"
+                                            value={day.morning.worthIt || ""}
+                                            onChange={(e) => updateDay(index, 'morning.worthIt', e.target.value)}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#10b981' }}>☀️ Best time to go</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #10b981', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="Morning for light?"
+                                                value={day.morning.bestTime || ""}
+                                                onChange={(e) => updateDay(index, 'morning.bestTime', e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#ef4444' }}>🚫 What to avoid</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #ef4444', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="Don't use the back entrance..."
+                                                value={day.morning.avoid || ""}
+                                                onChange={(e) => updateDay(index, 'morning.avoid', e.target.value)}
                                             />
                                         </div>
                                     </div>
@@ -295,6 +349,28 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                                     </div>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                         <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>⏱️ Duration spent</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #8b5cf6', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="e.g. 3 hours"
+                                                value={day.afternoon.duration || ""}
+                                                onChange={(e) => updateDay(index, 'afternoon.duration', e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>💰 Estimated Cost</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #8b5cf6', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="e.g. $25"
+                                                value={day.afternoon.cost || ""}
+                                                onChange={(e) => updateDay(index, 'afternoon.cost', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div>
                                             <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>✨ Premium: Why Visit?</label>
                                             <input
                                                 className="form-input"
@@ -312,6 +388,38 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                                                 placeholder="e.g., 20 min metro ride"
                                                 value={day.afternoon.transitToNext || ""}
                                                 onChange={(e) => updateDay(index, 'afternoon.transitToNext', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#ec4899' }}>❤️ Was it worth it? (Personal Insight)</label>
+                                        <input
+                                            className="form-input"
+                                            style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #ec4899', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                            placeholder="Would you do it again? Better alternative?"
+                                            value={day.afternoon.worthIt || ""}
+                                            onChange={(e) => updateDay(index, 'afternoon.worthIt', e.target.value)}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#10b981' }}>☀️ Best time to go</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #10b981', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="Early afternoon?"
+                                                value={day.afternoon.bestTime || ""}
+                                                onChange={(e) => updateDay(index, 'afternoon.bestTime', e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#ef4444' }}>🚫 What to avoid</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #ef4444', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="Crowds at peak times..."
+                                                value={day.afternoon.avoid || ""}
+                                                onChange={(e) => updateDay(index, 'afternoon.avoid', e.target.value)}
                                             />
                                         </div>
                                     </div>
@@ -366,6 +474,28 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                                     </div>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                         <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>⏱️ Duration spent</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #8b5cf6', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="e.g. Entire night"
+                                                value={day.evening.duration || ""}
+                                                onChange={(e) => updateDay(index, 'evening.duration', e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>💰 Estimated Cost</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #8b5cf6', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="e.g. $40"
+                                                value={day.evening.cost || ""}
+                                                onChange={(e) => updateDay(index, 'evening.cost', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div>
                                             <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#8b5cf6' }}>✨ Premium: Why Visit?</label>
                                             <input
                                                 className="form-input"
@@ -383,6 +513,38 @@ export default function DailyItineraryBuilder({ data, onChange }: DailyItinerary
                                                 placeholder="e.g., Safe taxi app to hotel"
                                                 value={day.evening.transitToNext || ""}
                                                 onChange={(e) => updateDay(index, 'evening.transitToNext', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#ec4899' }}>❤️ Was it worth it? (Personal Insight)</label>
+                                        <input
+                                            className="form-input"
+                                            style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #ec4899', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                            placeholder="Would you do it again? Better alternative?"
+                                            value={day.evening.worthIt || ""}
+                                            onChange={(e) => updateDay(index, 'evening.worthIt', e.target.value)}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#10b981' }}>🌙 Best time to go</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #10b981', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="After 9 PM for vibes?"
+                                                value={day.evening.bestTime || ""}
+                                                onChange={(e) => updateDay(index, 'evening.bestTime', e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.25rem', display: 'block', color: '#ef4444' }}>🚫 What to avoid</label>
+                                            <input
+                                                className="form-input"
+                                                style={{ backgroundColor: 'var(--input-bg)', border: '1px dashed #ef4444', fontSize: '0.875rem', color: 'var(--foreground)' }}
+                                                placeholder="Overpriced drinks..."
+                                                value={day.evening.avoid || ""}
+                                                onChange={(e) => updateDay(index, 'evening.avoid', e.target.value)}
                                             />
                                         </div>
                                     </div>

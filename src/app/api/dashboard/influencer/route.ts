@@ -45,6 +45,22 @@ export async function GET() {
         });
 
         const totalEarnings = purchases.reduce((acc, p) => acc + (p.creator_earnings || 0), 0);
+        const totalSales = purchases.length;
+
+        // Detailed transaction history for transparency
+        const transactions = purchases.map((p: any) => {
+            const it = itineraries.find(i => i._id.toString() === p.itinerary_id.toString());
+            return {
+                id: p._id.toString(),
+                date: p.createdAt,
+                itineraryTitle: it?.title || "Unknown Itinerary",
+                amountPaid: p.amount_paid,
+                currency: p.currency,
+                platformFee: p.platform_fee,
+                creatorEarnings: p.creator_earnings,
+                status: p.status
+            };
+        }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
         return NextResponse.json({
             profile: {
@@ -53,6 +69,8 @@ export async function GET() {
             },
             itineraries: itinerariesWithPurchases,
             totalEarnings,
+            totalSales,
+            transactions
         });
     } catch (error: any) {
         console.error("Dashboard API error:", error);

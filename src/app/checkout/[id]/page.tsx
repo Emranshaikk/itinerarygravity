@@ -12,6 +12,10 @@ export default function CheckoutPage() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [isLoadingData, setIsLoadingData] = useState(true);
     const [internalId, setInternalId] = useState<string>("");
+    const [couponCode, setCouponCode] = useState("");
+    const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+    const [couponError, setCouponError] = useState("");
+    const [discount, setDiscount] = useState<{ type: 'percentage' | 'fixed', value: number, code: string } | null>(null);
     const [item, setItem] = useState({
         title: "Loading...",
         price: 0,
@@ -43,6 +47,42 @@ export default function CheckoutPage() {
         fetchItinerary();
     }, [id]);
 
+    const handleApplyCoupon = async () => {
+        if (!couponCode.trim()) return;
+        setIsValidatingCoupon(true);
+        setCouponError("");
+        try {
+            const res = await fetch('/api/coupons/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: couponCode, itineraryId: internalId || id })
+            });
+            const data = await res.json();
+            if (data.valid) {
+                setDiscount({ type: data.discountType, value: data.value, code: data.code });
+                setCouponCode("");
+            } else {
+                setCouponError(data.error || "Invalid coupon");
+            }
+        } catch (err) {
+            setCouponError("Failed to validate coupon");
+        } finally {
+            setIsValidatingCoupon(false);
+        }
+    };
+
+    const calculateTotal = () => {
+        let total = item.price;
+        if (discount) {
+            if (discount.type === 'percentage') {
+                total = total * (1 - discount.value / 100);
+            } else {
+                total = Math.max(0, total - discount.value);
+            }
+        }
+        return total;
+    };
+
     const handleCheckout = async () => {
         setIsProcessing(true);
         try {
@@ -55,6 +95,7 @@ export default function CheckoutPage() {
                     itineraryId: internalId || id,
                     price: item.price,
                     title: item.title,
+                    couponCode: discount?.code
                 }),
             });
 
@@ -155,14 +196,51 @@ export default function CheckoutPage() {
 
                     <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '16px', padding: '32px', marginBottom: '40px', maxWidth: '400px', margin: '0 auto 40px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                            <span style={{ color: 'var(--gray-400)' }}>Price</span>
+                            <span style={{ color: 'var(--gray-400)' }}>Original Price</span>
                             <span>{formatCurrency(item.price, item.currency)}</span>
                         </div>
+
+                        {discount && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', color: '#10b981' }}>
+                                <span>Discount ({discount.code})</span>
+                                <span>-{discount.type === 'percentage' ? `${discount.value}%` : formatCurrency(discount.value, item.currency)}</span>
+                            </div>
+                        )}
+
+                        <div className="form-group" style={{ marginBottom: '24px', textAlign: 'left' }}>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <input
+                                    className="form-input"
+                                    placeholder="Coupon Code"
+                                    value={couponCode}
+                                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                    disabled={isValidatingCoupon || !!discount}
+                                />
+                                <button
+                                    className="btn btn-outline"
+                                    style={{ padding: '0 20px', whiteSpace: 'nowrap' }}
+                                    onClick={handleApplyCoupon}
+                                    disabled={isValidatingCoupon || !couponCode || !!discount}
+                                >
+                                    {isValidatingCoupon ? "..." : "Apply"}
+                                </button>
+                            </div>
+                            {couponError && <p style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '4px' }}>{couponError}</p>}
+                            {discount && (
+                                <button
+                                    style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '0.8rem', marginTop: '4px', cursor: 'pointer', padding: 0 }}
+                                    onClick={() => setDiscount(null)}
+                                >
+                                    Remove Coupon
+                                </button>
+                            )}
+                        </div>
+
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '1.5rem', paddingTop: '12px', borderTop: '1px solid var(--border)', alignItems: 'center' }}>
                             <span>Total</span>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                                 <span className="text-gradient">
-                                    {item.currency === 'INR' ? formatCurrency(item.price, 'INR') : `≈ ₹${convertToINR(item.price, item.currency).toFixed(2)}`}
+                                    {item.currency === 'INR' ? formatCurrency(calculateTotal(), 'INR') : `≈ ₹${convertToINR(calculateTotal(), item.currency).toFixed(2)}`}
                                 </span>
                                 {item.currency !== 'INR' && (
                                     <span style={{ fontSize: '0.8rem', color: 'var(--gray-400)', fontWeight: 400, marginTop: '4px' }}>

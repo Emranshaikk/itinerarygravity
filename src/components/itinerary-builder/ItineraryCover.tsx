@@ -166,7 +166,7 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                     </div>
 
                     <div style={{ padding: '1.5rem', border: '1px solid var(--border)', borderRadius: '1rem', backgroundColor: 'var(--surface)' }}>
-                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: 'var(--foreground)', marginBottom: '1rem' }}>Seasonal Info</h3>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: 'var(--foreground)', marginBottom: '1rem' }}>Seasonal & Personal Info</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', fontWeight: 'bold' }}>Best Time to Visit</label>
@@ -177,6 +177,28 @@ export default function ItineraryCover({ data, onChange }: CoverSectionProps) {
                                     className="form-input"
                                     style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
                                     placeholder="e.g. March - May (Sakura Season)"
+                                />
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', fontWeight: 'bold' }}>When did YOU visit?</label>
+                                <input
+                                    name="visitDate"
+                                    value={data.visitDate || ""}
+                                    onChange={handleChange}
+                                    className="form-input"
+                                    style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
+                                    placeholder="e.g. April 2024"
+                                />
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', fontWeight: 'bold' }}>Who should AVOID this trip?</label>
+                                <textarea
+                                    name="avoidReason"
+                                    value={data.avoidReason || ""}
+                                    onChange={handleChange}
+                                    className="form-input"
+                                    style={{ backgroundColor: 'var(--input-bg)', color: 'var(--foreground)', minHeight: '80px', paddingTop: '12px' }}
+                                    placeholder="e.g. People who dislike walking or high humidity..."
                                 />
                             </div>
                         </div>

@@ -146,12 +146,14 @@ export default function FoodSection({ data, onChange }: FoodSectionProps) {
                     </div>
 
                     <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
                             <thead style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--gray-400)', borderBottom: '1px solid var(--border)' }}>
                                 <tr>
                                     <th style={{ padding: '1rem', fontWeight: 'bold' }}>Name</th>
-                                    <th style={{ padding: '1rem', fontWeight: 'bold', width: '120px' }}>Price</th>
-                                    <th style={{ padding: '1rem', fontWeight: 'bold', width: '180px' }}>Cuisine</th>
+                                    <th style={{ padding: '1rem', fontWeight: 'bold', width: '100px' }}>Price</th>
+                                    <th style={{ padding: '1rem', fontWeight: 'bold', width: '140px' }}>Cuisine</th>
+                                    <th style={{ padding: '1rem', fontWeight: 'bold', width: '140px' }}>Best Dish</th>
+                                    <th style={{ padding: '1rem', fontWeight: 'bold', width: '140px' }}>Avoid Dish</th>
                                     <th style={{ padding: '1rem', fontWeight: 'bold' }}>Expert Notes</th>
                                     <th style={{ padding: '1rem', width: '50px' }}></th>
                                 </tr>
@@ -205,6 +207,32 @@ export default function FoodSection({ data, onChange }: FoodSectionProps) {
                                         <td style={{ padding: '0.75rem' }}>
                                             <input
                                                 className="form-input"
+                                                style={{ border: 'none', width: '100%', background: 'transparent', color: '#10b981', fontWeight: '500' }}
+                                                placeholder="Must try..."
+                                                value={rest.bestDish || ""}
+                                                onChange={(e) => {
+                                                    const newRests = [...data.restaurantRecommendations];
+                                                    newRests[i].bestDish = e.target.value;
+                                                    updateField("restaurantRecommendations", newRests);
+                                                }}
+                                            />
+                                        </td>
+                                        <td style={{ padding: '0.75rem' }}>
+                                            <input
+                                                className="form-input"
+                                                style={{ border: 'none', width: '100%', background: 'transparent', color: '#ef4444' }}
+                                                placeholder="Skip this..."
+                                                value={rest.avoidDish || ""}
+                                                onChange={(e) => {
+                                                    const newRests = [...data.restaurantRecommendations];
+                                                    newRests[i].avoidDish = e.target.value;
+                                                    updateField("restaurantRecommendations", newRests);
+                                                }}
+                                            />
+                                        </td>
+                                        <td style={{ padding: '0.75rem' }}>
+                                            <input
+                                                className="form-input"
                                                 style={{ border: 'none', width: '100%', background: 'transparent', fontStyle: 'italic', color: 'var(--gray-400)' }}
                                                 placeholder="e.g. Try the pasta..."
                                                 value={rest.notes || ""}
@@ -224,6 +252,34 @@ export default function FoodSection({ data, onChange }: FoodSectionProps) {
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                {/* Regrets & Traps */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                    <div style={{ padding: '1.5rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ef4444', margin: 0 }}>
+                            <Trash2 size={18} /> Places I Regret
+                        </h3>
+                        <textarea
+                            className="form-input"
+                            style={{ minHeight: '100px', backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
+                            placeholder="Places that weren't worth the hype..."
+                            value={(data.placesToRegret || []).join('\n')}
+                            onChange={(e) => updateField("placesToRegret", e.target.value.split('\n'))}
+                        />
+                    </div>
+                    <div style={{ padding: '1.5rem', border: '1px solid var(--border)', borderRadius: '1.5rem', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ea580c', margin: 0 }}>
+                            <AlertTriangle size={18} /> Tourist Traps to Avoid
+                        </h3>
+                        <textarea
+                            className="form-input"
+                            style={{ minHeight: '100px', backgroundColor: 'var(--input-bg)', color: 'var(--foreground)' }}
+                            placeholder="Overpriced or poor quality traps..."
+                            value={(data.touristTrapsToAvoid || []).join('\n')}
+                            onChange={(e) => updateField("touristTrapsToAvoid", e.target.value.split('\n'))}
+                        />
                     </div>
                 </div>
 

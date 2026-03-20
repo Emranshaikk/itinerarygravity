@@ -11,7 +11,9 @@ export default function InfluencerDashboard() {
     const { data: session, status } = useSession();
     const [profile, setProfile] = useState<any>(null);
     const [itineraries, setItineraries] = useState<any[]>([]);
+    const [transactions, setTransactions] = useState<any[]>([]);
     const [totalEarnings, setTotalEarnings] = useState(0);
+    const [totalSales, setTotalSales] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -35,6 +37,8 @@ export default function InfluencerDashboard() {
             setProfile(data.profile);
             setItineraries(data.itineraries);
             setTotalEarnings(data.totalEarnings);
+            setTotalSales(data.totalSales || 0);
+            setTransactions(data.transactions || []);
         } catch (error) {
             console.error("Error fetching dashboard data:", error);
             alert("Error fetching dashboard data: " + (error as any).message);
@@ -272,6 +276,57 @@ export default function InfluencerDashboard() {
                         <p style={{ fontSize: '1.8rem', fontWeight: 700 }}>0.00</p>
                         <p style={{ fontSize: '0.75rem', color: 'var(--gray-400)', marginTop: '4px' }}>Based on 0 reviews</p>
                     </div>
+                </div>
+            </div>
+
+            {/* Payout Transparency Section */}
+            <div className="glass card" style={{ padding: '32px', marginBottom: '48px' }}>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <DollarSign size={20} color="var(--primary)" /> Payout Transparency & History
+                </h3>
+                <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                        <thead>
+                            <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', color: 'var(--gray-400)' }}>
+                                <th style={{ padding: '12px 16px' }}>Date</th>
+                                <th style={{ padding: '12px 16px' }}>Itinerary</th>
+                                <th style={{ padding: '12px 16px' }}>Price</th>
+                                <th style={{ padding: '12px 16px' }}>Fee (30%)</th>
+                                <th style={{ padding: '12px 16px' }}>Earnings (70%)</th>
+                                <th style={{ padding: '12px 16px' }}>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {transactions.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: 'var(--gray-400)' }}>
+                                        No transactions yet.
+                                    </td>
+                                </tr>
+                            ) : (
+                                transactions.map((tx: any) => (
+                                    <tr key={tx.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                                        <td style={{ padding: '12px 16px' }}>{new Date(tx.date).toLocaleDateString()}</td>
+                                        <td style={{ padding: '12px 16px', fontWeight: 600 }}>{tx.itineraryTitle}</td>
+                                        <td style={{ padding: '12px 16px' }}>{tx.currency === 'INR' ? '₹' : (tx.currency || '$')}{tx.amountPaid.toFixed(2)}</td>
+                                        <td style={{ padding: '12px 16px', color: '#ef4444' }}>-{tx.currency === 'INR' ? '₹' : (tx.currency || '$')}{tx.platformFee?.toFixed(2) || '0.00'}</td>
+                                        <td style={{ padding: '12px 16px', color: '#10b981', fontWeight: 700 }}>+{tx.currency === 'INR' ? '₹' : (tx.currency || '$')}{tx.creatorEarnings?.toFixed(2) || '0.00'}</td>
+                                        <td style={{ padding: '12px 16px' }}>
+                                            <span style={{
+                                                fontSize: '0.75rem',
+                                                padding: '2px 8px',
+                                                borderRadius: '99px',
+                                                background: tx.status === 'completed' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(234, 179, 8, 0.1)',
+                                                color: tx.status === 'completed' ? '#10b981' : '#eab308'
+                                            }}>
+                                                {tx.status}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 

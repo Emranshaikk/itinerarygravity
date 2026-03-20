@@ -146,8 +146,10 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
 
     const purchaseCount = itinerary.purchases?.length || 0;
     const socialProofs = [
-        ...(purchaseCount > 0 ? [{ id: 'sales', text: `${purchaseCount} people purchased since launch.`, type: 'sales' }] : []),
-        { id: 'views', text: "Popular! 5 people are viewing this right now", type: 'views' }
+        ...(purchaseCount > 0 ? [{ id: 'sales', text: `${purchaseCount} travelers have unlocked this guide.`, type: 'sales' }] : []),
+        { id: 'views', text: "8 people are planning their trip right now", type: 'views' },
+        { id: 'recent', text: "Trending! 3 bookings in the last 24 hours", type: 'sales' },
+        { id: 'verified', text: "100% Expert Verified Itinerary", type: 'info' }
     ];
 
     useEffect(() => {
@@ -190,6 +192,46 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
 
     const handleShare = () => {
         setIsShareModalOpen(true);
+    };
+
+    const CountdownTimer = () => {
+        const [timeLeft, setTimeLeft] = useState({ hours: 2, minutes: 45, seconds: 0 });
+
+        useEffect(() => {
+            const timer = setInterval(() => {
+                setTimeLeft(prev => {
+                    let s = prev.seconds - 1;
+                    let m = prev.minutes;
+                    let h = prev.hours;
+
+                    if (s < 0) {
+                        s = 59;
+                        m -= 1;
+                    }
+                    if (m < 0) {
+                        m = 59;
+                        h -= 1;
+                    }
+                    if (h < 0) {
+                        return { hours: 2, minutes: 45, seconds: 0 };
+                    }
+                    return { hours: h, minutes: m, seconds: s };
+                });
+            }, 1000);
+            return () => clearInterval(timer);
+        }, []);
+
+        const formatTime = (val: number) => val.toString().padStart(2, '0');
+
+        return (
+            <div style={{ display: 'flex', gap: '8px', fontSize: '1.2rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--primary)', marginTop: '8px' }}>
+                <div style={{ background: 'rgba(255,133,162,0.1)', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,133,162,0.2)' }}>{formatTime(timeLeft.hours)}h</div>
+                <div style={{ alignSelf: 'center', opacity: 0.5 }}>:</div>
+                <div style={{ background: 'rgba(255,133,162,0.1)', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,133,162,0.2)' }}>{formatTime(timeLeft.minutes)}m</div>
+                <div style={{ alignSelf: 'center', opacity: 0.5 }}>:</div>
+                <div style={{ background: 'rgba(255,133,162,0.1)', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,133,162,0.2)' }}>{formatTime(timeLeft.seconds)}s</div>
+            </div>
+        );
     };
 
     const handleReviewSubmitted = async () => {
@@ -452,10 +494,9 @@ export default function ItineraryClientPage({ id, initialData, initialIsPurchase
                                     <span style={{ fontSize: '1rem', color: 'var(--gray-400)', marginLeft: '8px', fontWeight: 500 }}>{itinerary.priceType}</span>
                                 </h2>
 
-                                <div style={{ background: 'rgba(255,133,162,0.1)', border: '1px solid var(--primary)', borderRadius: '8px', padding: '8px 12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <div style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.85rem' }}>Limited Time Price</div>
-                                    <div style={{ background: 'var(--primary)', height: '14px', width: '1px' }}></div>
-                                    <div style={{ color: 'var(--foreground)', fontSize: '0.8rem', fontWeight: 500 }}>Saves 20+ hours of prep</div>
+                                <div style={{ background: 'rgba(255,133,162,0.1)', border: '1px solid var(--primary)', borderRadius: '12px', padding: '16px', marginBottom: '20px' }}>
+                                    <div style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Special Sale Ends In</div>
+                                    <CountdownTimer />
                                 </div>
 
                                 {!isPurchased ? (
